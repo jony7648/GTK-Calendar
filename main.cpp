@@ -6,18 +6,17 @@
 #include "project/scenes.h"
 #include "gtk_componets.h"
 #include "core/time_componet.h"
+#include "core/messenger.h"
 #include "util.h"
 
 
 void activate(GtkApplication* gtk_app, gpointer user_data) {
 	std::string title = "Calendar";
 
-	MessengerData<App*>* signal_data = (MessengerData<App*>*)(user_data);
-	App* app = signal_data->dataVector.at(0);
-	Window* window = new Window(gtk_app, title, app->get_win_dimensions());
+	core::MessengerData<core::App>* signal_data = (core::MessengerData<core::App>*)(user_data);
+	core::App* app = signal_data->object;
+	core::Window* window = new core::Window(gtk_app, title, app->get_win_dimensions());
 	core::TimeComponet* time_componet = app->get_time_componet();
-
-
 
 	Scene* main_scene = calender::create_main_scene(time_componet);
 
@@ -30,13 +29,13 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 int main(int argc, char *argv[]) {
 	space::Point win_dimensions;
 
-	MessengerData<App*> signal;
+	core::MessengerData<core::App> signal;
 
 	win_dimensions.x = 600;
 	win_dimensions.y = 600;
-	App app("org.jony.test", win_dimensions, argc, argv);
+	core::App app("org.jony.test", win_dimensions, argc, argv);
 
-	signal.dataVector.push_back(&app);
+	signal.object = &app;
 
 	app.run(&activate, &signal);
 }

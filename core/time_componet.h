@@ -32,6 +32,7 @@ struct TimeComponet {
 	void set_minute_and_hour(const std::string& str);
 	int get_day_count();
 	int get_day_count(int month);
+	int get_starting_weekday();
 	int get_starting_weekday(int month);
 
 };

@@ -2,6 +2,7 @@
 #include "window.h"
 
 
+namespace core {
 Window::Window(GtkApplication* gtk_app_ptr, const std::string& title, const space::Point& dimensions) {
 	this->title = title;
 	this->dimensions.x = dimensions.x;
@@ -39,4 +40,5 @@ void Window::display() {
 
 GtkWidget* Window::get_gtk_window() {
 	return gtk_window;
+}
 }

@@ -3,7 +3,40 @@
 #include "util.h"
 
 namespace util {
+int cycle_thorugh_bounds(int start_value, int cycle_count, int start_bound, int end_bound) {
+	//int cycled_position = start_value + cycle_count;
+	int bound_len = end_bound - start_bound;
+
+	if (bound_len <= 0) {
+		return start_value;
+	}
+
+	int cycled_position = 0;
+	cycled_position = (start_value + cycle_count) % (bound_len+1);
+
+
+
+
+	//cycled_position++;
+	//
+
+
+	std::cout << cycled_position << "\n";
+/*
+	while (cycled_position > end_bound) {
+		start_value 
+
+		cycled_position--;			
+	}
+	*/
+
+
+
+	return start_value;
+}
+
 std::vector<std::string>& str_split(std::vector<std::string>& store_vector, const std::string& str, char split_char) {
+	//this function splits a string when it hits a specified character
 	size_t strlen = str.length();
 	int copy_count = 0;
 	int sub_start = 0;

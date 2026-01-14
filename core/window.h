@@ -4,6 +4,7 @@
 #include "space.h"
 #include "scene.h"
 
+namespace core {
 class Window {
 private:
 	std::string title = "";
@@ -22,3 +23,4 @@ public:
 
 	void set_scene(Scene* scene);
 };
+}

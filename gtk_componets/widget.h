@@ -1,7 +1,9 @@
 #pragma once
 #include <iostream>
+#include <vector>
 #include <gtk/gtk.h>
 #include "core/space.h"
+#include "core/messenger.h"
 
 namespace gtkc {
 class Widget {
@@ -13,6 +15,7 @@ private:
 	space::Point scale;
 	GtkWidget* gtk_widget;
 	std::string gtk_widget_type = "";
+	std::vector<core::MessengerData<Widget>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
 
 public:
 	Widget();
@@ -30,8 +33,12 @@ public:
 	void set_grid_point(int x, int y);
 	const space::Point& get_grid_point();
 
-
-
 	const std::string& get_gtk_widget_type();
+
+	void set_messenger_data(core::MessengerData<Widget>* messenger_data);
+	core::MessengerData<Widget>* get_messenger_data();
+	void signal_connect(const std::string& emit_type, void(*activate_func)());
+	void signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget));
+	void signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget), core::MessengerData<Widget>* messenger_data);
 };
 }

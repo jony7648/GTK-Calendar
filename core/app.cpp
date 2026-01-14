@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include "app.h"
 
+namespace core {
 App::App(const std::string& app_title, const space::Point& dimensions, int argc, char* argv[]) {
 	this->win_dimensions.x = dimensions.x;
 	this->win_dimensions.y = dimensions.y;
@@ -23,7 +24,7 @@ void App::attach_window(Window* window) {
 	this->window = window;
 }
 
-void App::run(void(*activate_func)(GtkApplication* app, gpointer), MessengerData<App*>* signal_ptr) {
+void App::run(void(*activate_func)(GtkApplication* app, gpointer), core::MessengerData<App>* signal_ptr) {
 	//g_signal_connect(this->gtk_app, "activate", G_CALLBACK(activate_func), NULL);
 	g_signal_connect(gtk_app, "activate", G_CALLBACK(activate_func), signal_ptr);
 
@@ -37,6 +38,4 @@ core::TimeComponet* App::get_time_componet() {
 const space::Point& App::get_win_dimensions() {
 	return win_dimensions;
 }
-
-
-
+}

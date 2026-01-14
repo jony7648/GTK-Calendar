@@ -10,7 +10,14 @@ Widget::Widget() {
 }
 
 Widget::~Widget() {
-	if (get_gtk_widget() == nullptr) {
+	//clean up messengers
+	for (core::MessengerData<Widget>* data : messenger_vector) {
+		if (data) {
+			delete data;
+		}
+	}
+
+	if (gtk_widget) {
 		g_object_unref(get_gtk_widget());
 	}
 }
@@ -52,4 +59,18 @@ const space::Point& Widget::get_grid_point() {
 	return grid_point;
 }
 
+
+void Widget::signal_connect(const std::string& emit_type, void(*activate_func)()) {
+	g_signal_connect(this->get_gtk_widget(), emit_type.c_str(), G_CALLBACK (activate_func), nullptr);
+}
+
+void Widget::signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget)) {
+	g_signal_connect(this->get_gtk_widget(), emit_type.c_str(), G_CALLBACK (activate_func), nullptr);
+}
+
+void Widget::signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget), core::MessengerData<Widget>* messenger_data) {
+	g_signal_connect(this->get_gtk_widget(), emit_type.c_str(), G_CALLBACK (activate_func), nullptr);
+
+	messenger_vector.push_back(messenger_data);
+}
 }

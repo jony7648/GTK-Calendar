@@ -5,6 +5,22 @@
 #include "util.h"
 #include "time_componet.h"
 
+enum CTIME_INDEX {
+	CTIME_WEEKDAY,
+	CTIME_MONTH,
+	CTIME_DAY,
+	CTIME_TIME,
+	CTIME_YEAR,
+};
+
+void readable_time_to_vector(std::vector<std::string>& time_vector) {
+	time_t current_time;
+	time(&current_time);
+
+	std::string readable_time = std::ctime(&current_time);
+	util::str_split(time_vector, readable_time, ' ');
+}
+
 namespace core {
 TimeComponet::TimeComponet() {
 	weekday_arr[0] = "Sun";
@@ -85,42 +101,30 @@ void TimeComponet::set_minute_and_hour(const std::string& time_str) {
 }
 
 void TimeComponet::calculate_from_current_time() {
-	enum {
-		WEEKDAY_INDEX,
-		MONTH_INDEX,
-		DAY_INDEX,
-		TIME_INDEX,
-		YEAR_INDEX,
-	};
+	
 
-
-	time_t current_time;
-	time(&current_time);
-
-	std::string readable_time = std::ctime(&current_time);
 	std::vector<std::string> time_vector;
 
-
-	util::str_split(time_vector, readable_time, ' ');
+	readable_time_to_vector(time_vector);
 
 	int attrib_value = 0;
 
 	for (int i=0; i<time_vector.size(); i++) {
 		const std::string& str = time_vector.at(i);
 		switch (i) {
-			case DAY_INDEX:
+			case CTIME_DAY:
 				this->day = std::stoi(str);
 				break;
-			case MONTH_INDEX:
+			case CTIME_MONTH:
 				this->month = month_to_int(str);
 				break;
-			case WEEKDAY_INDEX:
+			case CTIME_WEEKDAY:
 				this->weekday = weekday_to_int(str);
 				break;
-			case TIME_INDEX:
+			case CTIME_TIME:
 				set_minute_and_hour(str);
 				break;
-			case YEAR_INDEX:
+			case CTIME_YEAR:
 				this->year = std::stoi(str);
 				break;
 
@@ -148,10 +152,30 @@ int TimeComponet::get_day_count(int month) {
 
 
 
-int get_starting_weekday() {
+int TimeComponet::get_starting_weekday() {
 	//this meathod will return the weekday that the month starts on
-	//NEEDS TO BE IMPLEMENTED
-	return 0;
+	
+	std::string weekday_str = "";
+	std::string day_str = "";
+	int day_value = 0;
+	int weekday_value = 0;
+	int start_value = 0;
+	int starting_weekday = 0;
+
+	std::vector<std::string> time_vector;
+	readable_time_to_vector(time_vector);
+
+	weekday_str = time_vector.at(CTIME_WEEKDAY);
+	day_str = time_vector.at(CTIME_DAY);
+
+	day_value = std::stoi(day_str);
+	weekday_value = weekday_to_int(weekday_str);
+
+	start_value = day_value + weekday_value;
+
+	starting_weekday = util::cycle_thorugh_bounds(4, 14, 0, 6);
+
+	return starting_weekday;
 		
 }
 }
