@@ -7,7 +7,6 @@
 #include "gtk_componets.h"
 #include "core/time_componet.h"
 #include "util.h"
-//#include <gdk-pixbuf/gdk-pixbuf>
 
 
 void activate(GtkApplication* gtk_app, gpointer user_data) {
@@ -29,9 +28,6 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 }
 
 int main(int argc, char *argv[]) {
-	//util::str_split(result, "Jonathan Walker", ' ');
-	//std::cout << result.at(0) << "\n";
-	//time.calculate_from_current_time();
 	space::Point win_dimensions;
 
 	MessengerData<App*> signal;
