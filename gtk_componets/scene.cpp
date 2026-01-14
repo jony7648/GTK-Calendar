@@ -1,0 +1,23 @@
+#include <iostream>
+#include <gtk/gtk.h>
+#include <core/time_componet.h>
+#include "scene.h"
+
+Scene::Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing) {
+	this->name = name;
+	container = new gtkc::GridContainer("MainSceneContainer", 30, 30);
+	//gtk_container->widget_spacing.x = widget_x_spacing;
+	//this->widget_spacing.y = widget_y_spacing;
+}
+
+Scene::~Scene() {
+	delete container;	
+}
+
+void Scene::set_time_componet(core::TimeComponet* time_componet) {
+	this->time_componet = time_componet;
+}
+
+core::TimeComponet* Scene::get_time_componet() {
+	return time_componet;
+}
