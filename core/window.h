@@ -18,7 +18,7 @@ public:
 	GtkWidget* get_gtk_window();
 	Window(GtkApplication* gtk_app_ptr, const std::string& title, const space::Point& dimensions);
 	~Window();
-	void display();
+	void display(GtkWidget* gtk_container);
 
 
 	void set_scene(Scene* scene);

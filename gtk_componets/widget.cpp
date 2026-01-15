@@ -59,6 +59,14 @@ const space::Point& Widget::get_grid_point() {
 	return grid_point;
 }
 
+bool Widget::get_hexpand() {
+	return hexpand;
+}
+
+bool Widget::get_vexpand() {
+	return vexpand;
+}
+
 
 void Widget::signal_connect(const std::string& emit_type, void(*activate_func)()) {
 	g_signal_connect(this->get_gtk_widget(), emit_type.c_str(), G_CALLBACK (activate_func), nullptr);

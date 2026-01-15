@@ -14,8 +14,8 @@ set(PROJECT_DIR "project")
 set(CORE_DIR "core")
 
 set(PROJECT_COMPONETS "${PROJECT_DIR}/scenes.cpp")
-set(WIDGET_COMPONETS "${WIDGET_DIR}/scene.cpp" "${WIDGET_DIR}/widget.cpp" "${WIDGET_DIR}/button_widget.cpp" "${WIDGET_DIR}/container.cpp" "${WIDGET_DIR}/grid_container.cpp" "${WIDGET_DIR}/label.cpp")
-set(CORE_COMPONETS "${CORE_DIR}/app.cpp" "${CORE_DIR}/window.cpp" "${CORE_DIR}/space.cpp" "${CORE_DIR}/util.cpp" "${CORE_DIR}/time_componet.cpp")
+set(WIDGET_COMPONETS  "${WIDGET_DIR}/widget.cpp" "${WIDGET_DIR}/button_widget.cpp" "${WIDGET_DIR}/container.cpp" "${WIDGET_DIR}/grid_container.cpp" "${WIDGET_DIR}/label.cpp")
+set(CORE_COMPONETS "${CORE_DIR}/app.cpp" "${CORE_DIR}/window.cpp" "${CORE_DIR}/space.cpp" "${CORE_DIR}/util.cpp" "${CORE_DIR}/time_componet.cpp" "${CORE_DIR}/scene.cpp")
 
 
 add_executable(my_app main.cpp ${CORE_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})

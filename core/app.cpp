@@ -31,6 +31,35 @@ void App::run(void(*activate_func)(GtkApplication* app, gpointer), core::Messeng
 	app_status = g_application_run(G_APPLICATION(gtk_app), 0, argv);
 }
 
+void App::set_scene(core::Scene* scene) {
+	if (window == nullptr) {
+		std::cout << "ERROR: the app does not have a window attached!\n";
+		return;
+	}
+	
+	if (scene == nullptr) {
+		std::cout << "ERROR: the new scene isa nullptr!\n";
+		return;
+	}
+
+	gtk_window_set_child(GTK_WINDOW(window->get_gtk_window()), scene->container->get_gtk_widget());
+
+	if (current_scene != nullptr) {
+		delete current_scene;
+	}
+
+	current_scene = scene;
+	//current_scene->container->win_dimensions();
+}
+
+void App::display_window() {
+	window->display(current_scene->container->get_gtk_widget());
+}
+
+GtkWidget* App::get_scene_container() {
+	return current_scene->container->get_gtk_widget();
+}
+
 core::TimeComponet* App::get_time_componet() {
 	return &time_componet;
 }

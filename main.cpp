@@ -18,12 +18,12 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	core::Window* window = new core::Window(gtk_app, title, app->get_win_dimensions());
 	core::TimeComponet* time_componet = app->get_time_componet();
 
-	Scene* main_scene = calender::create_main_scene(time_componet);
+	core::Scene* main_scene = calender::create_main_scene(time_componet);
 
 	main_scene->container->present_widgets();
-	window->set_scene(main_scene);
-	window->display();
 	app->attach_window(window);
+	app->set_scene(main_scene);
+	app->display_window();
 }
 
 int main(int argc, char *argv[]) {

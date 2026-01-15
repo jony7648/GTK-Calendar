@@ -85,20 +85,54 @@ void Container::present_widgets() {
 	//meathod takes widgets from the children_vector and displays them
 
 	GtkWidget* gtk_widget = get_gtk_widget();
-	const space::Point& widget_spacing = get_scale();
 
 	gtk_grid_set_column_spacing(GTK_GRID(gtk_widget), widget_spacing.x);
 	gtk_grid_set_row_spacing(GTK_GRID(gtk_widget), widget_spacing.y);
-	gtk_widget_set_halign(gtk_widget, GTK_ALIGN_CENTER);
-	gtk_widget_set_valign(gtk_widget, GTK_ALIGN_END);
+	gtk_widget_set_halign(gtk_widget, halign);
+	gtk_widget_set_valign(gtk_widget, valign);
+
+	bool child_hexpand = false;
+	bool child_vexpand = false;
+	
 
 	for (Widget* widget : children_vector) {
 		const space::Point& widget_scale = widget->get_scale();
 		const space::Point& widget_grid_point = widget->get_grid_point();
+		GtkWidget* child_gtk_widget = widget->get_gtk_widget();
+		child_hexpand = widget->get_hexpand();
+		child_vexpand = widget->get_vexpand();
 
-		gtk_grid_attach(GTK_GRID(gtk_widget), widget->get_gtk_widget(), widget_grid_point.x,widget_grid_point.y,widget_scale.x,widget_scale.y);
-		//gtk_widget_set_size_request(widget->get_gtk_widget(), widget_scale.x, widget_scale.y);
+		gtk_grid_attach(GTK_GRID(gtk_widget), child_gtk_widget, widget_grid_point.x,widget_grid_point.y,widget_scale.x,widget_scale.y);
+
+		gtk_widget_set_hexpand(child_gtk_widget, child_hexpand);
+		gtk_widget_set_vexpand(child_gtk_widget, child_vexpand);
+
+				//gtk_widget_set_size_request(widget->get_gtk_widget(), widget_scale.x, widget_scale.y);
 
 	}
+}
+
+void Container::set_valign(GtkAlign align) {
+	valign = align;
+	gtk_widget_set_valign(get_gtk_widget(), align);
+}
+
+void Container::set_halign(GtkAlign align) {
+	halign = align;
+	gtk_widget_set_valign(get_gtk_widget(), align);
+}
+
+void Container::set_widget_spacing(int x, int y) {
+	widget_spacing.x = x;
+	widget_spacing.y = y;
+}
+
+void Container::set_widget_spacing(int xy) {
+	widget_spacing.x = xy;	
+	widget_spacing.y = xy;	
+}
+
+const space::Point& Container::get_widget_spacing() {
+	return widget_spacing;
 }
 }

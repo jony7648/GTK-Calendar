@@ -13,6 +13,8 @@ private:
 	space::Rect transform;
 	space::Point grid_point;
 	space::Point scale;
+	bool hexpand = true;
+	bool vexpand = true;
 	GtkWidget* gtk_widget;
 	std::string gtk_widget_type = "";
 	std::vector<core::MessengerData<Widget>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
@@ -34,6 +36,9 @@ public:
 	const space::Point& get_grid_point();
 
 	const std::string& get_gtk_widget_type();
+
+	bool get_hexpand();
+	bool get_vexpand();
 
 	void set_messenger_data(core::MessengerData<Widget>* messenger_data);
 	core::MessengerData<Widget>* get_messenger_data();

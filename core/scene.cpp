@@ -3,6 +3,7 @@
 #include <core/time_componet.h>
 #include "scene.h"
 
+namespace core {
 Scene::Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing) {
 	this->name = name;
 	container = new gtkc::GridContainer("MainSceneContainer", 30, 30);
@@ -20,4 +21,5 @@ void Scene::set_time_componet(core::TimeComponet* time_componet) {
 
 core::TimeComponet* Scene::get_time_componet() {
 	return time_componet;
+}
 }

@@ -4,9 +4,6 @@
 #include "scenes.h"
 #include "util.h"
 
-void TEST_FOR_SIGNAL() {
-	std::cout << "SIGNAL THING WORKED YESSSSSS" << "\n";	
-}
 
 static void add_cal_days(std::vector<gtkc::Widget*>& widget_vector, int day_count, int starting_weekday) {
 	std::string days_of_week[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -46,7 +43,7 @@ static void add_cal_days(std::vector<gtkc::Widget*>& widget_vector, int day_coun
 		button_text = std::to_string(btn_index);
 		widget = new gtkc::ButtonWidget(name, button_text, grid_x, grid_y, row_count, column_count);
 		widget_vector.push_back(widget);
-		widget->signal_connect("clicked", &TEST_FOR_SIGNAL);
+		//widget->signal_connect("clicked", &TEST_FOR_SIGNAL);
 		grid_x++;
 	}
 }
@@ -54,12 +51,17 @@ static void add_cal_days(std::vector<gtkc::Widget*>& widget_vector, int day_coun
 
 
 namespace calender {
+	core::Scene* create_main_scene(core::TimeComponet* time_componet) {
 
-Scene* create_main_scene(core::TimeComponet* time_componet) {
 
 	const std::string scene_name = "Main Scene";
 
-	Scene* scene = new Scene("Main Scene", 32,5);
+	core::Scene* scene = new core::Scene("Main Scene", 32,5);
+	gtkc::Container* main_container = scene->container;
+	main_container->set_valign(GTK_ALIGN_FILL);
+	main_container->set_halign(GTK_ALIGN_FILL);
+	main_container->set_widget_spacing(15);
+	
 
 	std::vector<gtkc::Widget*> widget_vector;
 

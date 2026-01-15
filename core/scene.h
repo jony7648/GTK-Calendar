@@ -6,6 +6,7 @@
 #include "gtk_componets.h"
 
 
+namespace core {
 class Scene {
 private:
 	std::string name = "";
@@ -18,3 +19,4 @@ public:
 	core::TimeComponet* get_time_componet();
 	gtkc::Container* container = nullptr;
 };
+}

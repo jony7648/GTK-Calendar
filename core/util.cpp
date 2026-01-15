@@ -14,24 +14,6 @@ int cycle_thorugh_bounds(int start_value, int cycle_count, int start_bound, int 
 	int cycled_position = 0;
 	cycled_position = (start_value + cycle_count) % (bound_len+1);
 
-
-
-
-	//cycled_position++;
-	//
-
-
-	std::cout << cycled_position << "\n";
-/*
-	while (cycled_position > end_bound) {
-		start_value 
-
-		cycled_position--;			
-	}
-	*/
-
-
-
 	return start_value;
 }
 

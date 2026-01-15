@@ -6,12 +6,14 @@
 #include "space.h"
 #include "window.h"
 #include "time_componet.h"
+#include "scene.h"
 
 
 namespace core {
 class App {
 private:
 	Window* window = nullptr;
+	Scene* current_scene = nullptr;
 	GtkApplication* gtk_app = nullptr;
 	core::TimeComponet time_componet;
 	std::string title;
@@ -25,6 +27,9 @@ public:
 	~App();
 	void run(void(*activate_func)(GtkApplication*, gpointer), core::MessengerData<App>* signal_ptr);
 	void attach_window(Window* window);
+	void set_scene(core::Scene* scene);
+	void display_window();
+	GtkWidget* get_scene_container();
 	core::TimeComponet* get_time_componet();
 	const space::Point& get_win_dimensions();
 

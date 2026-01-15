@@ -22,16 +22,13 @@ void Window::set_scene(Scene* scene) {
 	}
 }
 
-void Window::display() {
+void Window::display(GtkWidget* gtk_container) {
+	/*
 	if (current_scene == nullptr) {
 		std::cout << "ERROR: current_scene is nullptr!\n";
 		return;
 	}
-
-	GtkWidget* gtk_container = current_scene->container->get_gtk_widget();
-	//
-	//
-	//
+	*/
 
 	gtk_window_set_default_size(GTK_WINDOW(gtk_window), dimensions.x, dimensions.y);
 	gtk_window_present(GTK_WINDOW(gtk_window));
