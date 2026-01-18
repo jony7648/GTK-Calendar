@@ -1,0 +1,11 @@
+install msys2
+
+pacman -S mingw-w64-x86_64-gtk4
+mingw-w64-x86_64-pkg-config
+mingw-w64-x86_64-cmake
+cmake
+
+use cd /c/
+
+pacman -S --needed base-devel mingw-w64-x86_64-toolchain
+pacman -S build-devel gcc

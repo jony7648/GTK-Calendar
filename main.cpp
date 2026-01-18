@@ -7,7 +7,7 @@
 #include "gtk_componets.h"
 #include "core/time_componet.h"
 #include "core/messenger.h"
-#include "util.h"
+#include "core/util.h"
 
 void activate(GtkApplication* gtk_app, gpointer user_data) {
 	std::string title = "Calendar";

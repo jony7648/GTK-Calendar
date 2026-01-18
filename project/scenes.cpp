@@ -3,7 +3,7 @@
 #include "gtk_componets.h"
 #include "scenes.h"
 #include "core/window.h"
-#include "util.h"
+#include "core/util.h"
 
 
 static void add_cal_days(std::vector<gtkc::Widget*>& widget_vector, int day_count, int starting_weekday) {
