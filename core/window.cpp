@@ -1,5 +1,6 @@
 #include <iostream>
 #include "window.h"
+#include "app.h"
 
 
 namespace core {
@@ -12,7 +13,7 @@ Window::Window(GtkApplication* gtk_app_ptr, const std::string& title, const spac
 }
 
 Window::~Window() {
-
+	gtk_window_close(GTK_WINDOW(gtk_window));
 }
 
 void Window::set_scene(Scene* scene) {
@@ -22,7 +23,7 @@ void Window::set_scene(Scene* scene) {
 	}
 }
 
-void Window::display(GtkWidget* gtk_container) {
+Error Window::display(Scene* scene) {
 	/*
 	if (current_scene == nullptr) {
 		std::cout << "ERROR: current_scene is nullptr!\n";
@@ -30,9 +31,53 @@ void Window::display(GtkWidget* gtk_container) {
 	}
 	*/
 
+	if (scene == nullptr) {
+		std::cout << "ERROR: Can't display a scene that is a nullptr\n";
+		return Error::NULLPTR;
+	}
+	if (scene->container == nullptr) {
+		std::cout << "ERROR: Scene container is a nullptr!";
+		return Error::NULLPTR;
+	}
+
+	if (scene->container->get_gtk_widget() == nullptr) {
+		std::cout << "ERROR: The gtk widget of the scene container is a nullptr";
+		return Error::NULLPTR;
+	}
+
 	gtk_window_set_default_size(GTK_WINDOW(gtk_window), dimensions.x, dimensions.y);
 	gtk_window_present(GTK_WINDOW(gtk_window));
-	gtk_widget_set_size_request(gtk_container, dimensions.x, dimensions.y);
+	gtk_widget_set_size_request(scene->container->get_gtk_widget(), dimensions.x, dimensions.y);
+
+	return Error::CLEAR;
+}
+
+
+
+void Window::signal_set_close(core::App* app, bool(*func)(GtkWidget* widget, gpointer user_data)) {
+	if (func == nullptr) {
+		return;
+	}
+
+	auto* messenger = new DoubleMessenger<App*, Window*>;
+	messenger->object1 = app;
+	messenger->object2 = this;
+
+	g_signal_connect(gtk_window, "close-request", G_CALLBACK (func), messenger);
+	
+	//_signal_close = func;
+}
+
+void Window::set_as_main_window() {
+	is_main_window = true;
+}
+
+bool Window::get_is_main_window() {
+	return is_main_window;
+}
+
+void Window::set_dimensions(const space::Point& dimensions) {
+	this->dimensions = dimensions;
 }
 
 GtkWidget* Window::get_gtk_window() {

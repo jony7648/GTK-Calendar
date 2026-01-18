@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include "gtk_componets.h"
 #include "scenes.h"
+#include "core/window.h"
 #include "util.h"
 
 
@@ -51,10 +52,9 @@ static void add_cal_days(std::vector<gtkc::Widget*>& widget_vector, int day_coun
 
 
 namespace calender {
-	core::Scene* create_main_scene(core::TimeComponet* time_componet) {
-
-
+core::Scene* create_main_scene(core::Window* window, core::TimeComponet* time_componet) {
 	const std::string scene_name = "Main Scene";
+	
 
 	core::Scene* scene = new core::Scene("Main Scene", 32,5);
 	gtkc::Container* main_container = scene->container;
@@ -75,5 +75,16 @@ namespace calender {
 
 
 	return scene;
+}
+
+core::Scene* create_note_scene() {
+	const std::string scene_name = "Note Scene";
+	space::Point widget_spacing;
+	widget_spacing.x = 32;
+	widget_spacing.y = 30;
+
+	core::Scene* scene = new core::Scene(scene_name, widget_spacing.x, widget_spacing.y);
+
+	return scene;	
 }
 }

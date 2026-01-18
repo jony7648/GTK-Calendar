@@ -15,6 +15,14 @@ Scene::~Scene() {
 	delete container;	
 }
 
+void Scene::set_custom_dimensions(const space::Point& dimensions) {
+	this->custom_dimensions = dimensions;
+}
+
+const space::Point& Scene::get_custom_dimensions() {
+	return custom_dimensions;
+}
+
 void Scene::set_time_componet(core::TimeComponet* time_componet) {
 	this->time_componet = time_componet;
 }

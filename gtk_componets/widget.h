@@ -17,7 +17,7 @@ private:
 	bool vexpand = true;
 	GtkWidget* gtk_widget;
 	std::string gtk_widget_type = "";
-	std::vector<core::MessengerData<Widget>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
+	std::vector<core::Messenger<Widget*>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
 
 public:
 	Widget();
@@ -40,10 +40,10 @@ public:
 	bool get_hexpand();
 	bool get_vexpand();
 
-	void set_messenger_data(core::MessengerData<Widget>* messenger_data);
-	core::MessengerData<Widget>* get_messenger_data();
+	void set_messenger_data(core::Messenger<Widget>* messenger_data);
+	core::Messenger<Widget>* get_messenger_data();
 	void signal_connect(const std::string& emit_type, void(*activate_func)());
 	void signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget));
-	void signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget), core::MessengerData<Widget>* messenger_data);
+	void signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget), core::Messenger<Widget*>* messenger_data);
 };
 }

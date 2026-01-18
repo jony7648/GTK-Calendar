@@ -11,7 +11,7 @@ Widget::Widget() {
 
 Widget::~Widget() {
 	//clean up messengers
-	for (core::MessengerData<Widget>* data : messenger_vector) {
+	for (core::Messenger<Widget*>* data : messenger_vector) {
 		if (data) {
 			delete data;
 		}
@@ -76,7 +76,7 @@ void Widget::signal_connect(const std::string& emit_type, void(*activate_func)(G
 	g_signal_connect(this->get_gtk_widget(), emit_type.c_str(), G_CALLBACK (activate_func), nullptr);
 }
 
-void Widget::signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget), core::MessengerData<Widget>* messenger_data) {
+void Widget::signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget), core::Messenger<Widget*>* messenger_data) {
 	g_signal_connect(this->get_gtk_widget(), emit_type.c_str(), G_CALLBACK (activate_func), nullptr);
 
 	messenger_vector.push_back(messenger_data);

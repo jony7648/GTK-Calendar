@@ -14,7 +14,7 @@ int cycle_thorugh_bounds(int start_value, int cycle_count, int start_bound, int 
 	int cycled_position = 0;
 	cycled_position = (start_value + cycle_count) % (bound_len+1);
 
-	return start_value;
+	return cycled_position;
 }
 
 std::vector<std::string>& str_split(std::vector<std::string>& store_vector, const std::string& str, char split_char) {
