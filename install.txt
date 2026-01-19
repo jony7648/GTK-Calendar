@@ -9,3 +9,4 @@ use cd /c/
 
 pacman -S --needed base-devel mingw-w64-x86_64-toolchain
 pacman -S build-devel gcc
+setx PATH "%PATH%;C:\msys64\mingw64\bin"
