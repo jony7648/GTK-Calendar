@@ -5,8 +5,12 @@
 #include "core/window.h"
 #include "core/util.h"
 
+static void signal_open_note_window(gtkc::Message* message) {
+	std::cout << "Nugget worked yes\n";	
+}
 
-static void add_cal_days(std::vector<gtkc::Widget*>& widget_vector, int day_count, int starting_weekday) {
+
+static void add_cal_days(core::Scene* scene, std::vector<gtkc::Widget*>& widget_vector, int day_count, int starting_weekday) {
 	std::string days_of_week[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 	gtkc::Widget* widget = nullptr;
@@ -26,9 +30,9 @@ static void add_cal_days(std::vector<gtkc::Widget*>& widget_vector, int day_coun
 		button_text = days_of_week[i];
 		grid_x = i;
 		grid_y = 0;
-
 		widget = new gtkc::Label(name, button_text, grid_x, grid_y, 1,1);
 		widget_vector.push_back(widget);
+		
 	}
 
 	
@@ -44,6 +48,7 @@ static void add_cal_days(std::vector<gtkc::Widget*>& widget_vector, int day_coun
 		button_text = std::to_string(btn_index);
 		widget = new gtkc::ButtonWidget(name, button_text, grid_x, grid_y, row_count, column_count);
 		widget_vector.push_back(widget);
+		widget->listener.connect(scene->listener, signal_open_note_window, "clicked");
 		//widget->signal_connect("clicked", &TEST_FOR_SIGNAL);
 		grid_x++;
 	}
@@ -69,7 +74,7 @@ core::Scene* create_main_scene(core::Window* window, core::TimeComponet* time_co
 
 	int starting_weekday = time_componet->get_starting_weekday();
 	
-	add_cal_days(widget_vector, day_count, starting_weekday);
+	add_cal_days(scene, widget_vector, day_count, starting_weekday);
 
 	scene->container->add_widget_vector(widget_vector);
 

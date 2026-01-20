@@ -2,6 +2,9 @@
 #include <gtk/gtk.h>
 #include <iostream>
 #include <unordered_map>
+
+namespace gtkc{class Widget;};
+
 namespace core {
 template <typename T>
 struct Messenger {
@@ -20,12 +23,11 @@ struct DataMessenger {
 	T2 data = nullptr;
 };
 
-class Listener {
-private:
-	std::unordered_map<std::string, gpointer (*)()> event_map;
-	
-public:
-	void connect(std::string emit_type, void(*signal_func)(std::string, gpointer));
+
+template <typename T>
+struct Message {
+	T object = nullptr;
+	std::string emit_type = "";
 };
 
 }

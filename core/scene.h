@@ -14,6 +14,7 @@ private:
 	space::Point custom_dimensions;
 
 public:
+	gtkc::Listener<gtkc::Widget*> listener;
 	Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing);
 	~Scene();
 	void set_time_componet(core::TimeComponet* time_componet);

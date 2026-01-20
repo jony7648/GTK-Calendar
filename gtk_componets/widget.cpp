@@ -6,7 +6,6 @@
 namespace gtkc {
 
 Widget::Widget() {
-	
 }
 
 Widget::~Widget() {
@@ -65,6 +64,10 @@ bool Widget::get_hexpand() {
 
 bool Widget::get_vexpand() {
 	return vexpand;
+}
+
+const std::string& Widget::get_widget_type() {
+	return _widget_type;
 }
 
 

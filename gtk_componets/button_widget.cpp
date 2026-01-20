@@ -9,6 +9,9 @@ ButtonWidget::ButtonWidget(const std::string& name, const std::string& text, int
 		set_gtk_widget(gtk_button_new_with_label(text.c_str()));
 	}
 
+
+	listener.parent_gtk_widget = get_gtk_widget();
+	//listener.set_gtk_parent(get_gtk_widget());
 	set_name(name);
 	set_grid_point(grid_x, grid_y);
 	set_scale(width, height);

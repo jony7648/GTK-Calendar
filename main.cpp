@@ -34,9 +34,12 @@ int main(int argc, char *argv[]) {
 
 	core::Messenger<core::App*> signal;
 
+
+
 	win_dimensions.x = 600;
 	win_dimensions.y = 600;
 	core::App app("org.jony.test", win_dimensions, argc, argv);
+	std::cout << std::is_class_v<core::App> << "\n";
 
 	signal.object = &app;
 
