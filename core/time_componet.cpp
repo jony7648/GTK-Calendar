@@ -60,6 +60,14 @@ TimeComponet::TimeComponet() {
 	calculate_from_current_time();
 }
 
+int TimeComponet::find_leap_year_count(int start_year, int end_year) {
+	int next_leap = start_year + (start_year % LEAP_FACTOR);
+	int leap_count = (end_year - next_leap + LEAP_FACTOR) / LEAP_FACTOR;
+
+	return leap_count;
+	
+}
+
 int TimeComponet::month_to_int(const std::string& conv_month) {
 	int month_index = 0;
 
@@ -101,8 +109,6 @@ void TimeComponet::set_minute_and_hour(const std::string& time_str) {
 }
 
 void TimeComponet::calculate_from_current_time() {
-	
-
 	std::vector<std::string> time_vector;
 
 	readable_time_to_vector(time_vector);
@@ -152,30 +158,44 @@ int TimeComponet::get_day_count(int month) {
 
 
 
-int TimeComponet::get_starting_weekday() {
+int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	//this meathod will return the weekday that the month starts on
+
+	int years_ahead = target_year - year;
+	int months_ahead = years_ahead * MONTH_COUNT + target_month - month;
+	int days_to_cycle = -(day-1);
+	int leap_year_count = 0;
+
+	int current_month = 0;
+
+	for (int i=0; i<months_ahead; i++) {
+		current_month = (i+month) % MONTH_COUNT;
+		days_to_cycle += day_count_arr[current_month];
+	}
+
+	//account for leap years
+	leap_year_count = find_leap_year_count(year, target_year);
+	days_to_cycle += leap_year_count;
+
+	//if the target month is before march don't account for 
+	//febuary's leap year
+	if (target_month < 2 and leap_year_count > 0) {
+		days_to_cycle--;
+	}
+
+
+	int result = util::cycle_through_bounds(weekday, days_to_cycle, 0, 6);
 	
-	std::string weekday_str = "";
-	std::string day_str = "";
-	int day_value = 0;
-	int weekday_value = 0;
-	int start_value = 0;
-	int starting_weekday = 0;
 
-	std::vector<std::string> time_vector;
-	readable_time_to_vector(time_vector);
+	//std::cout << util::cycle_through_bounds(weekday, days_to_cycle, 0, 6);
+	/*
+	std::println(
+		"Weekday: {}\nDays to cycle: {}\nMonths Ahead: {}\nResult: {}",
+		weekday, days_to_cycle, months_ahead, result
+	);
+	*/
 
-	weekday_str = time_vector.at(CTIME_WEEKDAY);
-	day_str = time_vector.at(CTIME_DAY);
-
-	day_value = std::stoi(day_str);
-	weekday_value = weekday_to_int(weekday_str);
-
-	start_value = day_value + weekday_value;
-
-	starting_weekday = util::cycle_thorugh_bounds(4, 14, 0, 6);
-
-	return starting_weekday;
-		
+	return result;
 }
+
 }

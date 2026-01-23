@@ -14,6 +14,7 @@ struct TimeComponet {
 	const size_t DAY_COUNT_ARR_LEN = 12;
 	const size_t WEEKDAY_COUNT = 7;
 	const size_t MONTH_COUNT = 12;
+	const short LEAP_FACTOR = 4;
 
 	int day = 0;
 	int month = 0;
@@ -24,8 +25,10 @@ struct TimeComponet {
 	int second = 0;
 
 	TimeComponet();
+	
 	void calculate_from_current_time();
 	void calculate_from_time_t(time_t time);
+	int find_leap_year_count(int start_year, int end_year);
 	int month_to_int(const std::string& conv_month);
 	int weekday_to_int(const std::string& conv_day);
 	void display_time_info();
@@ -33,7 +36,7 @@ struct TimeComponet {
 	int get_day_count();
 	int get_day_count(int month);
 	int get_starting_weekday();
-	int get_starting_weekday(int month);
+	int get_starting_weekday(int month, int year);
 
 };
 

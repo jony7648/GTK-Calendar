@@ -27,6 +27,7 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	app->attach_subwin(subwin);
 	app->attach_main_scene(main_scene);
 	app->display_main_window();
+	subwin->display(note_scene);
 }
 
 int main(int argc, char *argv[]) {

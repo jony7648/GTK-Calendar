@@ -1,7 +1,8 @@
 #include "button_widget.h"
 
 namespace gtkc {
-ButtonWidget::ButtonWidget(const std::string& name, const std::string& text, int grid_x, int grid_y, int width, int height) {
+ButtonWidget::ButtonWidget(const std::string& name, const std::string& text, int grid_x, int grid_y, int width, int height) : Widget() {
+
 	if (text.empty()) {
 		set_gtk_widget(gtk_button_new());
 	}
@@ -10,7 +11,6 @@ ButtonWidget::ButtonWidget(const std::string& name, const std::string& text, int
 	}
 
 
-	listener.parent_gtk_widget = get_gtk_widget();
 	//listener.set_gtk_parent(get_gtk_widget());
 	set_name(name);
 	set_grid_point(grid_x, grid_y);

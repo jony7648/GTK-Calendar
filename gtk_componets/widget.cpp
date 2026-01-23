@@ -6,6 +6,7 @@
 namespace gtkc {
 
 Widget::Widget() {
+
 }
 
 Widget::~Widget() {
@@ -16,7 +17,7 @@ Widget::~Widget() {
 		}
 	}
 
-	if (gtk_widget) {
+	if (_gtk_widget) {
 		g_object_unref(get_gtk_widget());
 	}
 }
@@ -31,11 +32,13 @@ const std::string& Widget::get_name() {
 
 
 void Widget::set_gtk_widget(GtkWidget* gtk_widget) {
-	this->gtk_widget = gtk_widget;
+	this->_gtk_widget = gtk_widget;
+	listener.set_parent_widget(this);
+	listener.set_gtk_parent(gtk_widget);
 }
 
 GtkWidget* Widget::get_gtk_widget() {
-	return gtk_widget;
+	return _gtk_widget;
 }
 
 void Widget::set_scale(int x, int y) {

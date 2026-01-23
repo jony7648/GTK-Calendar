@@ -45,9 +45,16 @@ Error Window::display(Scene* scene) {
 		return Error::NULLPTR;
 	}
 
-	gtk_window_set_default_size(GTK_WINDOW(gtk_window), dimensions.x, dimensions.y);
+
+
+	const space::Point& scene_dimensions = scene->get_custom_dimensions();
+
+	gtk_window_set_resizable(GTK_WINDOW(gtk_window), scene->get_resizability());
+	gtk_window_set_default_size(GTK_WINDOW(gtk_window), scene_dimensions.x, scene_dimensions.y);
 	gtk_window_present(GTK_WINDOW(gtk_window));
 	gtk_widget_set_size_request(scene->container->get_gtk_widget(), dimensions.x, dimensions.y);
+
+
 
 	return Error::CLEAR;
 }

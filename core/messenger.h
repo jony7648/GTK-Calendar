@@ -24,10 +24,4 @@ struct DataMessenger {
 };
 
 
-template <typename T>
-struct Message {
-	T object = nullptr;
-	std::string emit_type = "";
-};
-
 }

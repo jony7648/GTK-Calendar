@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include "core/space.h"
 #include "core/messenger.h"
-#include "gtk_componets/listener.h"
+#include "core/listener.h"
 
 namespace gtkc {
 class Widget {
@@ -16,18 +16,18 @@ private:
 	space::Point scale;
 	bool hexpand = true;
 	bool vexpand = true;
-	GtkWidget* gtk_widget;
 	std::vector<core::Messenger<Widget*>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
 
 protected:
 	std::string _widget_type = "";
+	GtkWidget* _gtk_widget;
 
 
 public:
 	Widget();
 	~Widget();
 
-	gtkc::Listener<Widget*> listener;
+	core::Listener listener;
 
 	void set_name(const std::string& name);
 	const std::string& get_name();

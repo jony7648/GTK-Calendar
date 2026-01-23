@@ -3,7 +3,7 @@
 #include "util.h"
 
 namespace util {
-int cycle_thorugh_bounds(int start_value, int cycle_count, int start_bound, int end_bound) {
+int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int end_bound) {
 	//int cycled_position = start_value + cycle_count;
 	int bound_len = end_bound - start_bound;
 
@@ -13,6 +13,10 @@ int cycle_thorugh_bounds(int start_value, int cycle_count, int start_bound, int 
 
 	int cycled_position = 0;
 	cycled_position = (start_value + cycle_count) % (bound_len+1);
+
+	if (cycled_position < 0) {
+		cycled_position += 7;
+	}
 
 	return cycled_position;
 }

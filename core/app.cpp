@@ -64,8 +64,6 @@ int App::attach_subwin(Window* subwin) {
 }
 
 Error App::attach_main_scene(core::Scene* scene) {
-	bool set_dimensions = false;
-
 	if (scene == nullptr) {
 		std::cout << "ERROR: the new scene is a nullptr!\n";
 		return Error::NULLPTR;
