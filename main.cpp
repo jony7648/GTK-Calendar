@@ -24,10 +24,11 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	main_scene->container->present_widgets();
 
 	app->attach_main_window(window);
+	app->attach_sub_scene(note_scene);
 	app->attach_subwin(subwin);
 	app->attach_main_scene(main_scene);
 	app->display_main_window();
-	subwin->display(note_scene);
+	//subwin->display(note_scene);
 }
 
 int main(int argc, char *argv[]) {
@@ -46,4 +47,6 @@ int main(int argc, char *argv[]) {
 
 	app.set_subwin_cap(1);
 	app.run(&activate, &signal);
+
+	std::cout << "yes";
 }

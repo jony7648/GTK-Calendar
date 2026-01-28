@@ -6,16 +6,11 @@
 namespace gtkc {
 
 Widget::Widget() {
-
+	//signaler.connect_to_signal(nullptr, "clicked", nullptr);
 }
 
 Widget::~Widget() {
 	//clean up messengers
-	for (core::Messenger<Widget*>* data : messenger_vector) {
-		if (data) {
-			delete data;
-		}
-	}
 
 	if (_gtk_widget) {
 		g_object_unref(get_gtk_widget());
@@ -33,8 +28,10 @@ const std::string& Widget::get_name() {
 
 void Widget::set_gtk_widget(GtkWidget* gtk_widget) {
 	this->_gtk_widget = gtk_widget;
-	listener.set_parent_widget(this);
-	listener.set_gtk_parent(gtk_widget);
+	_signaler.set_parent_gtk(gtk_widget);
+	_signaler.set_parent_widget(this);
+	//listener.set_parent_widget(this);
+	//listener.set_gtk_parent(gtk_widget);
 }
 
 GtkWidget* Widget::get_gtk_widget() {
@@ -73,6 +70,10 @@ const std::string& Widget::get_widget_type() {
 	return _widget_type;
 }
 
+core::Signaler* Widget::get_signaler() {
+	return &_signaler;
+}
+
 
 void Widget::signal_connect(const std::string& emit_type, void(*activate_func)()) {
 	g_signal_connect(this->get_gtk_widget(), emit_type.c_str(), G_CALLBACK (activate_func), nullptr);
@@ -85,6 +86,6 @@ void Widget::signal_connect(const std::string& emit_type, void(*activate_func)(G
 void Widget::signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget), core::Messenger<Widget*>* messenger_data) {
 	g_signal_connect(this->get_gtk_widget(), emit_type.c_str(), G_CALLBACK (activate_func), nullptr);
 
-	messenger_vector.push_back(messenger_data);
+//	messenger_vector.push_back(messenger_data);
 }
 }

@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include "app.h"
 
+
 bool is_custom_point(const space::Point& point) {
 	if (point.x == 0 && point.y == 0) {
 		return true;	
@@ -10,18 +11,13 @@ bool is_custom_point(const space::Point& point) {
 	return false;	
 }
 
-bool process_close_request(GtkWidget* gtk_app, gpointer user_data) {
-	auto* sig_data = (core::DoubleMessenger<core::App*, core::Window*>*)user_data;
-	bool is_main_window;
 
-	core::App* app = sig_data->object1;
-	core::Window* window = sig_data->object2;
 
-	is_main_window = window->get_is_main_window();
+void signal_request_subwin(void* app_addr, void* win_addr) {
+	core::App* app = static_cast<core::App*>(app_addr);
+	core::Window* win = static_cast<core::Window*>(app_addr);
 
-	//delete window;
-
-	return false;	
+	app->request_subwin("Note Scene");
 }
 
 namespace core {
@@ -31,11 +27,22 @@ App::App(const std::string& app_title, const space::Point& dimensions, int argc,
 	this->gtk_app = gtk_application_new(app_title.c_str(), G_APPLICATION_DEFAULT_FLAGS); 
 	this->argc = argc;
 	this->argv = argv;
+	
+	signaler.set_parent_widget(this);
+	S_scene_request_subwin.set_parent_widget(this);
+	S_scene_request_subwin.set_emit_func(&signal_request_subwin);
 }
 
 App::~App() {
+	for (auto& win : subwin_vect) {
+		delete win;
+	}
+
+
+	delete main_window;
 	g_object_unref(gtk_app);
 }
+
 
 Error App::attach_main_window(Window* window) {
 	if (window == nullptr) {
@@ -44,8 +51,8 @@ Error App::attach_main_window(Window* window) {
 
 	//attaches a window to the  app
 	this->main_window = window;
-
-	window->signal_set_close(this, process_close_request);
+	window->set_attached_state();
+	window->set_as_main_window();
 	return Error::CLEAR;
 }
 
@@ -61,6 +68,39 @@ int App::attach_subwin(Window* subwin) {
 	subwin_vect.push_back(subwin);
 
 	return 0;
+}
+
+bool App::request_subwin(const std::string& scene_name) {
+	Scene* sub_scene = nullptr;
+	Window* subwin = nullptr;
+
+	for (auto& scene : sub_scene_vect) {
+		if (scene->get_name() == scene_name) {
+			sub_scene = scene;
+			break;
+		}
+	}
+
+
+	if (!sub_scene) {
+		std::cout << "Subwin can't display sub scene cause it's a nullptr\n";
+		return false;
+	}
+
+	for (auto& win : subwin_vect) {
+		subwin = win;
+	}
+
+
+	//std::cout << "This is the window we are going to show: " << subwin;
+	if (subwin->get_display_state() == true) {
+		subwin->display(sub_scene);
+	}
+	else {
+		subwin->show();
+	}
+
+	return true;
 }
 
 Error App::attach_main_scene(core::Scene* scene) {
@@ -81,8 +121,20 @@ Error App::attach_main_scene(core::Scene* scene) {
 	}
 
 	main_scene = scene;
+	//scene->S_request_subwin.set_emit_func(signal_request_subwin);
+
+	//rewrite the signals so you can add signals to them and chain them
+	std::cout << "Signal Picked Up!" << "\n";
+	S_scene_request_subwin.pickup_signal(&scene->GS_cal_button_clicked);	
+	//S_scene_request_subwin.listen(scene->get_signaler(), "clicked", &signal_request_subwin);
 
 	return Error::CLEAR;
+}
+
+Error App::attach_sub_scene(Scene* scene) {
+	sub_scene_vect.push_back(scene);
+
+	return Error::CLEAR;	
 }
 
 void App::display_main_window() {

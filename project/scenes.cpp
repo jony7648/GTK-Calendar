@@ -5,12 +5,21 @@
 #include "core/window.h"
 #include "core/util.h"
 
-static void signal_open_note_window(core::Message* message) {
+static void signal_open_note_window(void* receiver_obj, void* emitter_obj) {
+	core::Scene* scene = static_cast<core::Scene*>(receiver_obj);
+	gtkc::ButtonWidget* button = static_cast<gtkc::ButtonWidget*>(button);
+	std::cout << scene << "\n";
+	std::cout << button << "\n";
+
+	scene->S_request_subwin.emit_signal(scene);
+
+
+	 
 	//gtkc::ButtonWidget* button = static_cast<gtkc::ButtonWidget*>(message->widget);
 
-	gtkc::ButtonWidget* button = static_cast<gtkc::ButtonWidget*>(message->widget);
-	core::Scene* main_scene = static_cast<core::Scene*>(message->receiver_object);
-	std::cout << button->get_text() << "\n";
+	//gtkc::ButtonWidget* button = static_cast<gtkc::ButtonWidget*>(message->widget);
+	//core::Scene* main_scene = static_cast<core::Scene*>(message->receiver_object);
+	//std::cout << button->get_text() << "\n";
 }
 
 static void add_weekday_header(const core::TimeComponet* time_componet, std::vector<gtkc::Widget*>& widget_vector) {
@@ -50,7 +59,8 @@ static void create_cal_buttons(core::Scene* scene, std::vector<gtkc::Widget*>& w
 		text = name;
 		widget = new gtkc::ButtonWidget(name, text, 0, 3, 1, 1);
 		widget_vector.push_back(widget);
-		widget->listener.connect(&scene->listener, signal_open_note_window, "clicked");
+		scene->GS_cal_button_clicked.listen(widget->get_signaler(), "clicked", &signal_open_note_window);
+		//widget->listener.connect(&scene->listener, scene->signal_request_subwin, "clicked");
 
 	}
 }

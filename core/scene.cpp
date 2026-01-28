@@ -7,9 +7,12 @@ namespace core {
 Scene::Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing) {
 	this->name = name;
 	container = new gtkc::GridContainer("MainSceneContainer", 30, 30);
-	listener.set_parent_widget(this);
-	//gtk_container->widget_spacing.x = widget_x_spacing;
-	//this->widget_spacing.y = widget_y_spacing;
+
+	std::cout << "This is the window address: " <<  this << "\n";
+	S_request_subwin.set_parent_widget(this);
+	//S_request_note_win.set_emit_func(test_func);
+	GS_cal_button_clicked.set_parent_widget(this);
+	signaler.set_parent_widget(this);
 }
 
 Scene::~Scene() {
@@ -30,6 +33,18 @@ void Scene::set_resizability(bool state) {
 
 bool Scene::get_resizability() {
 	return resizable_win;
+}
+
+void Scene::signal_request_subwin(core::Message* message) {
+	
+}
+
+const std::string& Scene::get_name() {
+	return name;	
+}
+
+Signaler* Scene::get_signaler() {
+	return &signaler;
 }
 
 void Scene::set_time_componet(core::TimeComponet* time_componet) {
