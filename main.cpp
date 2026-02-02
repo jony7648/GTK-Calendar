@@ -38,15 +38,13 @@ int main(int argc, char *argv[]) {
 
 
 
-	win_dimensions.x = 600;
+	win_dimensions.x = 1200;
 	win_dimensions.y = 600;
 	core::App app("org.jony.test", win_dimensions, argc, argv);
-	std::cout << std::is_class_v<core::App> << "\n";
 
 	signal.object = &app;
 
 	app.set_subwin_cap(1);
 	app.run(&activate, &signal);
 
-	std::cout << "yes";
 }

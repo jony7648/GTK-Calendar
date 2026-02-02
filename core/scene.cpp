@@ -6,13 +6,14 @@
 namespace core {
 Scene::Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing) {
 	this->name = name;
-	container = new gtkc::GridContainer("MainSceneContainer", 30, 30);
+	container = new gtkc::GridContainer("MainSceneContainer", widget_x_spacing, widget_y_spacing);
+	container->set_halign(GTK_ALIGN_START);
 
-	std::cout << "This is the window address: " <<  this << "\n";
 	S_request_subwin.set_parent_widget(this);
 	//S_request_note_win.set_emit_func(test_func);
 	GS_cal_button_clicked.set_parent_widget(this);
 	signaler.set_parent_widget(this);
+
 }
 
 Scene::~Scene() {

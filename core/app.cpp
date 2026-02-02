@@ -2,7 +2,6 @@
 #include <gtk/gtk.h>
 #include "app.h"
 
-
 bool is_custom_point(const space::Point& point) {
 	if (point.x == 0 && point.y == 0) {
 		return true;	
@@ -20,6 +19,15 @@ void signal_request_subwin(void* app_addr, void* win_addr) {
 	app->request_subwin("Note Scene");
 }
 
+void signal_end_app(void* app_ptr, void* ignore_ptr) {
+	core::App* app = static_cast<core::App*>(app_ptr);
+
+	//gtk_window_destroy(GTK_WINDOW(app->main_window->get_gtk_window()));
+
+	//std::cout << "App: " << app << "\n";
+	app->close();
+}
+
 namespace core {
 App::App(const std::string& app_title, const space::Point& dimensions, int argc, char* argv[]) {
 	this->win_dimensions.x = dimensions.x;
@@ -31,16 +39,20 @@ App::App(const std::string& app_title, const space::Point& dimensions, int argc,
 	signaler.set_parent_widget(this);
 	S_scene_request_subwin.set_parent_widget(this);
 	S_scene_request_subwin.set_emit_func(&signal_request_subwin);
+
+	S_window_end_program.set_parent_widget(this);
+	S_window_end_program.set_emit_func(&signal_end_app);
+	std::cout << "This is app " << this << "\n";
 }
 
 App::~App() {
 	for (auto& win : subwin_vect) {
-		delete win;
+		//delete win;
 	}
 
 
-	delete main_window;
-	g_object_unref(gtk_app);
+	//delete main_window;
+	//g_object_unref(gtk_app);
 }
 
 
@@ -53,6 +65,7 @@ Error App::attach_main_window(Window* window) {
 	this->main_window = window;
 	window->set_attached_state();
 	window->set_as_main_window();
+	S_window_end_program.pickup_signal(&window->S_end_program);
 	return Error::CLEAR;
 }
 
@@ -149,6 +162,16 @@ void App::run(void(*activate_func)(GtkApplication* app, gpointer), core::Messeng
 	g_signal_connect(gtk_app, "activate", G_CALLBACK(activate_func), signal_ptr);
 
 	app_status = g_application_run(G_APPLICATION(gtk_app), 0, argv);
+}
+
+void App::close() {
+	//gtk_window_destroy(GTK_WINDOW(main_window->get_gtk_window()));
+	
+	delete main_window;
+
+	for (Window* window : subwin_vect) {
+		delete window;
+	}
 }
 
 void App::set_subwin_cap(int cap) {

@@ -15,12 +15,15 @@ class Window;
 
 class App {
 private:
-	Window* main_window = nullptr;
 	Scene* main_scene = nullptr;
+	std::vector<Scene*> sub_scene_vect;
 	GtkApplication* gtk_app = nullptr;
 	core::TimeComponet time_componet;
 	std::string title;
 	space::Point win_dimensions;
+
+	Window* main_window = nullptr;
+	std::vector<Window*> subwin_vect;
 
 	Signaler signaler;
 
@@ -29,12 +32,11 @@ private:
 	int subwin_cap = 5;
 	int app_status = 0;
 public:
-	std::vector<Scene*> sub_scene_vect;
-	std::vector<Window*> subwin_vect;
-	App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
+		App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
 	~App();
 	//bool process_close_request(GtkWidget* gtk_widget, gpointer user_data);
 	void run(void(*activate_func)(GtkApplication*, gpointer), core::Messenger<App*>* signal_ptr);
+	void close();
 	Error attach_main_window(Window* window);
 	int attach_subwin(Window* window);
 	Error attach_main_scene(Scene* scene);
@@ -44,6 +46,7 @@ public:
 
 
 	Signal S_scene_request_subwin;
+	Signal S_window_end_program;
 
 	Scene* get_main_scene();
 	void set_subwin_cap(int cap);

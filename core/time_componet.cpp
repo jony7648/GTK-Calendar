@@ -17,7 +17,10 @@ void readable_time_to_vector(std::vector<std::string>& time_vector) {
 	time_t current_time;
 	time(&current_time);
 
+
 	std::string readable_time = std::ctime(&current_time);
+	util::str_strip(readable_time);
+	std::cout << readable_time << "\n";
 	util::str_split(time_vector, readable_time, ' ');
 }
 
@@ -156,7 +159,9 @@ int TimeComponet::get_day_count(int month) {
 	return day_count_arr[month];
 }
 
-
+int TimeComponet::get_starting_weekday() {
+	return weekday;
+}
 
 int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	//this meathod will return the weekday that the month starts on
@@ -197,5 +202,7 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 
 	return result;
 }
+
+
 
 }

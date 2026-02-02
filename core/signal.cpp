@@ -34,6 +34,7 @@ void Signal::listen(Signaler* signaler, const std::string& emit_type, void(*emit
 void Signal::emit_signal(void* emitter_obj) {
 	//This function will execute the funciton set in the signal
 	if (f_signal) {
+		std::cout << "need to go up another level\n";
 		f_signal->emit_signal(this->parent_widget);
 		return;
 	}

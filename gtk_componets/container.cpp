@@ -107,7 +107,7 @@ void Container::present_widgets() {
 		gtk_widget_set_hexpand(child_gtk_widget, child_hexpand);
 		gtk_widget_set_vexpand(child_gtk_widget, child_vexpand);
 
-				//gtk_widget_set_size_request(widget->get_gtk_widget(), widget_scale.x, widget_scale.y);
+		//gtk_widget_set_size_request(widget->get_gtk_widget(), widget_scale.x, widget_scale.y);
 
 	}
 }
@@ -119,7 +119,7 @@ void Container::set_valign(GtkAlign align) {
 
 void Container::set_halign(GtkAlign align) {
 	halign = align;
-	gtk_widget_set_valign(get_gtk_widget(), align);
+	gtk_widget_set_halign(get_gtk_widget(), align);
 }
 
 void Container::set_widget_spacing(int x, int y) {

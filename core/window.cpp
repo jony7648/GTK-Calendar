@@ -13,9 +13,10 @@ bool process_close_request(GtkWidget* gtk_window, gpointer user_data) {
 		return true;
 	}
 
-	//delete window;
 
-	return false;	
+	window->S_end_program.emit_signal(nullptr);
+	//gtk_window_destroy(GTK_WINDOW(gtk_window));
+	return true;	
 }
 
 
@@ -28,10 +29,11 @@ Window::Window(GtkApplication* gtk_app_ptr, const std::string& title, const spac
 	gtk_window = gtk_application_window_new(gtk_app_ptr);
 
 	g_signal_connect(this->gtk_window, "close-request", G_CALLBACK(process_close_request), this);
+	//std::cout << "This is the window address: " << this << "\n";
 }
 
 Window::~Window() {
-	gtk_window_close(GTK_WINDOW(gtk_window));
+	gtk_window_destroy(GTK_WINDOW(gtk_window));
 }
 
 void Window::set_scene(Scene* scene) {

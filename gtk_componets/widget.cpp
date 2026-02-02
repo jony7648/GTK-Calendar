@@ -6,6 +6,8 @@
 namespace gtkc {
 
 Widget::Widget() {
+	scale.x = 1;
+	scale.y = 1;
 	//signaler.connect_to_signal(nullptr, "clicked", nullptr);
 }
 

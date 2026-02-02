@@ -33,6 +33,8 @@ public:
 	void show();
 	void hide();
 
+	Signal S_end_program;
+
 	void set_scene(Scene* scene);
 
 

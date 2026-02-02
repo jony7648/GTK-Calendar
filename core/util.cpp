@@ -47,4 +47,46 @@ std::vector<std::string>& str_split(std::vector<std::string>& store_vector, cons
 
 	return store_vector;
 }
+
+void str_strip(std::string& str) { 
+	char target_char = ' ';
+	char current_char;
+	char prev_char;
+	int index = 0;
+	int index_offset = 0;
+	int start_pos = -1;
+
+	size_t strlen = str.length();
+	size_t slice_count = 1;
+
+
+	//std::cout << "Old String: " << str << "\n";
+
+	for (int i=1; i<strlen; i++) {
+		index = i - index_offset;
+
+		current_char = str[i];
+		prev_char = str[i-1];
+		std::cout << current_char << prev_char << "\n";
+
+		if (current_char != ' ' && start_pos != -1) {
+			slice_count = i - start_pos + 1;
+			//std::cout << "Pos: " << slice_count << " " << start_pos << "\n";
+			
+			str = str.substr(0, start_pos) + str.substr(i-1, strlen-i);
+			//std::cout << "New String: " << str << "\n";
+			index_offset += slice_count;
+			strlen -= slice_count;
+
+			
+			start_pos = -1;
+			break;
+		}
+
+		if (start_pos == -1 && current_char == target_char && prev_char == target_char) { 
+			//std::cout << "Start pos tracked!\n";
+			start_pos = i-1;
+		}
+	}
+}
 }
