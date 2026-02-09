@@ -20,8 +20,7 @@ private:
 	bool is_main_window = false;
 	bool is_attached = false;
 	bool is_displaying = false;
-
-
+	bool is_visible = false;
 
 public:
 	GtkWidget* get_gtk_window();
@@ -29,15 +28,12 @@ public:
 	~Window();
 	Error display(Scene* scene);
 	void signal_set_close(App*, bool(*func)(GtkWidget* widget, gpointer user_data));
+	void set_scene(Scene* scene);
 	void close();
 	void show();
 	void hide();
 
 	Signal S_end_program;
-
-	void set_scene(Scene* scene);
-
-
 
 	void set_attached_state();
 	bool get_attached_state();
@@ -48,5 +44,6 @@ public:
 	bool get_is_main_window();
 
 	bool get_display_state();
+	bool get_visibility();
 };
 }

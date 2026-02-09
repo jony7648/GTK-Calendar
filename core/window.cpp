@@ -38,17 +38,19 @@ Window::~Window() {
 
 void Window::set_scene(Scene* scene) {
 	if (scene != nullptr) {
-		gtk_window_set_child(GTK_WINDOW(gtk_window), scene->container->get_gtk_widget());
+		gtk_window_set_child(GTK_WINDOW(gtk_window), scene->widget_container.get_gtk_widget());
 		current_scene = scene;
 	}
 }
 
 void Window::show() {
 	gtk_widget_set_visible(gtk_window, true);
+	is_visible = true;
 }
 
 void Window::hide() {
 	gtk_widget_set_visible(gtk_window, false);
+	is_visible = false;
 }
 
 
@@ -66,12 +68,8 @@ Error Window::display(Scene* scene) {
 		std::cout << "ERROR: Can't display a scene that is a nullptr\n";
 		return Error::NULLPTR;
 	}
-	if (scene->container == nullptr) {
-		std::cout << "ERROR: Scene container is a nullptr!";
-		return Error::NULLPTR;
-	}
 
-	if (scene->container->get_gtk_widget() == nullptr) {
+	if (scene->widget_container.get_gtk_widget() == nullptr) {
 		std::cout << "ERROR: The gtk widget of the scene container is a nullptr";
 		return Error::NULLPTR;
 	}
@@ -83,7 +81,7 @@ Error Window::display(Scene* scene) {
 	gtk_window_set_resizable(GTK_WINDOW(gtk_window), scene->get_resizability());
 	gtk_window_set_default_size(GTK_WINDOW(gtk_window), scene_dimensions.x, scene_dimensions.y);
 	gtk_window_present(GTK_WINDOW(gtk_window));
-	gtk_widget_set_size_request(scene->container->get_gtk_widget(), dimensions.x, dimensions.y);
+	gtk_widget_set_size_request(scene->widget_container.get_gtk_widget(), dimensions.x, dimensions.y);
 
 	is_displaying = true;
 
@@ -116,6 +114,10 @@ bool Window::get_attached_state() {
 
 bool Window::get_display_state() {
 	return is_displaying;
+}
+
+bool Window::get_visibility() {
+	return is_visible;
 }
 
 void Window::set_as_main_window() {

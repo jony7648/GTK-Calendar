@@ -1,5 +1,6 @@
 #include <iostream>
 #include <gtk/gtk.h>
+#include "file_util.h"
 #include "app.h"
 
 bool is_custom_point(const space::Point& point) {
@@ -87,29 +88,33 @@ bool App::request_subwin(const std::string& scene_name) {
 	Scene* sub_scene = nullptr;
 	Window* subwin = nullptr;
 
+	//check for the subscenes existance
 	for (auto& scene : sub_scene_vect) {
-		if (scene->get_name() == scene_name) {
+		if (scene && scene->get_name() == scene_name) {
 			sub_scene = scene;
 			break;
 		}
 	}
 
 
+	//if the sub scene couldn't be found
 	if (!sub_scene) {
 		std::cout << "Subwin can't display sub scene cause it's a nullptr\n";
 		return false;
 	}
 
+
+	//prepare a win for the specified scene
 	for (auto& win : subwin_vect) {
 		subwin = win;
 	}
 
 
-	//std::cout << "This is the window we are going to show: " << subwin;
-	if (subwin->get_display_state() == true) {
+	//display window
+	if (subwin->get_display_state() == false) {
 		subwin->display(sub_scene);
 	}
-	else {
+	else if (subwin->get_visibility() == false) {
 		subwin->show();
 	}
 
@@ -127,7 +132,7 @@ Error App::attach_main_scene(core::Scene* scene) {
 		return Error::NULLPTR;
 	}
 
-	gtk_window_set_child(GTK_WINDOW(main_window->get_gtk_window()), scene->container->get_gtk_widget());
+	gtk_window_set_child(GTK_WINDOW(main_window->get_gtk_window()), scene->widget_container.get_gtk_widget());
 
 	if (main_scene != nullptr) {
 		delete main_scene;
@@ -139,6 +144,7 @@ Error App::attach_main_scene(core::Scene* scene) {
 	//rewrite the signals so you can add signals to them and chain them
 	std::cout << "Signal Picked Up!" << "\n";
 	S_scene_request_subwin.pickup_signal(&scene->GS_cal_button_clicked);	
+	scene->set_time_componet(&time_componet);
 	//S_scene_request_subwin.listen(scene->get_signaler(), "clicked", &signal_request_subwin);
 
 	return Error::CLEAR;
@@ -154,8 +160,30 @@ void App::display_main_window() {
 	main_window->display(main_scene);
 }
 
+void App::apply_provider(const std::string& css_dir_path) {
+	//use file_util to loop thorugh and grab content from all css files
+
+	_css_provider = gtk_css_provider_new();
+	_default_display = gdk_display_get_default();
+
+	std::vector<std::string> file_vector(10);
+
+	file_util::get_files_in_dir(file_vector, css_dir_path);
+
+	for (std::string& path : file_vector) {
+		if (path == "") {
+			continue;
+		}
+
+		std::cout << "Path: " << path << "\n";	
+	}
+
+	gtk_css_provider_load_from_path(_css_provider, "test.css");
+	gtk_style_context_add_provider_for_display(_default_display, GTK_STYLE_PROVIDER(_css_provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 GtkWidget* App::get_scene_container() {
-	return main_scene->container->get_gtk_widget();
+	return main_scene->widget_container.get_gtk_widget();
 }
 
 void App::run(void(*activate_func)(GtkApplication* app, gpointer), core::Messenger<App*>* signal_ptr) {

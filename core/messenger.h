@@ -22,6 +22,15 @@ struct DoubleMessenger {
 	T2 object2;
 };
 
+struct SigDataInt {
+	int data;	
+};
+
+struct SigDataStr {
+	std::string data;	
+};
+
+
 struct Message {
 	void* receiver_object;
 	void* widget;

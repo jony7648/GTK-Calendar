@@ -12,9 +12,9 @@ class Signal {
 private:
 	void* parent_widget;
 	GtkWidget* parent_gtk_widget;
-	std::vector<Message*> message_vec;
 	std::function<void(void*, void*)> _emit_func = nullptr;
 public:
+	~Signal();
 	Signal* f_signal = nullptr;
 	void listen(Signaler* signaler, const std::string& emit_type, void(*emit_func)(void*, void*));
 	void pickup_signal(Signal* signal);

@@ -15,7 +15,7 @@ int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int 
 	cycled_position = (start_value + cycle_count) % (bound_len+1);
 
 	if (cycled_position < 0) {
-		cycled_position += 7;
+		cycled_position += bound_len+1;
 	}
 
 	return cycled_position;
@@ -67,7 +67,6 @@ void str_strip(std::string& str) {
 
 		current_char = str[i];
 		prev_char = str[i-1];
-		std::cout << current_char << prev_char << "\n";
 
 		if (current_char != ' ' && start_pos != -1) {
 			slice_count = i - start_pos + 1;

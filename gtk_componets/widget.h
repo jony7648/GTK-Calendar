@@ -2,34 +2,68 @@
 #include <iostream>
 #include <vector>
 #include <gtk/gtk.h>
+#include "core/constants.h"
 #include "core/space.h"
 #include "core/messenger.h"
-#include "core/listener.h"
 #include "core/signal.h"
 
 namespace gtkc {
+class Container;
+
 class Widget {
 private:
-	std::string name = "";
-	int grid_pos = 0;
-	space::Rect transform;
-	space::Point grid_point;
-	space::Point scale;
-	bool hexpand = true;
-	bool vexpand = true;
+	std::string _name = "";
+	std::string _tag = "";
+	int _grid_pos = 0;
+	space::Rect _transform;
+	space::Point _grid_point;
+	space::Point _scale;
+	bool _hexpand = true;
+	bool _vexpand = true;
+	int _sig_data = 0;
+	bool _presenting = false;
+	bool is_visible = false;
+
+	GtkWidget* _holder_gtk_widget = nullptr;
+
+	std::string _css_path = "";
+	GtkCssProvider* _css_provider = nullptr;
+	GdkDisplay* _default_display = nullptr;
+
+
+	
 //	std::vector<core::Messenger<Widget*>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
 
 protected:
-	std::string _widget_type = "";
+	std::string _type = "UNDEFINED TYPE";
 	GtkWidget* _gtk_widget;
 	core::Signaler _signaler;
 
+	void set_css_file_name(const std::string& css_path);
+
 public:
+	void load_css(const std::string& css_str);
+	void apply_provider();
 	Widget();
 	~Widget();
 
+	void display_info();
+	void attach(Container* container);
+
+
+	void reattach();
+
+	void show();
+	void hide();
+	bool get_visibility();
+
 	void set_name(const std::string& name);
 	const std::string& get_name();
+
+	void set_tag(const std::string& tag);
+	const std::string& get_tag();
+	bool has_tag(const std::string&);
+
 
 	void set_gtk_widget(GtkWidget* gtk_widget);
 	GtkWidget* get_gtk_widget();
@@ -40,17 +74,19 @@ public:
 	void set_grid_point(int x, int y);
 	const space::Point& get_grid_point();
 
-	const std::string& get_widget_type();
+	bool is_type(const std::string& type);
+	const std::string& get_type();
 
+
+	void set_hexpand(bool hexpand);
+	void set_vexpand(bool vexpand);
 	bool get_hexpand();
 	bool get_vexpand();
+	void set_presenting(bool state);
 
 	core::Signaler* get_signaler();
 
-	void set_messenger_data(core::Messenger<Widget>* messenger_data);
-	core::Messenger<Widget>* get_messenger_data();
-	void signal_connect(const std::string& emit_type, void(*activate_func)());
-	void signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget));
-	void signal_connect(const std::string& emit_type, void(*activate_func)(GtkWidget* gtk_widget), core::Messenger<Widget*>* messenger_data);
+	void set_sig_data(int data);
+	int get_sig_data();
 };
 }

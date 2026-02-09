@@ -61,6 +61,7 @@ TimeComponet::TimeComponet() {
 	day_count_arr[11] = 31;
 
 	calculate_from_current_time();
+	reset_menu_time();
 }
 
 int TimeComponet::find_leap_year_count(int start_year, int end_year) {
@@ -156,6 +157,7 @@ int TimeComponet::get_day_count(int month) {
 		std::cout << "CRITICAL ERROR: MONTH IS OUT OF RANGE!!!" << "\n";
 		return 0;
 	}
+
 	return day_count_arr[month];
 }
 
@@ -163,20 +165,72 @@ int TimeComponet::get_starting_weekday() {
 	return weekday;
 }
 
+void TimeComponet::advance_menu_month(int cycle_count) {
+	//for somereason it is not cycling figure out why
+	//and try to improve the container iterator
+	
+	
+	if (menu_month + cycle_count < 0) {
+		menu_year--;
+	}
+	
+	if (menu_month + cycle_count == MONTH_COUNT) {
+		menu_year++;
+	}
+
+	//menu_year = menu_year + (menu_month + cycle_count) / (MONTH_COUNT);
+	menu_month = util::cycle_through_bounds(menu_month, cycle_count, 0, MONTH_COUNT-1);
+
+	std::cout << "This is the menu month: " << menu_month << "\n";
+	std::cout << "This is the menu year: " << menu_year << "\n";
+}
+
+void TimeComponet::reset_menu_time() {
+	menu_month = month;
+	menu_year = year;
+}
+
+
+int TimeComponet::get_menu_month() {
+	return menu_month;
+}
+
+int TimeComponet::get_menu_year() {
+	return menu_year;
+}
+
+std::string* TimeComponet::get_weekday_arr() {
+	return weekday_arr;
+}
+
 int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	//this meathod will return the weekday that the month starts on
 
 	int years_ahead = target_year - year;
 	int months_ahead = years_ahead * MONTH_COUNT + target_month - month;
-	int days_to_cycle = -(day-1);
+	int days_to_cycle = -(day-1); //converts to index format and sets it so it will loop back to day zero
 	int leap_year_count = 0;
+	int cycle_dir = 1;
 
+	std::cout << "Starting days to cycle: " << days_to_cycle << "\n";
 	int current_month = 0;
 
-	for (int i=0; i<months_ahead; i++) {
-		current_month = (i+month) % MONTH_COUNT;
-		days_to_cycle += day_count_arr[current_month];
+	if (months_ahead < 0) {
+		cycle_dir = -1;
 	}
+
+	for (int i=0; i<abs(months_ahead); i++) {
+		//current_month = (i + month*direction_factor) % MONTH_COUNT;
+		current_month = util::cycle_through_bounds(month, i*cycle_dir, 0, MONTH_COUNT);
+		
+		if (cycle_dir < 0 ) {
+			current_month--;
+		}
+
+		days_to_cycle += day_count_arr[current_month] * cycle_dir;
+	}
+
+
 
 	//account for leap years
 	leap_year_count = find_leap_year_count(year, target_year);
@@ -189,10 +243,9 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	}
 
 
-	int result = util::cycle_through_bounds(weekday, days_to_cycle, 0, 6);
+	int result = util::cycle_through_bounds(weekday, days_to_cycle, 0, WEEKDAY_COUNT-1);
 	
 
-	//std::cout << util::cycle_through_bounds(weekday, days_to_cycle, 0, 6);
 	/*
 	std::println(
 		"Weekday: {}\nDays to cycle: {}\nMonths Ahead: {}\nResult: {}",
@@ -202,7 +255,4 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 
 	return result;
 }
-
-
-
 }

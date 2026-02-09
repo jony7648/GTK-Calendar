@@ -27,12 +27,16 @@ private:
 
 	Signaler signaler;
 
+	GtkCssProvider* _css_provider = nullptr;
+	GdkDisplay* _default_display = nullptr;
+
 	int argc = 0;
 	char** argv = nullptr;
 	int subwin_cap = 5;
 	int app_status = 0;
+
 public:
-		App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
+	App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
 	~App();
 	//bool process_close_request(GtkWidget* gtk_widget, gpointer user_data);
 	void run(void(*activate_func)(GtkApplication*, gpointer), core::Messenger<App*>* signal_ptr);
@@ -42,7 +46,9 @@ public:
 	Error attach_main_scene(Scene* scene);
 	Error attach_sub_scene(Scene* scene);
 	void display_main_window();
+	void apply_provider(const std::string& css_dir_path);
 	bool request_subwin(const std::string& scene_name);
+
 
 
 	Signal S_scene_request_subwin;

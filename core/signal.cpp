@@ -3,7 +3,6 @@
 
 
 static void process_signal(GtkWidget* gtk_widget, gpointer user_data) {
-	//
 	core::SigMessageLink* sig_link = static_cast<core::SigMessageLink*>(user_data);
 
 	for (auto& signal : sig_link->signal_vec) {
@@ -12,6 +11,9 @@ static void process_signal(GtkWidget* gtk_widget, gpointer user_data) {
 }
 
 namespace core {
+Signal::~Signal() {
+
+}
 
 void Signal::listen(Signaler* signaler, const std::string& emit_type, void(*emit_func)(void*, void*)) {
 	//this function will "listen" for GTK_signals and execute a function 
@@ -34,13 +36,13 @@ void Signal::listen(Signaler* signaler, const std::string& emit_type, void(*emit
 void Signal::emit_signal(void* emitter_obj) {
 	//This function will execute the funciton set in the signal
 	if (f_signal) {
-		std::cout << "need to go up another level\n";
+		//std::cout << "need to go up another level\n";
 		f_signal->emit_signal(this->parent_widget);
 		return;
 	}
 
 	if (!_emit_func) {
-		std::cout << "ERROR: emit_func is nullptr\n";
+		//std::cout << "ERROR: emit_func is nullptr\n";
 		return;
 	}
 	

@@ -3,7 +3,7 @@
 #include "core/app.h"
 #include "core/window.h"
 #include "core/space.h"
-#include "project/scenes.h"
+#include "project/project_scenes.h"
 #include "gtk_componets.h"
 #include "core/time_componet.h"
 #include "core/messenger.h"
@@ -18,15 +18,16 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	core::Window* subwin = new core::Window(gtk_app, title, app->get_win_dimensions());
 	core::TimeComponet* time_componet = app->get_time_componet();
 
-	core::Scene* main_scene = calender::create_main_scene(window, time_componet);
-	core::Scene* note_scene = calender::create_note_scene();
+	core::Scene* main_scene = project::create_main_scene(time_componet);
+	core::Scene* note_scene = project::create_note_scene(time_componet);
 
-	main_scene->container->present_widgets();
+	main_scene->widget_container.present_widgets();
 
 	app->attach_main_window(window);
 	app->attach_sub_scene(note_scene);
 	app->attach_subwin(subwin);
 	app->attach_main_scene(main_scene);
+	//app->apply_provider("gtk_componets/css_styles");
 	app->display_main_window();
 	//subwin->display(note_scene);
 }
