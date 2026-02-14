@@ -12,10 +12,10 @@ int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int 
 	}
 
 	int cycled_position = 0;
-	cycled_position = (start_value + cycle_count) % (bound_len+1);
+	cycled_position = (start_value + cycle_count) % (bound_len);
 
 	if (cycled_position < 0) {
-		cycled_position += bound_len+1;
+		cycled_position += bound_len;
 	}
 
 	return cycled_position;

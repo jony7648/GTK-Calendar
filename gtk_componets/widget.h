@@ -42,7 +42,8 @@ protected:
 	void set_css_file_name(const std::string& css_path);
 
 public:
-	void load_css(const std::string& css_str);
+	void load_css();
+	void load_css(const std::string& class_name);
 	void apply_provider();
 	Widget();
 	~Widget();
@@ -70,6 +71,8 @@ public:
 
 	void set_scale(int x, int y);
 	const space::Point& get_scale();
+
+	void size_request(int x, int y);
 
 	void set_grid_point(int x, int y);
 	const space::Point& get_grid_point();

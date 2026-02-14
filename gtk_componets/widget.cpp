@@ -24,6 +24,7 @@ Widget::~Widget() {
 }
 
 void Widget::attach(Container* container) {
+	//std::cout << container->get_name() << "\n";
 	gtk_grid_attach(GTK_GRID(container->get_gtk_widget()), _gtk_widget, _grid_point.x, _grid_point.y, _scale.x, _scale.y);
 	_holder_gtk_widget = container->get_gtk_widget();
 }
@@ -55,7 +56,7 @@ void Widget::apply_provider() {
 	gtk_style_context_add_provider_for_display(_default_display, GTK_STYLE_PROVIDER(_css_provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
-void Widget::load_css(const std::string& css_style_path) {
+void Widget::load_css() {
 	if (!_gtk_widget) {
 		std::cout << "ERROR: can't css style gtk_widget is a nullptr\n";
 	}
@@ -66,12 +67,19 @@ void Widget::load_css(const std::string& css_style_path) {
 
 	const std::string& css_class = get_type();
 
-	//std::cout << _gtk_widget << "is going to be provider\n";
 	gtk_widget_add_css_class(_gtk_widget, css_class.c_str());
+}
 
-	//gtk_css_provider_load_from_path(_css_provider, css_style_path.c_str());
+void Widget::load_css(const std::string& class_name) {
+	if (!_gtk_widget) {
+		std::cout << "ERROR: can't css style gtk_widget is a nullptr\n";
+	}
 
-	//gtk_style_context_add_provider_for_display(_default_display, GTK_STYLE_PROVIDER(_css_provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	if (!_css_provider) {
+		std::cout << "Error: _css_provider is a nullptr!\n";
+	}
+
+	gtk_widget_add_css_class(_gtk_widget, class_name.c_str());
 }
 
 void Widget::show() {
@@ -136,6 +144,10 @@ void Widget::set_scale(int x, int y) {
 	//y denotes how many rows widget will take up
 	_scale.x = x;
 	_scale.y = y;
+}
+
+void Widget::size_request(int width, int height) {
+	gtk_widget_set_size_request(_gtk_widget, width, height);
 }
 
 const space::Point& Widget::get_scale() {

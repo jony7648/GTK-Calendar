@@ -9,6 +9,7 @@ class TimeComponet {
 private:
 	std::string weekday_arr[7];
 	std::string month_arr[12];
+	std::string long_mth_names[12];
 
 	int day_count_arr[12];
 	
@@ -45,6 +46,9 @@ public:
 	int get_day_count(int month);
 	int get_starting_weekday();
 	int get_starting_weekday(int month, int year);
+	const std::string& get_short_month_name(int month);
+	const std::string& get_long_month_name(int month);
+	void get_full_day_str(int day, int month, int year, std::string& output_str);
 	std::string* get_weekday_arr();
 
 	int get_menu_month();

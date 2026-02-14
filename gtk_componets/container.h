@@ -3,56 +3,54 @@
 #include <gtk/gtk.h>
 #include "widget.h"
 
-namespace gtkc {
-class Container;
+struct ContainerIntPair {
+	ContainerIntPair() = default;
 
+	ContainerIntPair(gtkc::Container* container, int index) {
+		this->container = container;
+		this->index = index;
+	}
+
+
+	gtkc::Container* container = nullptr;
+	int index = 0;
+};
+
+namespace gtkc {
 class ContainerIterator {
 private:
 	//pointer m_data*
-	Container* container;
-	std::vector<gtkc::Widget*>* widget_vector;
-	int _index;
+	Container* container = nullptr;
+	Widget* iter_widget = nullptr;
+	//std::vector<gtkc::Widget*>* widget_vector;
 	//int _end_index = widget_vector.size() + 1;
 	Widget* _ptr = nullptr;
 
+	//std::vector<container_int_pair> container_vector;
+	
 
-
+	std::unordered_map<int, ContainerIntPair> container_map;
+	int iter_level = 0;
+	Container* iter_container = nullptr;
 
 public:
 	using PointerType = Widget*;
 	using refrence = Widget&;
+	bool done = false;
 	//using ValueType = typename Container::ValueType;
 	//const std::vector<Widget*>& widget_vector = container->get_widget_vector();
 
-	ContainerIterator(std::vector<Widget*>* widget_vector, int index) {
-		this->widget_vector = widget_vector;
-		_index = index;
-	}
+	ContainerIterator(gtkc::Container* container, int index);
 
-	Widget* operator*() {
-		return widget_vector->at(_index);
-	}
+	Widget* operator*();
 
 
-	ContainerIterator& operator++() {
-		_index++;	
+	ContainerIterator& operator++();
 
-		
-		return *this;
-	}
+	Widget* operator=(Widget* widget_ptr);
 
-	Widget* operator=(Widget* widget_ptr) {
-		return widget_vector->at(_index);
-	}
-
-	bool operator==(ContainerIterator it) {
-		std::cout << "Index " << _index << "\n";
-		if (_index == it._index) {
-			return true;
-		}
-
-		return false;
-	}
+	bool operator==(ContainerIterator it);
+	
 };
 
 
@@ -80,6 +78,7 @@ public:
 	void add_widget_arr(Widget* widget_arr[], size_t arr_size);
 	void add_widget_vector(std::vector<Widget*>& widget_vector);
 	void get_tagged_widgets(std::vector<gtkc::Widget*>&, const std::string& tag);
+	Container* get_child_container(const std::string& name);
 
 	ContainerIterator begin();
 	ContainerIterator end();

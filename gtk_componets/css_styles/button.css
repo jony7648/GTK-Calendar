@@ -1,5 +1,30 @@
-.Button {
+.Button, .ShadeButton {
+	font-size: 30px;
+	background-image: none;
+	background-color: white;
+	border: 1px solid;
+}
+
+.Test {
 	background-color: gray;
 	background-image: none;
 	color: black;
+	font-size: 30px;
+}
+
+.Button {
+
+}
+
+.Button:hover {
+	background-color: lightgray;
+}
+
+.Button:active {
+	background-color: gray;
+	border: 1px solid;
+}
+
+.ShadeButton {
+	background-color: gray;	
 }

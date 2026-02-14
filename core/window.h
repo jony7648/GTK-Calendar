@@ -28,12 +28,17 @@ public:
 	~Window();
 	Error display(Scene* scene);
 	void signal_set_close(App*, bool(*func)(GtkWidget* widget, gpointer user_data));
+
 	void set_scene(Scene* scene);
+	core::Scene* get_scene();
+	
 	void close();
 	void show();
 	void hide();
 
+	Signal S_request;
 	Signal S_end_program;
+	Signal S_window_close;
 
 	void set_attached_state();
 	bool get_attached_state();

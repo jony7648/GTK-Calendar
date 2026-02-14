@@ -1,6 +1,88 @@
 #include "container.h"
 
+
 namespace gtkc {
+
+ContainerIterator::ContainerIterator(gtkc::Container* container, int index) {
+	//initiate the first container map
+	container_map[0] = ContainerIntPair(container, index);
+	iter_container = container_map[0].container;
+}
+
+bool ContainerIterator::operator==(ContainerIterator it) {
+	if (iter_level < 0) {
+		return true;
+	}
+
+	const std::vector<Widget*>& widget_vector = container_map[0].container->get_widget_vector();
+
+	static int loop_count = 0;
+
+	//if iterator iterates too much assume something is wrong and stop
+	if (loop_count++ == 1000) {
+		return true;
+	}
+
+	if ((iter_level == 0 && container_map[0].index >= widget_vector.size())) {
+		std::cout << "Time to done\n";
+		return true;
+	}
+
+	return false;
+}
+
+Widget* ContainerIterator::operator*() {
+	if (iter_level < -1) {
+		return nullptr;
+	}
+	if (iter_container == nullptr) {
+		return nullptr;
+	}
+
+	iter_container = container_map[iter_level].container;	
+	const std::vector<Widget*>& widget_vector = iter_container->get_widget_vector();
+	int index = container_map[iter_level].index;
+
+	iter_widget = widget_vector.at(index);
+
+	return iter_widget;
+}
+
+ContainerIterator& ContainerIterator::operator++() {
+	int* pair_index = &container_map[iter_level].index;
+
+
+	const std::vector<Widget*>& widget_refrence = iter_container->get_widget_vector();
+
+	auto* widget_vector = &widget_refrence;
+
+	static int loop_count = 0;
+	
+	*pair_index += 1;
+
+	if (iter_widget->get_type() == "Grid Container") {
+		iter_level++;
+		container_map[iter_level] = ContainerIntPair(static_cast<gtkc::Container*>(iter_widget), 0);
+		return *this;
+	}
+
+
+	while (iter_level >= 0 && *pair_index >= container_map[iter_level].container->get_widget_vector().size()) {
+		//std::cout << "Leave the iter level: " << iter_level << "\n";
+		iter_level--;
+		pair_index = &container_map[iter_level].index;
+		//std::cout << "New Iter Level " << iter_level <<  " at index " << *pair_index << "\n";
+	}
+
+	return *this;
+}
+
+
+Widget* ContainerIterator::operator=(Widget* widget_ptr) {
+	int index = container_map[iter_level].index;
+	Widget* widget = iter_container->get_widget_vector().at(index);
+	return widget;
+}
 
 
 
@@ -20,11 +102,11 @@ Container::~Container() {
 
 
 ContainerIterator Container::begin() {
-	return ContainerIterator(&children_vector, 0);
+	return ContainerIterator(this, 0);
 }
 
 ContainerIterator Container::end() {
-	return ContainerIterator(&children_vector, children_vector.size());
+	return ContainerIterator(this, children_vector.size());
 }
 
 
@@ -98,6 +180,13 @@ void Container::get_tagged_widgets(std::vector<gtkc::Widget*>& widget_vec, const
 	std::string container_type = "Grid Container";
 	gtkc::Container* container = nullptr;
 
+	static int recursions = 0;
+
+	if (recursions == MAX_RECURSIONS) {
+		std::cout << "ERROR: get_tagged_widgets function hit max recursion limit\n";
+		return;
+	}
+
 	for (gtkc::Widget* widget : children_vector) {
 		if (widget->is_type(container_type)) {
 			container = static_cast<gtkc::Container*>(widget);
@@ -109,6 +198,19 @@ void Container::get_tagged_widgets(std::vector<gtkc::Widget*>& widget_vec, const
 			widget_vec.push_back(widget);
 		}
 	}
+}
+
+Container* Container::get_child_container(const std::string& name) {
+	Container* ret_widget = nullptr;
+
+	for (Widget* widget : *this) {
+		if (widget != nullptr && widget->get_name() == name) {
+			ret_widget = static_cast<Container*>(widget);
+		}
+		
+	}
+
+	return ret_widget;
 }
 
 void Container::present_widgets() {

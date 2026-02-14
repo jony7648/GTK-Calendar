@@ -47,9 +47,9 @@ public:
 	Error attach_sub_scene(Scene* scene);
 	void display_main_window();
 	void apply_provider(const std::string& css_dir_path);
-	bool request_subwin(const std::string& scene_name);
+	bool request_subwin(void* emitter_obj, const core::SigData& sig_data);
 
-
+	
 
 	Signal S_scene_request_subwin;
 	Signal S_window_end_program;

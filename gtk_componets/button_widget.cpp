@@ -18,6 +18,7 @@ Button::Button(const std::string& name, const std::string& text, int grid_x, int
 	set_grid_point(grid_x, grid_y);
 	set_scale(width, height);
 	this->text = text;
+	load_css();
 }
 
 Button::~Button() {

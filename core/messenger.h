@@ -22,6 +22,11 @@ struct DoubleMessenger {
 	T2 object2;
 };
 
+struct SigData {
+	std::string str;
+	int num;
+};
+
 struct SigDataInt {
 	int data;	
 };

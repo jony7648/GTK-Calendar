@@ -37,7 +37,7 @@ void Signal::emit_signal(void* emitter_obj) {
 	//This function will execute the funciton set in the signal
 	if (f_signal) {
 		//std::cout << "need to go up another level\n";
-		f_signal->emit_signal(this->parent_widget);
+		f_signal->emit_signal(emitter_obj);
 		return;
 	}
 
@@ -47,6 +47,23 @@ void Signal::emit_signal(void* emitter_obj) {
 	}
 	
 	_emit_func(this->parent_widget, emitter_obj);
+}
+
+void Signal::emit_signal(void* emitter_obj, const SigData& sig_data) {
+	//This function will execute the funciton set in the signal
+	std::cout << "Decide which one...\n";
+	if (f_signal) {
+		//std::cout << "need to go up another level\n";
+		f_signal->emit_signal(emitter_obj, sig_data);
+		return;
+	}
+
+	if (!_param_emit_func) {
+		//std::cout << "ERROR: emit_func is nullptr\n";
+		return;
+	}
+	
+	_param_emit_func(this->parent_widget, emitter_obj, sig_data);
 }
 
 void Signal::pickup_signal(Signal* signal) {
@@ -61,6 +78,10 @@ void Signal::set_parent_widget(void* parent_widget) {
 
 void Signal::set_emit_func(void(*emit_func)(void*, void*)) {
 	this->_emit_func = emit_func;
+}
+
+void Signal::set_emit_func(void(*emit_func)(void*, void*, const SigData&)) {
+	this->_param_emit_func = emit_func;
 }
 
 void Signal::disconnect(Signaler* signaler) {

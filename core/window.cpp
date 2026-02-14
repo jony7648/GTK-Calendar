@@ -8,6 +8,10 @@ bool process_close_request(GtkWidget* gtk_window, gpointer user_data) {
 
 	is_main_window = window->get_is_main_window();
 
+	
+	window->get_scene()->S_window_closed.emit_signal(nullptr);
+	window->S_window_close.emit_signal(nullptr);
+
 	if (is_main_window == false) {
 		window->hide();
 		return true;
@@ -28,6 +32,8 @@ Window::Window(GtkApplication* gtk_app_ptr, const std::string& title, const spac
 	
 	gtk_window = gtk_application_window_new(gtk_app_ptr);
 
+	S_request.set_parent_widget(this);
+	S_window_close.set_parent_widget(this);
 	g_signal_connect(this->gtk_window, "close-request", G_CALLBACK(process_close_request), this);
 	//std::cout << "This is the window address: " << this << "\n";
 }
@@ -38,9 +44,13 @@ Window::~Window() {
 
 void Window::set_scene(Scene* scene) {
 	if (scene != nullptr) {
-		gtk_window_set_child(GTK_WINDOW(gtk_window), scene->widget_container.get_gtk_widget());
+		gtk_window_set_child(GTK_WINDOW(gtk_window), scene->get_widget_container().get_gtk_widget());
 		current_scene = scene;
 	}
+}
+
+core::Scene* Window::get_scene() {
+	return current_scene;
 }
 
 void Window::show() {
@@ -69,7 +79,7 @@ Error Window::display(Scene* scene) {
 		return Error::NULLPTR;
 	}
 
-	if (scene->widget_container.get_gtk_widget() == nullptr) {
+	if (scene->get_widget_container().get_gtk_widget() == nullptr) {
 		std::cout << "ERROR: The gtk widget of the scene container is a nullptr";
 		return Error::NULLPTR;
 	}
@@ -78,10 +88,13 @@ Error Window::display(Scene* scene) {
 
 	const space::Point& scene_dimensions = scene->get_custom_dimensions();
 
+	current_scene = scene;
 	gtk_window_set_resizable(GTK_WINDOW(gtk_window), scene->get_resizability());
 	gtk_window_set_default_size(GTK_WINDOW(gtk_window), scene_dimensions.x, scene_dimensions.y);
 	gtk_window_present(GTK_WINDOW(gtk_window));
-	gtk_widget_set_size_request(scene->widget_container.get_gtk_widget(), dimensions.x, dimensions.y);
+	gtk_window_set_child(GTK_WINDOW(get_gtk_window()), scene->get_widget_container().get_gtk_widget());
+	//gtk_widget_set_size_request(scene->widget_container.get_gtk_widget(), dimensions.x, dimensions.y);
+
 
 	is_displaying = true;
 

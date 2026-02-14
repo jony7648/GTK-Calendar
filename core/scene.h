@@ -15,12 +15,16 @@ private:
 	space::Point custom_dimensions;
 	bool resizable_win = true;
 	Signaler signaler;
+	gtkc::GridContainer widget_container;
 
 public:
 	Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing);
 	~Scene();
 	Signal GS_cal_button_clicked;
 	Signal GS_button_clicked;
+	//Signal S_request_subwin;
+	Signal S_window_displayed;
+	Signal S_window_closed;
 	Signal S_request_subwin;
 
 
@@ -32,7 +36,7 @@ public:
 	void signal_request_subwin(core::Message* message);
 
 
-	gtkc::GridContainer widget_container;
+	gtkc::GridContainer& get_widget_container();
 
 	const std::string& get_name();
 	Signaler* get_signaler();

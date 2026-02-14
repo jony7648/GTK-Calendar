@@ -11,13 +11,11 @@ bool is_custom_point(const space::Point& point) {
 	return false;	
 }
 
-
-
-void signal_request_subwin(void* app_addr, void* win_addr) {
+void signal_request_subwin(void* app_addr, void* emitter_obj, const core::SigData& sig_data) {
 	core::App* app = static_cast<core::App*>(app_addr);
-	core::Window* win = static_cast<core::Window*>(app_addr);
+	gtkc::Widget* widget = static_cast<gtkc::Widget*>(emitter_obj);
 
-	app->request_subwin("Note Scene");
+	app->request_subwin(emitter_obj, sig_data);
 }
 
 void signal_end_app(void* app_ptr, void* ignore_ptr) {
@@ -43,7 +41,6 @@ App::App(const std::string& app_title, const space::Point& dimensions, int argc,
 
 	S_window_end_program.set_parent_widget(this);
 	S_window_end_program.set_emit_func(&signal_end_app);
-	std::cout << "This is app " << this << "\n";
 }
 
 App::~App() {
@@ -84,7 +81,10 @@ int App::attach_subwin(Window* subwin) {
 	return 0;
 }
 
-bool App::request_subwin(const std::string& scene_name) {
+bool App::request_subwin(void* emitter_obj, const SigData& sig_data) {
+
+	const std::string& scene_name = sig_data.str;
+
 	Scene* sub_scene = nullptr;
 	Window* subwin = nullptr;
 
@@ -118,6 +118,10 @@ bool App::request_subwin(const std::string& scene_name) {
 		subwin->show();
 	}
 
+	sub_scene->S_window_displayed.emit_signal(emitter_obj, sig_data);
+
+	//subwin->get_scene
+
 	return true;
 }
 
@@ -132,7 +136,7 @@ Error App::attach_main_scene(core::Scene* scene) {
 		return Error::NULLPTR;
 	}
 
-	gtk_window_set_child(GTK_WINDOW(main_window->get_gtk_window()), scene->widget_container.get_gtk_widget());
+	//gtk_window_set_child(GTK_WINDOW(main_window->get_gtk_window()), scene->widget_container.get_gtk_widget());
 
 	if (main_scene != nullptr) {
 		delete main_scene;
@@ -143,7 +147,7 @@ Error App::attach_main_scene(core::Scene* scene) {
 
 	//rewrite the signals so you can add signals to them and chain them
 	std::cout << "Signal Picked Up!" << "\n";
-	S_scene_request_subwin.pickup_signal(&scene->GS_cal_button_clicked);	
+	S_scene_request_subwin.pickup_signal(&scene->S_request_subwin);	
 	scene->set_time_componet(&time_componet);
 	//S_scene_request_subwin.listen(scene->get_signaler(), "clicked", &signal_request_subwin);
 
@@ -151,6 +155,7 @@ Error App::attach_main_scene(core::Scene* scene) {
 }
 
 Error App::attach_sub_scene(Scene* scene) {
+	scene->set_time_componet(&time_componet);
 	sub_scene_vect.push_back(scene);
 
 	return Error::CLEAR;	
@@ -183,7 +188,7 @@ void App::apply_provider(const std::string& css_dir_path) {
 }
 
 GtkWidget* App::get_scene_container() {
-	return main_scene->widget_container.get_gtk_widget();
+	return main_scene->get_widget_container().get_gtk_widget();
 }
 
 void App::run(void(*activate_func)(GtkApplication* app, gpointer), core::Messenger<App*>* signal_ptr) {

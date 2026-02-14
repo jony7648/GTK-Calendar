@@ -11,6 +11,8 @@ Scene::Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing
 	widget_container.set_halign(GTK_ALIGN_START);
 
 	S_request_subwin.set_parent_widget(this);
+	S_window_closed.set_parent_widget(this);
+	S_window_displayed.set_parent_widget(this);
 	//S_request_note_win.set_emit_func(test_func);
 	GS_cal_button_clicked.set_parent_widget(this);
 	GS_button_clicked.set_parent_widget(this);
@@ -44,6 +46,11 @@ bool Scene::get_resizability() {
 void Scene::signal_request_subwin(core::Message* message) {
 	
 }
+
+gtkc::GridContainer& Scene::get_widget_container() {
+	return widget_container;	
+}
+
 
 const std::string& Scene::get_name() {
 	return name;	

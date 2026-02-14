@@ -47,6 +47,21 @@ TimeComponet::TimeComponet() {
 	month_arr[10] = "Nov";
 	month_arr[11] = "Dec";
 
+
+	long_mth_names[0] = "Janurary";
+	long_mth_names[1] = "February";
+	long_mth_names[2] = "March";
+	long_mth_names[3] = "April";
+	long_mth_names[4] = "May";
+	long_mth_names[5] = "June";
+	long_mth_names[6] = "July";
+	long_mth_names[7] = "August";
+	long_mth_names[8] = "September";
+	long_mth_names[9] = "October";
+	long_mth_names[10] = "November";
+	long_mth_names[11] = "December";
+
+
 	day_count_arr[0] = 31;
 	day_count_arr[1] = 28;
 	day_count_arr[2] = 31;
@@ -166,10 +181,6 @@ int TimeComponet::get_starting_weekday() {
 }
 
 void TimeComponet::advance_menu_month(int cycle_count) {
-	//for somereason it is not cycling figure out why
-	//and try to improve the container iterator
-	
-	
 	if (menu_month + cycle_count < 0) {
 		menu_year--;
 	}
@@ -179,15 +190,20 @@ void TimeComponet::advance_menu_month(int cycle_count) {
 	}
 
 	//menu_year = menu_year + (menu_month + cycle_count) / (MONTH_COUNT);
-	menu_month = util::cycle_through_bounds(menu_month, cycle_count, 0, MONTH_COUNT-1);
-
-	std::cout << "This is the menu month: " << menu_month << "\n";
-	std::cout << "This is the menu year: " << menu_year << "\n";
+	menu_month = util::cycle_through_bounds(menu_month, cycle_count, 0, MONTH_COUNT);
 }
 
 void TimeComponet::reset_menu_time() {
 	menu_month = month;
 	menu_year = year;
+}
+
+const std::string& TimeComponet::get_long_month_name(int month) {
+	return long_mth_names[month];
+}
+
+const std::string& TimeComponet::get_short_month_name(int month) {
+	return month_arr[month];
 }
 
 
@@ -203,6 +219,38 @@ std::string* TimeComponet::get_weekday_arr() {
 	return weekday_arr;
 }
 
+void TimeComponet::get_full_day_str(int day, int month, int year, std::string& output_str) {
+	const std::string& RD_ENDING = "rd";			
+	const std::string& TH_ENDING = "th";			
+	const std::string& ST_ENDING = "st";			
+	const std::string& ND_ENDING = "nd";			
+
+	int day_last_num = day % 10;
+
+	std::string day_suffix = "";
+
+	if (day > 3 and day < 21) {
+		day_suffix = TH_ENDING;
+	}
+	else if (day_last_num > 4) {
+		day_suffix = TH_ENDING;
+	}
+	else if (day_last_num == 3) {
+		day_suffix = RD_ENDING;
+	}
+	else if (day_last_num == 2) {
+		day_suffix = ND_ENDING;
+	}
+	else {
+		day_suffix = ST_ENDING;	
+	}
+
+	const std::string& month_str = long_mth_names[month];
+	const std::string& day_str = std::to_string(day) + day_suffix;
+
+	output_str = month_str + " " + day_str + ", " + std::to_string(year);
+}
+
 int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	//this meathod will return the weekday that the month starts on
 
@@ -212,25 +260,26 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	int leap_year_count = 0;
 	int cycle_dir = 1;
 
-	std::cout << "Starting days to cycle: " << days_to_cycle << "\n";
+	//std::cout << "Starting days to cycle: " << days_to_cycle << "\n";
 	int current_month = 0;
 
 	if (months_ahead < 0) {
 		cycle_dir = -1;
 	}
 
+
+	//calculate the amount of days to cycle (without leap years)
 	for (int i=0; i<abs(months_ahead); i++) {
-		//current_month = (i + month*direction_factor) % MONTH_COUNT;
 		current_month = util::cycle_through_bounds(month, i*cycle_dir, 0, MONTH_COUNT);
 		
 		if (cycle_dir < 0 ) {
-			current_month--;
+			//if cycle_dir < 0, decrement current_month to access
+			//the day count of the previous month
+			current_month = util::cycle_through_bounds(current_month, -1, 0, MONTH_COUNT);
 		}
 
 		days_to_cycle += day_count_arr[current_month] * cycle_dir;
 	}
-
-
 
 	//account for leap years
 	leap_year_count = find_leap_year_count(year, target_year);
@@ -243,8 +292,7 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	}
 
 
-	int result = util::cycle_through_bounds(weekday, days_to_cycle, 0, WEEKDAY_COUNT-1);
-	
+	int result = util::cycle_through_bounds(weekday, days_to_cycle, 0, WEEKDAY_COUNT);
 
 	/*
 	std::println(

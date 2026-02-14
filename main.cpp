@@ -21,7 +21,8 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	core::Scene* main_scene = project::create_main_scene(time_componet);
 	core::Scene* note_scene = project::create_note_scene(time_componet);
 
-	main_scene->widget_container.present_widgets();
+	main_scene->get_widget_container().present_widgets();
+	note_scene->get_widget_container().present_widgets();
 
 	app->attach_main_window(window);
 	app->attach_sub_scene(note_scene);
