@@ -1,6 +1,7 @@
 #include <iostream>
 #include "gtk_componets/gtk_componets.h"
 #include "note_scene.h"
+#include "persist_data.h"
 
 const std::string NOTE_CONTAINER_STR = "Note Container";
 const std::string NOTE_INPUT_NAME = "Note TextField";
@@ -23,6 +24,17 @@ static void save_note_text(void* receiver_obj, void* emitter_obj) {
 	note_str = note_text_field->get_text();
 
 	std::cout << note_str << "\n";
+
+	data::DaySave day_save;
+
+	day_save.year = 2026;
+	day_save.month = 5;
+	day_save.day = 3;
+	day_save.note = "Apples";
+
+	data::save_data(day_save);
+
+
 
 }
 
@@ -67,10 +79,11 @@ void prepare_note_scene(core::Scene* scene, gtkc::Button* emit_button) {
 	date_label->set_text(date_str);
 }
 
-void signal_window_displayed(void* receiver_obj, void* emitter_obj, const core::SigData& sig_data) {
-	std::cout << receiver_obj << " " << emitter_obj << " " << &sig_data << "\n";
+void signal_window_displayed(void* receiver_obj, void* emitter_obj, void* sig_data_addr) {
+	core::SigData* sig_data = static_cast<core::SigData*>(sig_data_addr);
 	core::Scene* scene = static_cast<core::Scene*>(receiver_obj);
 	gtkc::Button* emit_button = static_cast<gtkc::Button*>(emitter_obj);
+	std::cout << receiver_obj << " " << emitter_obj << " " << &sig_data << "\n";
 
 
 	prepare_note_scene(scene, emit_button);

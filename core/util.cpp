@@ -23,14 +23,17 @@ int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int 
 
 std::vector<std::string>& str_split(std::vector<std::string>& store_vector, const std::string& str, char split_char) {
 	//this function splits a string when it hits a specified character
-	size_t strlen = str.length();
+	size_t strlen = str.length(), vec_len = store_vector.size();
 	int copy_count = 0;
 	int sub_start = 0;
 	int sub_end = 0;
+	char character = ' ';
 	std::string sub_str = "";
 
+	int vec_index = 0;
+
 	for (int i=0; i<strlen; i++) {
-		char character = str[i];
+		character = str[i];
 		copy_count = i - sub_start;
 
 		if (i == strlen - 1) {
@@ -38,10 +41,19 @@ std::vector<std::string>& str_split(std::vector<std::string>& store_vector, cons
 		}
 
 		if (character == split_char || i == strlen - 1){
-			//std::cout << copy_count << "\n" << sub_start << "\n";
 			sub_str = str.substr(sub_start, copy_count);
-			store_vector.push_back(sub_str);
 			sub_start = i+1;
+			
+			//add differently based on if we are dealing with default
+			//vector values
+			if (vec_index >= vec_len) {
+				store_vector.push_back(sub_str);
+			}
+			else {
+				store_vector.at(vec_index) = sub_str;
+			}
+
+			vec_index++;
 		}
 	}
 

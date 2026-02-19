@@ -11,9 +11,11 @@ bool is_custom_point(const space::Point& point) {
 	return false;	
 }
 
-void signal_request_subwin(void* app_addr, void* emitter_obj, const core::SigData& sig_data) {
+void signal_request_subwin(void* app_addr, void* emitter_obj, void* sig_data_addr) {
 	core::App* app = static_cast<core::App*>(app_addr);
 	gtkc::Widget* widget = static_cast<gtkc::Widget*>(emitter_obj);
+	core::SigData* sig_data = static_cast<core::SigData*>(sig_data_addr);
+
 
 	app->request_subwin(emitter_obj, sig_data);
 }
@@ -36,6 +38,7 @@ App::App(const std::string& app_title, const space::Point& dimensions, int argc,
 	this->argv = argv;
 	
 	signaler.set_parent_widget(this);
+
 	S_scene_request_subwin.set_parent_widget(this);
 	S_scene_request_subwin.set_emit_func(&signal_request_subwin);
 
@@ -81,15 +84,15 @@ int App::attach_subwin(Window* subwin) {
 	return 0;
 }
 
-bool App::request_subwin(void* emitter_obj, const SigData& sig_data) {
-
-	const std::string& scene_name = sig_data.str;
+bool App::request_subwin(void* emitter_obj, SigData* sig_data) {
+	const std::string& scene_name = sig_data->str;
 
 	Scene* sub_scene = nullptr;
 	Window* subwin = nullptr;
 
 	//check for the subscenes existance
 	for (auto& scene : sub_scene_vect) {
+		std::cout << "Scene Name" << scene_name << "\n";
 		if (scene && scene->get_name() == scene_name) {
 			sub_scene = scene;
 			break;
@@ -125,7 +128,7 @@ bool App::request_subwin(void* emitter_obj, const SigData& sig_data) {
 	return true;
 }
 
-Error App::attach_main_scene(core::Scene* scene) {
+Error App::attach_main_scene(core::Scene* scene, void* signal_data) {
 	if (scene == nullptr) {
 		std::cout << "ERROR: the new scene is a nullptr!\n";
 		return Error::NULLPTR;
@@ -149,6 +152,8 @@ Error App::attach_main_scene(core::Scene* scene) {
 	std::cout << "Signal Picked Up!" << "\n";
 	S_scene_request_subwin.pickup_signal(&scene->S_request_subwin);	
 	scene->set_time_componet(&time_componet);
+	scene->S_ready.emit_signal(signal_data);
+
 	//S_scene_request_subwin.listen(scene->get_signaler(), "clicked", &signal_request_subwin);
 
 	return Error::CLEAR;
@@ -191,8 +196,8 @@ GtkWidget* App::get_scene_container() {
 	return main_scene->get_widget_container().get_gtk_widget();
 }
 
-void App::run(void(*activate_func)(GtkApplication* app, gpointer), core::Messenger<App*>* signal_ptr) {
-	g_signal_connect(gtk_app, "activate", G_CALLBACK(activate_func), signal_ptr);
+void App::run(void(*activate_func)(GtkApplication*, gpointer), void* activate_signal) {
+	g_signal_connect(gtk_app, "activate", G_CALLBACK(activate_func), activate_signal);
 
 	app_status = g_application_run(G_APPLICATION(gtk_app), 0, argv);
 }

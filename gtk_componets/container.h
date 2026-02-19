@@ -19,15 +19,9 @@ struct ContainerIntPair {
 namespace gtkc {
 class ContainerIterator {
 private:
-	//pointer m_data*
 	Container* container = nullptr;
 	Widget* iter_widget = nullptr;
-	//std::vector<gtkc::Widget*>* widget_vector;
-	//int _end_index = widget_vector.size() + 1;
 	Widget* _ptr = nullptr;
-
-	//std::vector<container_int_pair> container_vector;
-	
 
 	std::unordered_map<int, ContainerIntPair> container_map;
 	int iter_level = 0;
@@ -37,8 +31,6 @@ public:
 	using PointerType = Widget*;
 	using refrence = Widget&;
 	bool done = false;
-	//using ValueType = typename Container::ValueType;
-	//const std::vector<Widget*>& widget_vector = container->get_widget_vector();
 
 	ContainerIterator(gtkc::Container* container, int index);
 

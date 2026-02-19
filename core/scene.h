@@ -23,6 +23,7 @@ public:
 	Signal GS_cal_button_clicked;
 	Signal GS_button_clicked;
 	//Signal S_request_subwin;
+	Signal S_ready; // a signal that gets executed when being attached to the app object
 	Signal S_window_displayed;
 	Signal S_window_closed;
 	Signal S_request_subwin;

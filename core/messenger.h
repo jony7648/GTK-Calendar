@@ -3,8 +3,9 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include "csv_writer.h"
 
-namespace core{struct Signal; struct SigMessageLink;};
+namespace core{class Window; struct Signal; struct SigMessageLink;};
 namespace gtkc{class Widget;};
 
 
@@ -15,6 +16,7 @@ template <typename T>
 struct Messenger {
 	T object;
 };
+
 
 template <typename T1, typename T2>
 struct DoubleMessenger {

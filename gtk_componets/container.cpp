@@ -51,7 +51,6 @@ Widget* ContainerIterator::operator*() {
 ContainerIterator& ContainerIterator::operator++() {
 	int* pair_index = &container_map[iter_level].index;
 
-
 	const std::vector<Widget*>& widget_refrence = iter_container->get_widget_vector();
 
 	auto* widget_vector = &widget_refrence;

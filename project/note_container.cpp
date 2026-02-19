@@ -1,0 +1,84 @@
+#include "note_container.h"
+
+namespace data {
+NoteContainerIterator::NoteContainerIterator(NoteContainer* note_container, Note note_arr[], short start_index, short end_index, size_t container_size) {
+	this->note_container = note_container;
+	this->start_index = start_index;
+	this->end_index = end_index;
+	this->container_size = container_size;
+	this->note_arr = note_arr;
+}
+
+bool NoteContainerIterator::operator==(NoteContainerIterator it) {
+	if (current_index == end_index) {
+		return true;
+	}
+
+	return false;
+}
+
+Note* NoteContainerIterator::operator->() {
+	Note* note = &note_arr[current_index];
+
+	return note;
+}
+
+Note& NoteContainerIterator::operator*() {
+	Note& note = note_arr[current_index];
+
+	return note;
+}
+
+NoteContainerIterator& NoteContainerIterator::operator++() {
+	current_index = (current_index+1) % MAX_NOTE_COUNT;
+	
+	return *this;
+}
+
+
+
+Note& NoteContainer::add_note() {
+	if (start_index == MAX_NOTE_COUNT) {
+		start_index = 0;
+	}
+
+	if (end_index == MAX_NOTE_COUNT) {
+		end_index = 0;
+	}
+
+	reset(end_index);
+
+
+	end_index++;
+	return note_arr[end_index-1];
+}
+
+void NoteContainer::reset(int index) {
+	if (index < 0 || index >= MAX_NOTE_COUNT) {
+		std::cout << "You are trying to reset index " << index << ", which is out of bounds!\n";
+	}
+
+	Note& note = note_arr[index];
+
+	note.year = 0;
+	note.month = 0;
+	note.day = 0;
+	note.text = "";
+}
+
+NoteContainerIterator NoteContainer::begin() {
+	return NoteContainerIterator(this, note_arr, start_index, end_index, MAX_NOTE_COUNT);
+}
+
+NoteContainerIterator NoteContainer::end() {
+	return NoteContainerIterator(this, note_arr, start_index, end_index, MAX_NOTE_COUNT);
+}
+
+short NoteContainer::get_start_index() {
+	return start_index;
+}
+
+short NoteContainer::get_end_index() {
+	return start_index;
+}
+}

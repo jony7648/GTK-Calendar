@@ -31,8 +31,6 @@ void Signal::listen(Signaler* signaler, const std::string& emit_type, void(*emit
 	g_signal_connect(signaler->get_parent_gtk(), emit_type.c_str(), G_CALLBACK(&process_signal), sig_link);
 }
 
-
-
 void Signal::emit_signal(void* emitter_obj) {
 	//This function will execute the funciton set in the signal
 	if (f_signal) {
@@ -49,7 +47,7 @@ void Signal::emit_signal(void* emitter_obj) {
 	_emit_func(this->parent_widget, emitter_obj);
 }
 
-void Signal::emit_signal(void* emitter_obj, const SigData& sig_data) {
+void Signal::emit_signal(void* emitter_obj, void* sig_data) {
 	//This function will execute the funciton set in the signal
 	std::cout << "Decide which one...\n";
 	if (f_signal) {
@@ -80,7 +78,7 @@ void Signal::set_emit_func(void(*emit_func)(void*, void*)) {
 	this->_emit_func = emit_func;
 }
 
-void Signal::set_emit_func(void(*emit_func)(void*, void*, const SigData&)) {
+void Signal::set_emit_func(void(*emit_func)(void*, void*, void*)) {
 	this->_param_emit_func = emit_func;
 }
 

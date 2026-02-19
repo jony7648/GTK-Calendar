@@ -39,15 +39,15 @@ public:
 	App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
 	~App();
 	//bool process_close_request(GtkWidget* gtk_widget, gpointer user_data);
-	void run(void(*activate_func)(GtkApplication*, gpointer), core::Messenger<App*>* signal_ptr);
+	void run(void(*activate_func)(GtkApplication*, gpointer), void* activate_signal);
 	void close();
 	Error attach_main_window(Window* window);
 	int attach_subwin(Window* window);
-	Error attach_main_scene(Scene* scene);
+	Error attach_main_scene(Scene* scene, void* signal_data = nullptr);
 	Error attach_sub_scene(Scene* scene);
 	void display_main_window();
 	void apply_provider(const std::string& css_dir_path);
-	bool request_subwin(void* emitter_obj, const core::SigData& sig_data);
+	bool request_subwin(void* emitter_obj, SigData* sig_data);
 
 	
 
