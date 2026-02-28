@@ -5,6 +5,7 @@
 #include "core/window.h"
 #include "core/util.h"
 #include "persist_data.h"
+#include "note_container.h"
 
 data::PersistData* persist_data = nullptr;
 
@@ -25,14 +26,19 @@ static void arrange_cal_buttons(core::TimeComponet* time_componet, std::vector<g
 		day = i+1;
 		widget = widget_vector.at(i);
 
+		//if the month has less than 31 days hide the buttons that
+		//have a higher day value than the month's day count
 		if (i >= day_count) {
 			widget->hide();
-			break;
+			continue;
 		}
 
 		if (persist_data->note_exists(day, month, year)) {
 			std::cout << "Day " << day << " exists!\n";
 			widget->load_css("ShadeButton");
+		}
+		else {
+			widget->load_css("BlankState");
 		}
 
 		pos_index = i + start_weekday;
@@ -114,18 +120,64 @@ static void signal_button_clicked(void* receiver_obj, void* emitter_obj) {
 
 static void signal_open_note_window(void* receiver_obj, void* emitter_obj) {
 	core::Scene* scene = static_cast<core::Scene*>(receiver_obj);
+	core::TimeComponet* time_componet = scene->get_time_componet();
 	gtkc::Button* button = static_cast<gtkc::Button*>(emitter_obj);
+	data::Note* note_ptr = nullptr;
+
 
 	core::SigData sig_data;
 
+	if (time_componet == nullptr) {
+		return;	
+	}
+
+
+	time_componet->set_menu_day(std::stoi(button->get_text()));
+	const core::Date& date = time_componet->get_menu_date();
+	
+
+	note_ptr = persist_data->get_note(date);
+
+
+
 	sig_data.str = "Note Scene";
 
-	scene->S_request_subwin.emit_signal(emitter_obj, &sig_data);
-	//gtkc::Button* button = static_cast<gtkc::Button*>(message->widget);
+	if (note_ptr) {
+		sig_data.obj_ptr = note_ptr;
+	}
+	else {
+		note_ptr = &persist_data->note_container.after_end();
+		std::cout << "this is the note pointer: " << note_ptr << "\n";
+		persist_data->note_container.reset(note_ptr);
 
-	//gtkc::Button* button = static_cast<gtkc::Button*>(message->widget);
-	//core::Scene* main_scene = static_cast<core::Scene*>(message->receiver_object);
-	//std::cout << button->get_text() << "\n";
+		note_ptr->date.day = std::stoi(button->get_text());
+		note_ptr->date.month = time_componet->get_menu_month();
+		note_ptr->date.year = time_componet->get_menu_year();
+
+		sig_data.obj_ptr = note_ptr;
+	}
+
+
+	scene->sig_handler.emit_data(core::Scene::S_REQUEST_SUBWIN, &sig_data, button);
+}
+
+static void signal_window_closed(void* scene_addr, void* subscene_addr, void* sig_data) {
+	core::Scene* scene = static_cast<core::Scene*>(scene_addr);	
+	core::Scene* sub_scene = static_cast<core::Scene*>(subscene_addr);	
+	data::Note& end_note = persist_data->note_container.after_end();
+	data::NoteContainer& note_container = persist_data->note_container;
+
+
+
+	std::cout << "Closed Scene Name: " << scene->get_name() << "\n";
+	std::cout << "Closed Sub Scene Name: " << sub_scene->get_name() << "\n";
+	std::cout << "Should Save " << end_note.should_save << "\n";
+
+	if (end_note.should_save) {
+		note_container.increment();			
+	}
+	
+
 }
 
 static void add_weekday_header(core::TimeComponet* time_componet, std::vector<gtkc::Widget*>& widget_vector) {
@@ -169,8 +221,7 @@ static void create_cal_buttons(core::Scene* scene, std::vector<gtkc::Widget*>& w
 
 		button->set_tag("Cal Buttons");
 		widget_vector.push_back(button);
-		scene->GS_cal_button_clicked.listen(button->get_signaler(), "clicked", &signal_open_note_window);
-
+		scene->sig_handler.g_listen(button, "clicked", signal_open_note_window);
 	}
 }
 
@@ -203,8 +254,9 @@ static gtkc::GridContainer* create_info_container(core::Scene* scene) {
 	next_month_button->set_sig_data(1);
 	prev_month_button->set_tag("Month Scroll");
 	next_month_button->set_tag("Month Scroll");
-	scene->GS_button_clicked.listen(prev_month_button->get_signaler(), "clicked", signal_button_clicked);
-	scene->GS_button_clicked.listen(next_month_button->get_signaler(), "clicked", signal_button_clicked);
+
+	scene->sig_handler.g_listen(next_month_button, "clicked", signal_button_clicked);
+	scene->sig_handler.g_listen(prev_month_button, "clicked", signal_button_clicked);
 
 	top_container->present_widgets();
 	info_container->add_widget(top_container);
@@ -270,13 +322,12 @@ core::Scene* create_main_scene(core::TimeComponet* time_componet, core::CsvWrite
 	std::vector<gtkc::Widget*> widget_vector;
 	std::vector<gtkc::Widget*> cal_button_vector;
 
-
-
 	core::Scene* scene = new core::Scene("Main Scene", 32,5);
 
 	scene->set_custom_dimensions(scene_dimensions);
+	scene->add_emit_func(core::Scene::S_WINDOW_CLOSED, signal_window_closed, scene);
 
-	gtkc::Container& main_container = scene->get_widget_container();
+	gtkc::GridContainer& main_container = scene->get_widget_container();
 	main_container.set_valign(GTK_ALIGN_FILL);
 	main_container.set_halign(GTK_ALIGN_FILL);
 	main_container.set_widget_spacing(30,1);

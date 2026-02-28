@@ -21,7 +21,22 @@ GridContainer::GridContainer(const std::string& name, int size_x, int size_y) {
 	_type = "Grid Container";
 }
 
+GridContainer* GridContainer::get_child_container(const std::string& name) {
+	GridContainer* ret_widget = nullptr;
+
+	for (Widget* widget : *this) {
+		if (widget != nullptr && widget->get_name() == name) {
+			ret_widget = static_cast<GridContainer*>(widget);
+		}
+		
+	}
+
+	return ret_widget;
+}
+
 const space::Point& GridContainer::get_grid_size() {
 	return grid_size;	
 }
+
+
 }

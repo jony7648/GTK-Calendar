@@ -26,8 +26,9 @@ struct DoubleMessenger {
 
 struct SigData {
 	std::string str;
-	int num;
+	void* obj_ptr = nullptr;
 };
+
 
 struct SigDataInt {
 	int data;	

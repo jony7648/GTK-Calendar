@@ -8,12 +8,49 @@
 #include "time_componet.h"
 #include "scene.h"
 #include "error_code.h"
+#include "signal_handler.h"
 
 
 namespace core {
 class Window;
 
 class App {
+
+public:
+	enum SIGNALS {
+		S_SCENE_REQUEST_SUBWIN,
+		S_WINDOW_END_PROGRAM,
+		S_SUBWIN_CLOSE,
+	};
+
+	App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
+	~App();
+	//bool process_close_request(GtkWidget* gtk_widget, gpointer user_data);
+	void run(void(*activate_func)(GtkApplication*, gpointer), void* activate_signal);
+	void close();
+	Error attach_main_window(Window* window);
+	void create_subwins(unsigned int count);
+	int attach_subwin(Window* window);
+	Error attach_main_scene(Scene* scene, void* signal_data = nullptr);
+	Error attach_sub_scene(Scene* scene);
+	void display_main_window();
+	void apply_provider(const std::string& css_dir_path);
+	bool request_subwin(void* emitter_obj, SigData* sig_data);
+	bool request_subwin(core::Scene* scene);
+
+	SigHandler sig_handler;
+	
+	//Signal S_scene_request_subwin;
+	//Signal S_window_end_program;
+	//Signal S_subwin_close;
+
+	Scene* get_main_scene();
+	GtkWidget* get_scene_container();
+	core::TimeComponet* get_time_componet();
+	const space::Point& get_win_dimensions();
+
+
+
 private:
 	Scene* main_scene = nullptr;
 	std::vector<Scene*> sub_scene_vect;
@@ -25,40 +62,14 @@ private:
 	Window* main_window = nullptr;
 	std::vector<Window*> subwin_vect;
 
-	Signaler signaler;
-
 	GtkCssProvider* _css_provider = nullptr;
 	GdkDisplay* _default_display = nullptr;
 
 	int argc = 0;
 	char** argv = nullptr;
-	int subwin_cap = 5;
+	const short DEFAULT_SUBWIN_COUNT = 5;
 	int app_status = 0;
 
-public:
-	App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
-	~App();
-	//bool process_close_request(GtkWidget* gtk_widget, gpointer user_data);
-	void run(void(*activate_func)(GtkApplication*, gpointer), void* activate_signal);
-	void close();
-	Error attach_main_window(Window* window);
-	int attach_subwin(Window* window);
-	Error attach_main_scene(Scene* scene, void* signal_data = nullptr);
-	Error attach_sub_scene(Scene* scene);
-	void display_main_window();
-	void apply_provider(const std::string& css_dir_path);
-	bool request_subwin(void* emitter_obj, SigData* sig_data);
-
-	
-
-	Signal S_scene_request_subwin;
-	Signal S_window_end_program;
-
-	Scene* get_main_scene();
-	void set_subwin_cap(int cap);
-	GtkWidget* get_scene_container();
-	core::TimeComponet* get_time_componet();
-	const space::Point& get_win_dimensions();
 
 };
 }

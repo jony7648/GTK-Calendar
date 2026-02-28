@@ -9,4 +9,8 @@ struct ActivateSignal {
 	core::CsvWriter* csv_writer = nullptr;
 	data::PersistData* persist_data = nullptr;
 };
+
+struct ObjectSignal {
+	void* object = nullptr;
+};
 }

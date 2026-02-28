@@ -9,37 +9,49 @@ bool process_close_request(GtkWidget* gtk_window, gpointer user_data) {
 	is_main_window = window->get_is_main_window();
 
 	
-	window->get_scene()->S_window_closed.emit_signal(nullptr);
-	window->S_window_close.emit_signal(nullptr);
-
 	if (is_main_window == false) {
+		//alert app and scene of the sub_window's closing
+		window->get_scene()->sig_handler.emit(core::Window::S_WINDOW_CLOSE);
+		window->sig_handler.emit(core::Window::S_WINDOW_CLOSE);
+
 		window->hide();
+		
 		return true;
 	}
 
-
-	window->S_end_program.emit_signal(nullptr);
+	window->sig_handler.emit(core::Window::S_END_PROGRAM);
 	//gtk_window_destroy(GTK_WINDOW(gtk_window));
 	return true;	
 }
 
 
 namespace core {
-Window::Window(GtkApplication* gtk_app_ptr, const std::string& title, const space::Point& dimensions) {
+Window::Window(GtkApplication* gtk_app_ptr, const std::string& title) {
 	this->title = title;
-	this->dimensions.x = dimensions.x;
-	this->dimensions.y = dimensions.y;
+	this->dimensions.x = 30;
+	this->dimensions.y = 30;
 	
 	gtk_window = gtk_application_window_new(gtk_app_ptr);
 
-	S_request.set_parent_widget(this);
-	S_window_close.set_parent_widget(this);
+	sig_handler.set_parent_object(this);
+	sig_handler.add_signal(S_REQUEST);
+	sig_handler.add_signal(S_END_PROGRAM);
+	sig_handler.add_signal(S_WINDOW_CLOSE);
+
 	g_signal_connect(this->gtk_window, "close-request", G_CALLBACK(process_close_request), this);
 	//std::cout << "This is the window address: " << this << "\n";
 }
 
 Window::~Window() {
 	gtk_window_destroy(GTK_WINDOW(gtk_window));
+}
+
+void Window::emit_signal(int id, void* parent) {
+	sig_handler.emit(id, parent);
+}
+
+void Window::add_emit_func(int id, void(*emit_func)(void*, void*, void*), void* receiver_obj) {
+	sig_handler.add_emit_func(id, emit_func, receiver_obj);
 }
 
 void Window::set_scene(Scene* scene) {
@@ -74,6 +86,11 @@ Error Window::display(Scene* scene) {
 	}
 	*/
 
+	if (is_displaying) {
+		show();
+		return Error::CLEAR;
+	}
+
 	if (scene == nullptr) {
 		std::cout << "ERROR: Can't display a scene that is a nullptr\n";
 		return Error::NULLPTR;
@@ -107,6 +124,8 @@ void Window::signal_set_close(core::App* app, bool(*func)(GtkWidget* widget, gpo
 	if (func == nullptr) {
 		return;
 	}
+
+	//YOU NEED TO REWRITE THIS AS THIS IS A MEMORY LEAK
 
 	auto* messenger = new DoubleMessenger<App*, Window*>;
 	messenger->object1 = app;

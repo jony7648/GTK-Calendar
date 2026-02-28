@@ -13,5 +13,7 @@ public:
 
 	const space::Point& get_grid_size();
 
+	GridContainer* get_child_container(const std::string& name);
+
 };
 }

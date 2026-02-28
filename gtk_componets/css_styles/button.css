@@ -1,4 +1,4 @@
-.Button, .ShadeButton {
+.Button, .BlankState, .ShadeButton {
 	font-size: 30px;
 	background-image: none;
 	background-color: white;
@@ -12,8 +12,8 @@
 	font-size: 30px;
 }
 
-.Button {
-
+.BlankState {
+	background-color: white;
 }
 
 .Button:hover {

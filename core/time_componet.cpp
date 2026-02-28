@@ -21,59 +21,59 @@ void readable_time_to_vector(std::vector<std::string>& time_vector) {
 	std::string readable_time = std::ctime(&current_time);
 	util::str_strip(readable_time);
 	std::cout << readable_time << "\n";
-	util::str_split(time_vector, readable_time, ' ');
+	util::str_split(readable_time, ' ', time_vector);
 }
 
 namespace core {
 TimeComponet::TimeComponet() {
-	weekday_arr[0] = "Sun";
-	weekday_arr[1] = "Mon";
-	weekday_arr[2] = "Tue";
-	weekday_arr[3] = "Wed";
-	weekday_arr[4] = "Thu";
-	weekday_arr[5] = "Fri";
-	weekday_arr[6] = "Sat";
+	_weekday_arr[0] = "Sun";
+	_weekday_arr[1] = "Mon";
+	_weekday_arr[2] = "Tue";
+	_weekday_arr[3] = "Wed";
+	_weekday_arr[4] = "Thu";
+	_weekday_arr[5] = "Fri";
+	_weekday_arr[6] = "Sat";
 
-	month_arr[0] = "Jan";
-	month_arr[1] = "Feb";
-	month_arr[2] = "Mar";
-	month_arr[3] = "Apr";
-	month_arr[4] = "May";
-	month_arr[5] = "Jun";
-	month_arr[6] = "Jul";
-	month_arr[7] = "Aug";
-	month_arr[8] = "Sep";
-	month_arr[9] = "Oct";
-	month_arr[10] = "Nov";
-	month_arr[11] = "Dec";
-
-
-	long_mth_names[0] = "Janurary";
-	long_mth_names[1] = "February";
-	long_mth_names[2] = "March";
-	long_mth_names[3] = "April";
-	long_mth_names[4] = "May";
-	long_mth_names[5] = "June";
-	long_mth_names[6] = "July";
-	long_mth_names[7] = "August";
-	long_mth_names[8] = "September";
-	long_mth_names[9] = "October";
-	long_mth_names[10] = "November";
-	long_mth_names[11] = "December";
+	_month_arr[0] = "Jan";
+	_month_arr[1] = "Feb";
+	_month_arr[2] = "Mar";
+	_month_arr[3] = "Apr";
+	_month_arr[4] = "May";
+	_month_arr[5] = "Jun";
+	_month_arr[6] = "Jul";
+	_month_arr[7] = "Aug";
+	_month_arr[8] = "Sep";
+	_month_arr[9] = "Oct";
+	_month_arr[10] = "Nov";
+	_month_arr[11] = "Dec";
 
 
-	day_count_arr[0] = 31;
-	day_count_arr[1] = 28;
-	day_count_arr[2] = 31;
-	day_count_arr[3] = 30;
-	day_count_arr[4] = 31;
-	day_count_arr[5] = 30;
-	day_count_arr[6] = 31;
-	day_count_arr[7] = 31;
-	day_count_arr[8] = 30;
-	day_count_arr[9] = 31;
-	day_count_arr[10] = 30;
-	day_count_arr[11] = 31;
+	_long_mth_names[0] = "Janurary";
+	_long_mth_names[1] = "February";
+	_long_mth_names[2] = "March";
+	_long_mth_names[3] = "April";
+	_long_mth_names[4] = "May";
+	_long_mth_names[5] = "June";
+	_long_mth_names[6] = "July";
+	_long_mth_names[7] = "August";
+	_long_mth_names[8] = "September";
+	_long_mth_names[9] = "October";
+	_long_mth_names[10] = "November";
+	_long_mth_names[11] = "December";
+
+
+	_day_count_arr[0] = 31;
+	_day_count_arr[1] = 28;
+	_day_count_arr[2] = 31;
+	_day_count_arr[3] = 30;
+	_day_count_arr[4] = 31;
+	_day_count_arr[5] = 30;
+	_day_count_arr[6] = 31;
+	_day_count_arr[7] = 31;
+	_day_count_arr[8] = 30;
+	_day_count_arr[9] = 31;
+	_day_count_arr[10] = 30;
+	_day_count_arr[11] = 31;
 
 	calculate_from_current_time();
 	reset_menu_time();
@@ -91,7 +91,7 @@ int TimeComponet::month_to_int(const std::string& conv_month) {
 	int month_index = 0;
 
 	for (int i=0; i<MONTH_COUNT; i++) {
-		const std::string& month = month_arr[i];	
+		const std::string& month = _month_arr[i];	
 
 		if (conv_month.compare(month) == 0) {
 			month_index = i;
@@ -105,7 +105,7 @@ int TimeComponet::weekday_to_int(const std::string& conv_day) {
 	int day_index = 0;
 
 	for (int i=0; i<WEEKDAY_COUNT; i++) {
-		const std::string& day = weekday_arr[i];	
+		const std::string& day = _weekday_arr[i];	
 
 		if (conv_day.compare(day) == 0) {
 			day_index = i;
@@ -119,8 +119,10 @@ int TimeComponet::weekday_to_int(const std::string& conv_day) {
 void TimeComponet::display_time_info() {
 	std::println(
 	"Day: {}\nMonth: {}\nYear: {}\nWeekday: {}\nHour: {}\nMinute: {}\nSecond: {}", 
-		day, month, year, weekday, hour, minute, second
+		_date.day, _date.month, _date.year, _weekday, _time.hour, _time.minute, _time.minute 
 	);
+
+	std::cout << _month_arr[3] << " this is month\n";	
 }
 
 void TimeComponet::set_minute_and_hour(const std::string& time_str) {
@@ -132,38 +134,39 @@ void TimeComponet::calculate_from_current_time() {
 
 	readable_time_to_vector(time_vector);
 
+
 	int attrib_value = 0;
 
 	for (int i=0; i<time_vector.size(); i++) {
 		const std::string& str = time_vector.at(i);
+		// do a specific action based on the current iteration
 		switch (i) {
 			case CTIME_DAY:
-				this->day = std::stoi(str);
+				this->_date.day = std::stoi(str);
 				break;
 			case CTIME_MONTH:
-				this->month = month_to_int(str);
+				this->_date.month = month_to_int(str);
 				break;
 			case CTIME_WEEKDAY:
-				this->weekday = weekday_to_int(str);
+				this->_weekday = weekday_to_int(str);
 				break;
 			case CTIME_TIME:
 				set_minute_and_hour(str);
 				break;
 			case CTIME_YEAR:
-				this->year = std::stoi(str);
+				this->_date.year = std::stoi(str);
 				break;
-
 		}
 	}
 }
 
 int TimeComponet::get_day_count() {
 	//this method will return the amount of days in a month
-	if (month >= MONTH_COUNT || month < 0) {
+	if (_date.month >= MONTH_COUNT || _date.month < 0) {
 		std::cout << "CRITICAL ERROR: MONTH IS OUT OF RANGE!!!" << "\n";
 		return 0;
 	}
-	return day_count_arr[month];
+	return _day_count_arr[_date.month];
 }
 
 int TimeComponet::get_day_count(int month) {
@@ -173,63 +176,87 @@ int TimeComponet::get_day_count(int month) {
 		return 0;
 	}
 
-	return day_count_arr[month];
+	return _day_count_arr[month];
 }
 
 int TimeComponet::get_starting_weekday() {
-	return weekday;
+	return _weekday;
 }
 
 void TimeComponet::advance_menu_month(int cycle_count) {
-	if (menu_month + cycle_count < 0) {
-		menu_year--;
+	std::cout << _menu_date.month + cycle_count << "\n";
+	if (_menu_date.month + cycle_count < 0) {
+		_menu_date.year--;
+		std::cout << "Year should go down by one\n";
 	}
 	
-	if (menu_month + cycle_count == MONTH_COUNT) {
-		menu_year++;
+	if (_menu_date.month + cycle_count == MONTH_COUNT) {
+		_menu_date.year++;
 	}
 
 	//menu_year = menu_year + (menu_month + cycle_count) / (MONTH_COUNT);
-	menu_month = util::cycle_through_bounds(menu_month, cycle_count, 0, MONTH_COUNT);
+	_menu_date.month = util::cycle_through_bounds(_menu_date.month, cycle_count, 0, MONTH_COUNT);
 }
 
 void TimeComponet::reset_menu_time() {
-	menu_month = month;
-	menu_year = year;
+	_menu_date.month = _date.month;
+	_menu_date.year = _date.year;
+}
+
+void TimeComponet::set_menu_day(int day) {
+	_menu_date.day = day;
+}
+
+void TimeComponet::set_menu_month(int month) {
+	_menu_date.month = month;
+}
+
+void TimeComponet::set_menu_year(int year) {
+	_menu_date.year = year;
+}
+
+void TimeComponet::set_menu_date(Date& date) {
+	this->_menu_date.day = date.day;
+	this->_menu_date.month = date.month;
+	this->_menu_date.year = date.year;
 }
 
 const std::string& TimeComponet::get_long_month_name(int month) {
-	return long_mth_names[month];
+	return _long_mth_names[month];
 }
 
 const std::string& TimeComponet::get_short_month_name(int month) {
-	return month_arr[month];
+	return _month_arr[month];
 }
 
 
 int TimeComponet::get_menu_month() {
-	return menu_month;
+	return _menu_date.month;
 }
 
 int TimeComponet::get_menu_year() {
-	return menu_year;
+	return _menu_date.year;
+}
+
+const Date& TimeComponet::get_menu_date() {
+	return _menu_date;		
 }
 
 std::string* TimeComponet::get_weekday_arr() {
-	return weekday_arr;
+	return _weekday_arr;
 }
 
-void TimeComponet::get_full_day_str(int day, int month, int year, std::string& output_str) {
+void TimeComponet::get_full_day_str(core::Date& date, std::string& output_str) {
 	const std::string& RD_ENDING = "rd";			
 	const std::string& TH_ENDING = "th";			
 	const std::string& ST_ENDING = "st";			
 	const std::string& ND_ENDING = "nd";			
 
-	int day_last_num = day % 10;
+	int day_last_num = date.day % 10;
 
 	std::string day_suffix = "";
 
-	if (day > 3 and day < 21) {
+	if (date.day > 3 and date.day < 21) {
 		day_suffix = TH_ENDING;
 	}
 	else if (day_last_num > 4) {
@@ -245,18 +272,18 @@ void TimeComponet::get_full_day_str(int day, int month, int year, std::string& o
 		day_suffix = ST_ENDING;	
 	}
 
-	const std::string& month_str = long_mth_names[month];
-	const std::string& day_str = std::to_string(day) + day_suffix;
+	const std::string& month_str = _long_mth_names[date.month];
+	const std::string& day_str = std::to_string(date.day) + day_suffix;
 
-	output_str = month_str + " " + day_str + ", " + std::to_string(year);
+	output_str = month_str + " " + day_str + ", " + std::to_string(date.year);
 }
 
 int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	//this meathod will return the weekday that the month starts on
 
-	int years_ahead = target_year - year;
-	int months_ahead = years_ahead * MONTH_COUNT + target_month - month;
-	int days_to_cycle = -(day-1); //converts to index format and sets it so it will loop back to day zero
+	int years_ahead = target_year - _date.year;
+	int months_ahead = years_ahead * MONTH_COUNT + target_month - _date.month;
+	int days_to_cycle = -(_date.day-1); //converts to index format and sets it so it will loop back to day zero
 	int leap_year_count = 0;
 	int cycle_dir = 1;
 
@@ -270,7 +297,7 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 
 	//calculate the amount of days to cycle (without leap years)
 	for (int i=0; i<abs(months_ahead); i++) {
-		current_month = util::cycle_through_bounds(month, i*cycle_dir, 0, MONTH_COUNT);
+		current_month = util::cycle_through_bounds(_date.month, i*cycle_dir, 0, MONTH_COUNT);
 		
 		if (cycle_dir < 0 ) {
 			//if cycle_dir < 0, decrement current_month to access
@@ -278,11 +305,11 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 			current_month = util::cycle_through_bounds(current_month, -1, 0, MONTH_COUNT);
 		}
 
-		days_to_cycle += day_count_arr[current_month] * cycle_dir;
+		days_to_cycle += _day_count_arr[current_month] * cycle_dir;
 	}
 
 	//account for leap years
-	leap_year_count = find_leap_year_count(year, target_year);
+	leap_year_count = find_leap_year_count(_date.year, target_year);
 	days_to_cycle += leap_year_count;
 
 	//if the target month is before march don't account for 
@@ -292,7 +319,7 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) {
 	}
 
 
-	int result = util::cycle_through_bounds(weekday, days_to_cycle, 0, WEEKDAY_COUNT);
+	int result = util::cycle_through_bounds(_weekday, days_to_cycle, 0, WEEKDAY_COUNT);
 
 	/*
 	std::println(

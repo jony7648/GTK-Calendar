@@ -70,7 +70,6 @@ public:
 	void add_widget_arr(Widget* widget_arr[], size_t arr_size);
 	void add_widget_vector(std::vector<Widget*>& widget_vector);
 	void get_tagged_widgets(std::vector<gtkc::Widget*>&, const std::string& tag);
-	Container* get_child_container(const std::string& name);
 
 	ContainerIterator begin();
 	ContainerIterator end();

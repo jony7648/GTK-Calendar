@@ -67,7 +67,9 @@ void Widget::load_css() {
 
 	const std::string& css_class = get_type();
 
+	gtk_widget_remove_css_class(_gtk_widget, _css_class.c_str());
 	gtk_widget_add_css_class(_gtk_widget, css_class.c_str());
+	_css_class = css_class;
 }
 
 void Widget::load_css(const std::string& class_name) {
@@ -79,7 +81,10 @@ void Widget::load_css(const std::string& class_name) {
 		std::cout << "Error: _css_provider is a nullptr!\n";
 	}
 
+	gtk_widget_remove_css_class(_gtk_widget, _css_class.c_str());
 	gtk_widget_add_css_class(_gtk_widget, class_name.c_str());
+	_css_class = class_name;
+
 }
 
 void Widget::show() {
@@ -129,8 +134,7 @@ void Widget::set_gtk_widget(GtkWidget* gtk_widget) {
 	this->_gtk_widget = gtk_widget;
 	_css_provider = gtk_css_provider_new();
 	_default_display = gdk_display_get_default();
-	_signaler.set_parent_gtk(gtk_widget);
-	_signaler.set_parent_widget(this);
+	sig_handler.set_parent_object(this);
 	//listener.set_parent_widget(this);
 	//listener.set_gtk_parent(gtk_widget);
 }
@@ -207,7 +211,4 @@ int Widget::get_sig_data() {
 	return _sig_data;
 }
 
-core::Signaler* Widget::get_signaler() {
-	return &_signaler;
-}
 }

@@ -11,20 +11,16 @@ namespace core {
 class App;
 
 class Window {
-private:
-	std::string title = "";
-	space::Point dimensions;
-	GtkWidget* gtk_window = nullptr;
-	Scene* current_scene = nullptr;
-	void(*_signal_close)(GtkWidget*, gpointer user_data);
-	bool is_main_window = false;
-	bool is_attached = false;
-	bool is_displaying = false;
-	bool is_visible = false;
-
+	
 public:
+	enum SIGNALS {
+		S_REQUEST,
+		S_END_PROGRAM,
+		S_WINDOW_CLOSE
+	};
+
 	GtkWidget* get_gtk_window();
-	Window(GtkApplication* gtk_app_ptr, const std::string& title, const space::Point& dimensions);
+	Window(GtkApplication* gtk_app_ptr, const std::string& title);
 	~Window();
 	Error display(Scene* scene);
 	void signal_set_close(App*, bool(*func)(GtkWidget* widget, gpointer user_data));
@@ -36,10 +32,8 @@ public:
 	void show();
 	void hide();
 
-	Signal S_request;
-	Signal S_end_program;
-	Signal S_window_close;
 
+	
 	void set_attached_state();
 	bool get_attached_state();
 
@@ -50,5 +44,25 @@ public:
 
 	bool get_display_state();
 	bool get_visibility();
+
+	void emit_signal(int id, void* parent = nullptr);
+	void add_emit_func(int id, void(*emit_func)(void*, void*, void*), void* receiver_obj);
+
+	SigHandler sig_handler;
+
+
+
+private:
+	std::string title = "";
+	space::Point dimensions;
+	GtkWidget* gtk_window = nullptr;
+	Scene* current_scene = nullptr;
+	void(*_signal_close)(GtkWidget*, gpointer user_data);
+	bool is_main_window = false;
+	bool is_attached = false;
+	bool is_displaying = false;
+	bool is_visible = false;
+	
+
 };
 }

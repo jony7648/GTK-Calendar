@@ -19,13 +19,22 @@ TextField::TextField(const std::string& name, int scale_x, int scale_y) {
 	_gtk_text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(_gtk_widget));
 
 	//gtk_text_buffer_insert(gtk_text_buffer, &gtk_text_iter, "nugs\n", 5);
-	gtk_text_buffer_set_text(_gtk_text_buffer, "Helllo World", -1);
+	set_text(_empty_text);
 
 }
 
 void TextField::set_wrap_mode(GtkWrapMode wrap_mode) {
 	_wrap_mode = wrap_mode;
 	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(_gtk_widget), wrap_mode);
+}
+
+void TextField::set_text(const std::string& text) {
+	if (text.empty()) {
+		gtk_text_buffer_set_text(_gtk_text_buffer, _empty_text.c_str(), -1);
+		return;
+	}
+
+	gtk_text_buffer_set_text(_gtk_text_buffer, text.c_str(), -1);
 }
 
 std::string TextField::get_text() {

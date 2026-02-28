@@ -5,41 +5,12 @@
 #include "core/constants.h"
 #include "core/space.h"
 #include "core/messenger.h"
-#include "core/signal.h"
+#include "core/signal_handler.h"
 
 namespace gtkc {
 class Container;
 
 class Widget {
-private:
-	std::string _name = "";
-	std::string _tag = "";
-	int _grid_pos = 0;
-	space::Rect _transform;
-	space::Point _grid_point;
-	space::Point _scale;
-	bool _hexpand = true;
-	bool _vexpand = true;
-	int _sig_data = 0;
-	bool _presenting = false;
-	bool is_visible = false;
-
-	GtkWidget* _holder_gtk_widget = nullptr;
-
-	std::string _css_path = "";
-	GtkCssProvider* _css_provider = nullptr;
-	GdkDisplay* _default_display = nullptr;
-
-
-	
-//	std::vector<core::Messenger<Widget*>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
-
-protected:
-	std::string _type = "UNDEFINED TYPE";
-	GtkWidget* _gtk_widget;
-	core::Signaler _signaler;
-
-	void set_css_file_name(const std::string& css_path);
 
 public:
 	void load_css();
@@ -87,9 +58,41 @@ public:
 	bool get_vexpand();
 	void set_presenting(bool state);
 
-	core::Signaler* get_signaler();
 
 	void set_sig_data(int data);
 	int get_sig_data();
+
+protected:
+	std::string _type = "UNDEFINED TYPE";
+	GtkWidget* _gtk_widget;
+
+	void set_css_file_name(const std::string& css_path);
+
+
+private:
+	std::string _name = "";
+	std::string _tag = "";
+	std::string _css_class = "N/A";
+	int _grid_pos = 0;
+	space::Rect _transform;
+	space::Point _grid_point;
+	space::Point _scale;
+	bool _hexpand = true;
+	bool _vexpand = true;
+	int _sig_data = 0;
+	bool _presenting = false;
+	bool is_visible = false;
+
+	GtkWidget* _holder_gtk_widget = nullptr;
+
+	std::string _css_path = "";
+	GtkCssProvider* _css_provider = nullptr;
+	GdkDisplay* _default_display = nullptr;
+
+	core::SigHandler sig_handler;
+	
+//	std::vector<core::Messenger<Widget*>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
+
+
 };
 }

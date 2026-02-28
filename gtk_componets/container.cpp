@@ -199,18 +199,7 @@ void Container::get_tagged_widgets(std::vector<gtkc::Widget*>& widget_vec, const
 	}
 }
 
-Container* Container::get_child_container(const std::string& name) {
-	Container* ret_widget = nullptr;
 
-	for (Widget* widget : *this) {
-		if (widget != nullptr && widget->get_name() == name) {
-			ret_widget = static_cast<Container*>(widget);
-		}
-		
-	}
-
-	return ret_widget;
-}
 
 void Container::present_widgets() {
 	//meathod takes widgets from the children_vector and displays them

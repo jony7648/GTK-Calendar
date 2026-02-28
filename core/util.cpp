@@ -2,7 +2,51 @@
 #include <vector>
 #include "util.h"
 
+struct DynamicHeader {
+	size_t size;
+};
+
 namespace util {
+
+void* dynamic_data_init(size_t struct_size) {
+	//function allocates some data from the heap attaches a header
+	//to said data and returns the data
+	DynamicHeader* header = static_cast<DynamicHeader*>(malloc(sizeof(struct_size) + sizeof(DynamicHeader)));
+	void* data = header+1;
+
+	header->size = struct_size;
+
+	return data;
+}
+
+void* dynamic_data_assign(void* dynamic_data, size_t new_struct_size) {
+	//this function allows one to assign previously dynamicly allocated
+	//data to another data sturcture avoiding the need to allocate more
+	//memory
+
+	if (dynamic_data == nullptr) {
+		std::cout << "ERROR: dynamic data is a nullptr\n";	
+	}
+
+	DynamicHeader* header = static_cast<DynamicHeader*>(dynamic_data);
+	header--;
+
+	//if additional memory is needed reallocate the data and 
+	//reassign the pointers accordingly
+	if (new_struct_size > header->size) {
+		header = (DynamicHeader*)realloc(header, new_struct_size + sizeof(DynamicHeader));
+		dynamic_data = header+1;
+	}
+	
+	return dynamic_data;
+}
+
+void dynamic_data_free(void* dynamic_data) {
+	DynamicHeader* header = (DynamicHeader*)dynamic_data;
+	header--;
+	free(header);
+}
+
 int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int end_bound) {
 	//int cycled_position = start_value + cycle_count;
 	int bound_len = end_bound - start_bound;
@@ -21,43 +65,33 @@ int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int 
 	return cycled_position;
 }
 
-std::vector<std::string>& str_split(std::vector<std::string>& store_vector, const std::string& str, char split_char) {
-	//this function splits a string when it hits a specified character
-	size_t strlen = str.length(), vec_len = store_vector.size();
-	int copy_count = 0;
-	int sub_start = 0;
-	int sub_end = 0;
-	char character = ' ';
+void str_split(const std::string& src_str, char split_char, std::vector<std::string>& output_vec) {
+	unsigned int start_pos = 0, copy_count = 0, copy_offset = 0, final_index = 0;
+	size_t strlen = src_str.length();
+	char curr_char = ' ';
 	std::string sub_str = "";
 
-	int vec_index = 0;
+	//use vector.at notation to preserve orginal implementatino
+
+
+	final_index = strlen - 1;
 
 	for (int i=0; i<strlen; i++) {
-		character = str[i];
-		copy_count = i - sub_start;
-
-		if (i == strlen - 1) {
-			copy_count++;
+		curr_char = src_str.at(i);
+		
+		if (i == final_index) {
+			copy_offset++;
 		}
+	
+		if (curr_char == split_char || i == final_index) {
+			copy_count = i - start_pos + copy_offset;
 
-		if (character == split_char || i == strlen - 1){
-			sub_str = str.substr(sub_start, copy_count);
-			sub_start = i+1;
-			
-			//add differently based on if we are dealing with default
-			//vector values
-			if (vec_index >= vec_len) {
-				store_vector.push_back(sub_str);
-			}
-			else {
-				store_vector.at(vec_index) = sub_str;
-			}
+			sub_str = src_str.substr(start_pos, copy_count);
+			output_vec.push_back(sub_str);
 
-			vec_index++;
+			start_pos = i+1;
 		}
 	}
-
-	return store_vector;
 }
 
 void str_strip(std::string& str) { 

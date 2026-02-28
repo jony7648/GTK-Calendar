@@ -3,10 +3,13 @@
 #include "note_scene.h"
 #include "persist_data.h"
 
+
 const std::string NOTE_CONTAINER_STR = "Note Container";
 const std::string NOTE_INPUT_NAME = "Note TextField";
 
-static void save_note_text(void* receiver_obj, void* emitter_obj) {
+data::Note* current_note = nullptr;
+
+static void save_note_text(void* receiver_obj, void* emitter_obj, void*) {
 	core::Scene* scene = static_cast<core::Scene*>(receiver_obj);
 
 	gtkc::GridContainer* note_container = static_cast<gtkc::GridContainer*>(scene->get_widget_container().get_child_container(NOTE_CONTAINER_STR));
@@ -38,45 +41,52 @@ static void save_note_text(void* receiver_obj, void* emitter_obj) {
 
 }
 
-void prepare_note_scene(core::Scene* scene, gtkc::Button* emit_button) {
-	int day = 0;
-	int month = 0;
-	int year = 0;
-	
+void prepare_note_scene(core::Scene* scene, data::Note* note) {
 	core::TimeComponet* time_componet = nullptr;
+	gtkc::GridContainer& main_container = scene->get_widget_container();
 	gtkc::GridContainer* date_container = nullptr;
+	gtkc::GridContainer* note_container = nullptr;
 	gtkc::Label* date_label = nullptr;
 	std::string date_str = "";
+	gtkc::TextField* text_field = nullptr;
 
 
 	time_componet = scene->get_time_componet();
-	day = std::stoi(emit_button->get_text());
-	month = time_componet->get_menu_month();
-	year = time_componet->get_menu_year();
-
-	
-	const std::string& month_str = time_componet->get_long_month_name(month);
+	const std::string& month_str = time_componet->get_long_month_name(note->date.month);
 
 
 
 	
-	for (gtkc::Widget* widget : scene->get_widget_container()) {
-		if (widget->get_name() == "Date Container") {
-			date_container = static_cast<gtkc::GridContainer*>(widget);	
-			break;
-		}
+	date_container = main_container.get_child_container("Date Container");	
+	note_container = main_container.get_child_container("Date Container");	
+
+	if (!date_container || !note_container) {
+		return;
 	}
 	
-
 	
 	for (gtkc::Widget* widget : *date_container) {
 		if (widget->get_name() == "Date Field") {
 			date_label = static_cast<gtkc::Label*>(widget);	
 		}
+
+	}
+
+	for (gtkc::Widget* widget : scene->get_widget_container()) {
+		if (widget->get_name() == NOTE_INPUT_NAME) {
+			text_field = static_cast<gtkc::TextField*>(widget);
+		}
+	}
+
+	if (text_field == nullptr) {
+		return;
 	}
 	
-	time_componet->get_full_day_str(day, month, year, date_str);
+	//time_componet->get_full_day_str(note->day, note->month, note->year, date_str);
+	time_componet->get_full_day_str(note->date, date_str);
+	text_field->set_text(note->text);
 	date_label->set_text(date_str);
+	current_note = note;
 }
 
 void signal_window_displayed(void* receiver_obj, void* emitter_obj, void* sig_data_addr) {
@@ -85,8 +95,12 @@ void signal_window_displayed(void* receiver_obj, void* emitter_obj, void* sig_da
 	gtkc::Button* emit_button = static_cast<gtkc::Button*>(emitter_obj);
 	std::cout << receiver_obj << " " << emitter_obj << " " << &sig_data << "\n";
 
+	data::Note* note = static_cast<data::Note*>(sig_data->obj_ptr);
+	std::cout << "Note Text before text field " << note->text << "\n";
+	std::cout << emit_button->get_text() << "\n";
 
-	prepare_note_scene(scene, emit_button);
+
+	prepare_note_scene(scene, note);
 }
 
 
@@ -120,6 +134,30 @@ gtkc::GridContainer* create_note_container(core::Scene* scene) {
 	return note_container;
 }
 
+static void signal_window_closed(void* scene_addr, void* emitter_obj, void*) {
+	core::Scene* scene = static_cast<core::Scene*>(scene_addr);
+	gtkc::TextField* text_field = nullptr;
+
+	for (gtkc::Widget* widget : scene->get_widget_container()) {
+		if (widget->get_name() == NOTE_INPUT_NAME) {
+			text_field = static_cast<gtkc::TextField*>(widget);
+		}
+	}
+
+
+	const std::string& text_field_text = text_field->get_text();
+
+	text_field->display_info();
+
+	std::cout << "Compare: " << text_field_text << " " << current_note->text << "\n";;
+
+	if (text_field_text != current_note->text) {
+		std::cout << "The compare did pass\n";
+		current_note->text = text_field_text;
+		current_note->should_save = true;
+	}
+}
+
 namespace project {
 core::Scene* create_note_scene(core::TimeComponet* time_componet) {
 	const std::string scene_name = "Note Scene";
@@ -139,9 +177,10 @@ core::Scene* create_note_scene(core::TimeComponet* time_componet) {
 	scene = new core::Scene(scene_name, widget_spacing.x, widget_spacing.y);
 	scene->set_custom_dimensions(win_size);
 	scene->set_resizability(false);
-	scene->S_window_displayed.set_emit_func(signal_window_displayed);
+	scene->sig_handler.add_emit_func(core::Scene::S_WINDOW_DISPLAYED, signal_window_displayed, scene);
+	scene->sig_handler.add_emit_func(core::Scene::S_WINDOW_CLOSED, signal_window_closed, scene);
 
-	gtkc::Container& main_container = scene->get_widget_container();
+	gtkc::GridContainer& main_container = scene->get_widget_container();
 	main_container.set_valign(GTK_ALIGN_START);
 	main_container.set_halign(GTK_ALIGN_CENTER);
 
@@ -151,7 +190,6 @@ core::Scene* create_note_scene(core::TimeComponet* time_componet) {
 	main_container.add_widget(date_container);
 	main_container.add_widget(note_container);
 
-	scene->S_window_closed.set_emit_func(save_note_text);
 
 
 	return scene;	

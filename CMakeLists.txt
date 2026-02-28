@@ -13,13 +13,14 @@ set(WIDGET_DIR "gtk_componets")
 set(PROJECT_DIR "project")
 set(CORE_DIR "core")
 
+set(DEBUG_COMPONETS "${PROJECT_DIR}/debug_scene.cpp")
 set(PROJECT_COMPONETS "${PROJECT_DIR}/calendar_scene.cpp" "${PROJECT_DIR}/note_scene.cpp" "${PROJECT_DIR}/persist_data.cpp" "${PROJECT_DIR}/note_container.cpp")
 set(WIDGET_COMPONETS  "${WIDGET_DIR}/widget.cpp" "${WIDGET_DIR}/button_widget.cpp" "${WIDGET_DIR}/container.cpp" "${WIDGET_DIR}/grid_container.cpp" "${WIDGET_DIR}/label.cpp" "${WIDGET_DIR}/text_field.cpp")
 set(CORE_COMPONETS "${CORE_DIR}/app.cpp" "${CORE_DIR}/window.cpp" "${CORE_DIR}/space.cpp" "${CORE_DIR}/util.cpp" "${CORE_DIR}/file_util.cpp" "${CORE_DIR}/time_componet.cpp" "${CORE_DIR}/scene.cpp" "${CORE_DIR}/csv_writer.cpp")
-set(SIGNAL_COMPONETS "${CORE_DIR}/messenger.cpp" "${CORE_DIR}/signal.cpp" "${CORE_DIR}/signaler.cpp")
+set(SIGNAL_COMPONETS "${CORE_DIR}/signal_handler.cpp")
 
 
-add_executable(my_app main.cpp ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
+add_executable(my_app main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
 target_compile_features(my_app PRIVATE cxx_std_23)
 target_link_libraries(my_app PkgConfig::GTK4)
 

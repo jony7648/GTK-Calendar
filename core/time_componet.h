@@ -1,28 +1,23 @@
 #pragma once
 #include <iostream>
 #include <ctime>
-
+#include "date.h"
 
 
 namespace core {
+
 class TimeComponet {
 private:
-	std::string weekday_arr[7];
-	std::string month_arr[12];
-	std::string long_mth_names[12];
+	std::string _weekday_arr[7];
+	std::string _month_arr[12];
+	std::string _long_mth_names[12];
 
-	int day_count_arr[12];
+	int _day_count_arr[12];
 	
-	int day = 0;
-	int month = 0;
-	int year = 0;
-	int weekday = 0;
-	int hour = 0;
-	int minute = 0;
-	int second = 0;
-
-	int menu_month = 0;
-	int menu_year = 0;
+	Date _date;
+	Time _time;
+	Date _menu_date;
+	int _weekday = 0;
 
 public:
 	const size_t DAY_COUNT_ARR_LEN = 12;
@@ -42,17 +37,25 @@ public:
 	void advance_menu_month(int cycle_count);
 	void reset_menu_time();
 
+	void set_menu_day(int day);
+	void set_menu_month(int month);
+	void set_menu_year(int year);
+	void set_menu_date(Date& date);
+
 	int get_day_count();
 	int get_day_count(int month);
 	int get_starting_weekday();
 	int get_starting_weekday(int month, int year);
 	const std::string& get_short_month_name(int month);
 	const std::string& get_long_month_name(int month);
-	void get_full_day_str(int day, int month, int year, std::string& output_str);
+	void get_full_day_str(core::Date& date, std::string& output_str);
 	std::string* get_weekday_arr();
 
 	int get_menu_month();
 	int get_menu_year();
+
+	const Date& get_menu_date();
+	
 };
 
 }

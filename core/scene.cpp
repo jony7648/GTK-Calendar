@@ -10,17 +10,23 @@ Scene::Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing
 	widget_container.set_widget_spacing(widget_x_spacing, widget_y_spacing);
 	widget_container.set_halign(GTK_ALIGN_START);
 
-	S_request_subwin.set_parent_widget(this);
-	S_window_closed.set_parent_widget(this);
-	S_window_displayed.set_parent_widget(this);
-	//S_request_note_win.set_emit_func(test_func);
-	GS_cal_button_clicked.set_parent_widget(this);
-	GS_button_clicked.set_parent_widget(this);
-	signaler.set_parent_widget(this);
+	sig_handler.set_parent_object(this);
+	sig_handler.add_signal(S_READY);
+	sig_handler.add_signal(S_WINDOW_DISPLAYED);
+	sig_handler.add_signal(S_WINDOW_CLOSED);
+	sig_handler.add_signal(S_REQUEST_SUBWIN);
 }
-
 Scene::~Scene() {
 
+}
+
+
+void Scene::emit_signal(int id) {
+	sig_handler.emit(id);
+}
+
+void Scene::add_emit_func(int id, void(*emit_func)(void*, void*, void*), void* receiver_obj) {
+	sig_handler.add_emit_func(id, emit_func, receiver_obj);
 }
 
 void Scene::get_tagged_widgets(std::vector<gtkc::Widget*>& ret_vec, std::string tag) {
@@ -54,10 +60,6 @@ gtkc::GridContainer& Scene::get_widget_container() {
 
 const std::string& Scene::get_name() {
 	return name;	
-}
-
-Signaler* Scene::get_signaler() {
-	return &signaler;
 }
 
 void Scene::set_time_componet(core::TimeComponet* time_componet) {
