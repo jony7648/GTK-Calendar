@@ -10,6 +10,7 @@ const std::string NOTE_INPUT_NAME = "Note TextField";
 data::Note* current_note = nullptr;
 
 static void save_note_text(void* receiver_obj, void* emitter_obj, void*) {
+	return;
 	core::Scene* scene = static_cast<core::Scene*>(receiver_obj);
 
 	gtkc::GridContainer* note_container = static_cast<gtkc::GridContainer*>(scene->get_widget_container().get_child_container(NOTE_CONTAINER_STR));

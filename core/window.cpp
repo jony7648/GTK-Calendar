@@ -88,17 +88,17 @@ Error Window::display(Scene* scene) {
 
 	if (is_displaying) {
 		show();
-		return Error::CLEAR;
+		return Error(ErrorType::Clear);
 	}
 
 	if (scene == nullptr) {
 		std::cout << "ERROR: Can't display a scene that is a nullptr\n";
-		return Error::NULLPTR;
+		return Error(ErrorType::Nullptr);
 	}
 
 	if (scene->get_widget_container().get_gtk_widget() == nullptr) {
 		std::cout << "ERROR: The gtk widget of the scene container is a nullptr";
-		return Error::NULLPTR;
+		return Error(ErrorType::Nullptr);
 	}
 
 
@@ -115,7 +115,7 @@ Error Window::display(Scene* scene) {
 
 	is_displaying = true;
 
-	return Error::CLEAR;
+	return Error(ErrorType::Clear);
 }
 
 

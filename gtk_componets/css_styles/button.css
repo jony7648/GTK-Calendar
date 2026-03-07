@@ -12,10 +12,6 @@
 	font-size: 30px;
 }
 
-.BlankState {
-	background-color: white;
-}
-
 .Button:hover {
 	background-color: lightgray;
 }

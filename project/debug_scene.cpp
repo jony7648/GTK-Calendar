@@ -18,15 +18,21 @@ PropertyMap<std::string> str_property_map = {
 };
 
 void create_labels(PropertyMap<int>& property_map, gtkc::Container* container) {
-	for (auto& [key, value] : property_map) {
-		gtkc::Label* name_label = new gtkc::Label("LabelKey " + std::to_string(label_count), key, 0, label_count, 1, 1);
-		gtkc::Label* value_label = new gtkc::Label("LabelValue " + std::to_string(label_count), std::to_string(value), 1, label_count, 1, 1);
+	gtkc::KeyMapLabel* key_label = nullptr;
 
-		container->add_widget(name_label);
-		container->add_widget(value_label);
+	for (auto& [key, value] : property_map) {
+		key_label = new gtkc::KeyMapLabel();
+		key_label->set_name("KeyMapLabel " + std::to_string(label_count));
+		key_label->set_key_text(key);
+		key_label->set_value_text(std::to_string(value));
+
+
+		container->add_widget(key_label);
+	
 		
 		
 		label_count++;
+		break;
 	}
 }
 

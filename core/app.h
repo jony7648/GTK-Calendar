@@ -7,7 +7,7 @@
 #include "window.h"
 #include "time_componet.h"
 #include "scene.h"
-#include "error_code.h"
+#include "error.h"
 #include "signal_handler.h"
 
 
@@ -35,8 +35,8 @@ public:
 	Error attach_sub_scene(Scene* scene);
 	void display_main_window();
 	void apply_provider(const std::string& css_dir_path);
-	bool request_subwin(void* emitter_obj, SigData* sig_data);
-	bool request_subwin(core::Scene* scene);
+	//Error request_subwin(void* emitter_obj, SigData* sig_data);
+	Error request_subwin(core::Scene* scene, void* emitter_obj = nullptr, SigData* sig_data = nullptr);
 
 	SigHandler sig_handler;
 	
@@ -45,6 +45,7 @@ public:
 	//Signal S_subwin_close;
 
 	Scene* get_main_scene();
+	std::vector<Scene*>& get_sub_scene_vect();
 	GtkWidget* get_scene_container();
 	core::TimeComponet* get_time_componet();
 	const space::Point& get_win_dimensions();

@@ -11,6 +11,7 @@ private:
 
 
 public:
+	Label();
 	Label(const std::string& name, const std::string& text, int grid_x, int grid_y, int column_count, int row_count);
 	~Label();
 	void set_font_size(int font_size);

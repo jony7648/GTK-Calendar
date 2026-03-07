@@ -140,7 +140,7 @@ void Container::add_widget(Widget *widget) {
 	}
 
 	if (widget_name.empty()) {
-		std::cout << "Widget does not have a name!\n";
+		std::cout << "Widget of type " << widget->get_type() << " does not have a name!\n";
 		return;
 	}
 

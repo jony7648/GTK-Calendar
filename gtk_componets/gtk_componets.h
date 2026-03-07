@@ -4,4 +4,5 @@
 #include "grid_container.h"
 #include "widget.h"
 #include "label.h"
+#include "key_map_label.h"
 #include "text_field.h"

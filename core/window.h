@@ -3,7 +3,7 @@
 #include <gtk/gtk.h>
 #include "space.h"
 #include "scene.h"
-#include "error_code.h"
+#include "error.h"
 #include "app.h"
 
 

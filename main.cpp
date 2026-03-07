@@ -54,32 +54,57 @@ void load_save_data(data::PersistData& persist_data, core::CsvWriter& csv_writer
 	std::vector<core::CsvWriter::CsvMap> data_map_vector;
 
 	csv_writer.read_csv(data_map_vector);
+	try {
+		for (core::CsvWriter::CsvMap& map : data_map_vector) {
+			data::Note& note = persist_data.add_note();
+			note.date.day = stoi(map["Day"]);
+			note.date.month = stoi(map["Month"]);
+			note.date.year = stoi(map["Year"]);
+			note.text = map["Note"];
+		}
+	}
 
-	for (core::CsvWriter::CsvMap& map : data_map_vector) {
-		data::Note& note = persist_data.add_note();
-		note.date.day = stoi(map["Day"]);
-		note.date.month = stoi(map["Month"]);
-		note.date.year = stoi(map["Year"]);
-		note.text = map["Note"];
+	catch (std::exception& e) {
+		std::cout << "File failed to load, likely due to bad formatting!\n";
 	}
 }
 
+void save_app_data(data::PersistData& persist_data, core::CsvWriter& csv_writer) {
+	std::vector<core::CsvWriter::CsvMap> csv_map_vec;
+
+	for (data::Note note : persist_data.get_note_container()) {
+		if (!note.should_save) {
+			continue;
+		}
+
+		std::cout << "Gathered data\n";
+
+		csv_map_vec.push_back(core::CsvWriter::CsvMap());
+		core::CsvWriter::CsvMap& csv_map = csv_map_vec.back();
+
+		csv_map["Day"] = std::to_string(note.date.day);	
+		csv_map["Month"] = std::to_string(note.date.month);	
+		csv_map["Year"] = std::to_string(note.date.year);	
+		csv_map["Note"] = note.text;	
+	}
+
+
+	csv_writer.write_csv(csv_map_vec);
+
+}
+
 int main(int argc, char *argv[]) {
+	std::vector<std::string> csv_header = {"Day", "Month", "Year", "Note"};
 	std::string save_path = "test.save";
 
 	data::PersistData persist_data;
-
-	std::vector<std::string> csv_header = {"Day", "Month", "Year", "Note"};
-
 	core::CsvWriter csv_writer(save_path, csv_header);
+	csv_writer.set_equivalnce_bounds(0, 3);
+
 
 	load_save_data(persist_data, csv_writer);
 
-
-	persist_data.display_notes();
-
 	space::Point win_dimensions;
-
 
 	project::ActivateSignal activate_signal;
 
@@ -87,12 +112,21 @@ int main(int argc, char *argv[]) {
 
 	win_dimensions.x = 1200;
 	win_dimensions.y = 600;
+
 	core::App app("org.jony.test", win_dimensions, argc, argv);
 
 	activate_signal.app = &app;
 	activate_signal.csv_writer = &csv_writer;
 	activate_signal.persist_data = &persist_data;
 
+
 	app.run(&activate, &activate_signal);
+
+
+
+	persist_data.display_notes();
+
+	save_app_data(persist_data, csv_writer);
+
 
 }

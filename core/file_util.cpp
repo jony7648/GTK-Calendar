@@ -3,6 +3,22 @@
 #include "file_util.h"
 
 namespace file_util {
+void set_stream_start_line(std::ifstream& stream, int line) {
+	std::string dummy_str;
+
+	for (int i=0; i<line; i++) {
+		getline(stream, dummy_str);
+	}
+}
+
+void set_stream_start_line(std::fstream& stream, int line) {
+	std::string dummy_str;
+
+	for (int i=0; i<line; i++) {
+		getline(stream, dummy_str);
+	}
+}
+
 void get_file_contents(std::ifstream& file_stream, std::vector<std::string>& line_vector) {
 	if (file_stream.is_open() == false) {
 		std::cout << "ERROR: file is not open!\n";

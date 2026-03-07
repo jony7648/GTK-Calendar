@@ -38,7 +38,7 @@ static void arrange_cal_buttons(core::TimeComponet* time_componet, std::vector<g
 			widget->load_css("ShadeButton");
 		}
 		else {
-			widget->load_css("BlankState");
+			widget->load_css("Button");
 		}
 
 		pos_index = i + start_weekday;

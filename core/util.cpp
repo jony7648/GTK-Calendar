@@ -94,6 +94,16 @@ void str_split(const std::string& src_str, char split_char, std::vector<std::str
 	}
 }
 
+void str_unsplit(std::vector<std::string>& str_vec, std::string& output_str, char split_char) {
+	output_str = "";
+
+	for (const std::string& str : str_vec) {
+		output_str += str + split_char;
+	}
+
+	output_str.pop_back();
+}
+
 void str_strip(std::string& str) { 
 	char target_char = ' ';
 	char current_char;
