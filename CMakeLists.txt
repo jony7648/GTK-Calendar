@@ -34,7 +34,7 @@ endif()
 
 add_executable(Calendar main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
 target_compile_options(Calendar PRIVATE ${GTK4_CFLAGS})
-target_compile_features(Calendar PRIVATE cxx_std_23)
+target_compile_features(Calendar PRIVATE cxx_std_20)
 target_link_libraries(Calendar PkgConfig::GTK4)
 
 
