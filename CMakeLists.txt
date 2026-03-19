@@ -24,6 +24,12 @@ add_executable(my_app main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COM
 target_compile_features(my_app PRIVATE cxx_std_23)
 target_link_libraries(my_app PkgConfig::GTK4)
 
-if(WIN32)
-    add_definitions(-Duid_t=int -Dgid_t=int)
+if(MSVC)
+	set(GCC_FLAGS "-msse" "-msse2" "-mfpmath=sse")
+
+	foreach(FLAG ${GCC_FLAGS})
+		string(REPLACE "${FLAG}" "" GTK4_CFLAGS "${GTK4_CFLAGS}")
+	endforeach()
+
+	string(REPLACE "  " " " GTK4_CFLAGS "${GTK4_CFLAGS}")
 endif()
