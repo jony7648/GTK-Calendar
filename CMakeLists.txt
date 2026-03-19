@@ -21,20 +21,13 @@ set(SIGNAL_COMPONETS "${CORE_DIR}/signal_handler.cpp")
 
 
 if(MSVC)
-	get_target_property(GTK4_INCLUDE_DIRS PkgConfig::GTK4 INTERFACE_INCLUDE_DIRECTORIES)
-	set(GTK4_WIN_INCLUDES "")
-
-	foreach(inc_path ${GTK4_INCLUDE_DIRS})
-		file(TO_CMAKE_PATH "${inc_path}" clean_path)
-		list(APPEND GTK4_WIN_INCLUDES "${clean_path}")
-	endforeach()
-
-	set_target_properties(PkgConfig::GTK4 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${GTK4_WIN_INCLUDES}")
+	add_compile_options(/TP) 
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 add_executable(Calendar main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
 target_compile_options(Calendar PRIVATE ${GTK4_CFLAGS})
-target_compile_features(Calendar PRIVATE cxx_std_20)
+target_compile_features(Calendar PRIVATE cxx_std_23)
 target_link_libraries(Calendar PkgConfig::GTK4)
 
 
