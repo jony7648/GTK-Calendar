@@ -20,10 +20,6 @@ set(CORE_COMPONETS "${CORE_DIR}/app.cpp" "${CORE_DIR}/window.cpp" "${CORE_DIR}/s
 set(SIGNAL_COMPONETS "${CORE_DIR}/signal_handler.cpp")
 
 
-add_executable(my_app main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
-target_compile_features(my_app PRIVATE cxx_std_23)
-target_link_libraries(my_app PkgConfig::GTK4)
-
 if(MSVC)
 	set(GCC_FLAGS "-msse" "-msse2" "-mfpmath=sse")
 
@@ -33,3 +29,12 @@ if(MSVC)
 
 	string(REPLACE "  " " " GTK4_CFLAGS "${GTK4_CFLAGS}")
 endif()
+
+
+
+add_executable(Calendar main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
+target_compile_options(Calendar PRIVATE ${GTK4_CFLAGS})
+target_compile_features(Calendar PRIVATE cxx_std_23)
+target_link_libraries(Calendar PkgConfig::GTK4)
+
+
