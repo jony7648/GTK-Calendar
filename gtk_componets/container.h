@@ -60,6 +60,7 @@ public:
 	//using ValueType = Widget*;
 	//using Iterator = ContainerIterator<Container>;
 
+	Container();
 	~Container();
 
 	void present_widgets();

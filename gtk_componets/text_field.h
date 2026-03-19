@@ -4,8 +4,10 @@
 
 namespace gtkc {
 class TextField : public Widget {
+
+public:
+	const int a = 3;
 private:
-	std::string _empty_text = "Please enter some Text";
 	std::string _text = "";
 	GtkTextBuffer* _gtk_text_buffer = nullptr;
 	GtkTextIter _iter_start, _iter_end;
@@ -15,7 +17,10 @@ public:
 	TextField(const std::string& name, int scale_x, int scale_y);
 	void set_wrap_mode(GtkWrapMode wrap_mode);
 	void set_text(const std::string& text);
+	void reset_text();
 	std::string get_text();
+	std::string get_default_text();
+
 };
 }
 

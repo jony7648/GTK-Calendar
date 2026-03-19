@@ -16,8 +16,8 @@ public:
 	const std::string VALUE_LABEL_NAME = "ValueLabel";
 
 	KeyMapLabel();
-	const Label& get_key_label();
-	const Label& get_value_label();
+	Label& get_key_label();
+	Label& get_value_label();
 	const std::string& get_key_text();
 	void set_key_text(const std::string& new_text);
 	const std::string& get_value_text();

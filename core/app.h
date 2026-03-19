@@ -36,9 +36,9 @@ public:
 	void display_main_window();
 	void apply_provider(const std::string& css_dir_path);
 	//Error request_subwin(void* emitter_obj, SigData* sig_data);
-	Error request_subwin(core::Scene* scene, void* emitter_obj = nullptr, SigData* sig_data = nullptr);
+	Error request_subwin(core::Scene& scene, core::Window* p_emit_window = nullptr, void* emitter_obj = nullptr, SigData* sig_data = nullptr);
 
-	SigHandler sig_handler;
+	SigHandler<App> sig_handler;
 	
 	//Signal S_scene_request_subwin;
 	//Signal S_window_end_program;
@@ -70,7 +70,5 @@ private:
 	char** argv = nullptr;
 	const short DEFAULT_SUBWIN_COUNT = 5;
 	int app_status = 0;
-
-
 };
 }

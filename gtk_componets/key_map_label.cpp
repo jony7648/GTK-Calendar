@@ -2,6 +2,8 @@
 
 namespace gtkc {
 KeyMapLabel::KeyMapLabel() : _key_label(), _value_label(){
+
+	set_type(Type::KeyMapLabel);
 	
 	_key_label.set_name(KEY_LABEL_NAME);
 	_value_label.set_name(VALUE_LABEL_NAME);
@@ -36,11 +38,11 @@ const std::string& KeyMapLabel::get_value_text() {
 	return _value_label.get_text();
 }
 
-const Label& KeyMapLabel::get_key_label() {
+Label& KeyMapLabel::get_key_label() {
 	return _key_label;
 }
 
-const Label& KeyMapLabel::get_value_label() {
+Label& KeyMapLabel::get_value_label() {
 	return _value_label;
 }
 

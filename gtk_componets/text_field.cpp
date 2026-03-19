@@ -1,10 +1,11 @@
 #include "text_field.h"
 
+#define DEFAULT_TEXT "Please enter some text"
+
 namespace gtkc {
 TextField::TextField(const std::string& name, int scale_x, int scale_y) {
-	_type = "TextField";
-
 	set_name(name);
+	set_type(Type::TextField);
 	set_scale(scale_x, scale_y);
 	set_grid_point(0,0);
 	set_css_file_name("text_field.css");
@@ -19,7 +20,7 @@ TextField::TextField(const std::string& name, int scale_x, int scale_y) {
 	_gtk_text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(_gtk_widget));
 
 	//gtk_text_buffer_insert(gtk_text_buffer, &gtk_text_iter, "nugs\n", 5);
-	set_text(_empty_text);
+	set_text(DEFAULT_TEXT);
 
 }
 
@@ -30,7 +31,7 @@ void TextField::set_wrap_mode(GtkWrapMode wrap_mode) {
 
 void TextField::set_text(const std::string& text) {
 	if (text.empty()) {
-		gtk_text_buffer_set_text(_gtk_text_buffer, _empty_text.c_str(), -1);
+		gtk_text_buffer_set_text(_gtk_text_buffer, DEFAULT_TEXT, -1);
 		return;
 	}
 
@@ -46,4 +47,12 @@ std::string TextField::get_text() {
 	return std::string(c_str);
 }
 
+std::string TextField::get_default_text() {
+	return DEFAULT_TEXT;
+}
+
+void TextField::reset_text() {
+	this->_text = DEFAULT_TEXT;
+	gtk_text_buffer_set_text(_gtk_text_buffer, DEFAULT_TEXT, -1);
+}
 }

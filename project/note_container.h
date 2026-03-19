@@ -3,13 +3,15 @@
 #include "core/time_componet.h"
 #include "core/signal_handler.h"
 
-const short int MAX_NOTE_COUNT = 50;
-const short int MAX_SAVE_COUNT = 20;
+const short int MAX_NOTE_COUNT = 4;
+//const short int MAX_SAVE_COUNT = 20;
 
 namespace data {
 class NoteContainer;
 
 struct Note {
+	void display_info();
+
 	core::Date date;
 	std::string text = "";	
 	bool should_save = false;
@@ -50,7 +52,6 @@ class NoteContainer {
 	using Iterator = NoteContainerIterator;
 
 public:
-
 	enum SIGNALS {
 		S_NOTE_ADDED,
 		S_NOTE_SAVED,
@@ -58,25 +59,24 @@ public:
 	};
 
 	struct SigNoteAdded {
-		Note* note;
-
+		Note* note = nullptr;
 	};
 
 	struct SigNoteSaved {
-		Note* note;	
-
+		Note* note = nullptr;	
 	};
 
 	struct SigIncremented {
-		Note* end_note;	
+		Note* end_note = nullptr;	
+		int start_index = 0, end_index = 0;
 
 	};
 
 	NoteContainer();
 	~NoteContainer();
-	core::SigHandler sig_handler;
-	Note& add_note();
-	Note& after_end();
+	core::SigHandler<NoteContainer> sig_handler;
+	void add_note(const Note& note);
+	Note& after_back();
 	void increment();
 	void reset(int index);
 	void reset(Note& note);
@@ -85,6 +85,7 @@ public:
 	Iterator end();
 	short get_start_index();
 	short get_end_index();
+	Note& back();
 
 
 private:

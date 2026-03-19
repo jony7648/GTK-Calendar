@@ -47,6 +47,8 @@ void dynamic_data_free(void* dynamic_data) {
 	free(header);
 }
 
+
+
 int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int end_bound) {
 	//int cycled_position = start_value + cycle_count;
 	int bound_len = end_bound - start_bound;
@@ -56,11 +58,14 @@ int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int 
 	}
 
 	int cycled_position = 0;
-	cycled_position = (start_value + cycle_count) % (bound_len);
+	
+	
+	//if you go beyond the end bound return at the start
+	cycled_position = ((start_value+cycle_count - start_bound) % bound_len) + start_bound;
 
-	if (cycled_position < 0) {
-		cycled_position += bound_len;
-	}
+	//if you go under the start bound you should return to the start again
+	cycled_position += (cycled_position < start_bound)*bound_len;
+
 
 	return cycled_position;
 }
@@ -144,4 +149,6 @@ void str_strip(std::string& str) {
 		}
 	}
 }
+
+
 }

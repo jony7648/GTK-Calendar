@@ -5,7 +5,7 @@ namespace gtkc {
 
 Label::Label() {
 	text = "Empty";
-	_type = "Label";
+	set_type(Type::Label);
 	set_gtk_widget(gtk_label_new(text.c_str()));
 	set_css_file_name("label.css");
 	set_font_size(2);
@@ -16,7 +16,7 @@ Label::Label(const std::string& name, const std::string& text, int grid_x, int g
 	GtkWidget* gtk_widget = gtk_label_new(text.c_str());
 
 	set_name(name);
-	_type = "Label";
+	set_type(Type::Label);
 	set_css_file_name("label.css");
 	set_gtk_widget(gtk_widget);
 	set_grid_point(grid_x, grid_y);

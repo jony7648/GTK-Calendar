@@ -24,15 +24,17 @@ public:
 	const size_t WEEKDAY_COUNT = 7;
 	const size_t MONTH_COUNT = 12;
 	const short LEAP_FACTOR = 4;
+	const int MAX_YEAR = 2100;
+	const int MIN_YEAR = 1900;
 
 	TimeComponet();
 	
 	void calculate_from_current_time();
 	void calculate_from_time_t(time_t time);
-	int find_leap_year_count(int start_year, int end_year);
-	int month_to_int(const std::string& conv_month);
-	int weekday_to_int(const std::string& conv_day);
-	void display_time_info();
+	int find_leap_year_count(int start_year, int end_year) const;
+	bool is_leap_month(int month, int year) const;
+	int month_to_int(const std::string& conv_month) const;
+	int weekday_to_int(const std::string& conv_day) const;
 	void set_minute_and_hour(const std::string& str);
 	void advance_menu_month(int cycle_count);
 	void reset_menu_time();
@@ -42,19 +44,24 @@ public:
 	void set_menu_year(int year);
 	void set_menu_date(Date& date);
 
-	int get_day_count();
-	int get_day_count(int month);
-	int get_starting_weekday();
-	int get_starting_weekday(int month, int year);
-	const std::string& get_short_month_name(int month);
-	const std::string& get_long_month_name(int month);
-	void get_full_day_str(core::Date& date, std::string& output_str);
-	std::string* get_weekday_arr();
+	int get_day_count() const;
+	int get_day_count(int month) const;
+	int get_starting_weekday() const;
+	int get_starting_weekday(int month, int year) const;
+	void get_month_year_str(const core::Date& date, std::string& output_str) const;
+	const std::string& get_short_month_name(int month) const;
+	const std::string& get_long_month_name(int month) const ;
+	const std::string& get_weekday_name(int weekday) const;
+	void get_full_day_str(core::Date& date, std::string& output_str) const;
+	const std::string* get_weekday_arr() const;
 
-	int get_menu_month();
-	int get_menu_year();
+	int get_menu_month() const;
+	int get_menu_year() const;
 
-	const Date& get_menu_date();
+	const Date& get_menu_date() const;
+
+
+	void display_time_info() const;
 	
 };
 

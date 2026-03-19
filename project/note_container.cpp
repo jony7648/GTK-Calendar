@@ -1,15 +1,23 @@
 #include "note_container.h"
 #include "core/util.h"
 
+#define SAVE_ADJUST_COUNT 2
+
 namespace data {
+void Note::display_info() {
+	std::println(
+		"\nNote Info\nYear: {}\nMonth: {}\nDay: {}\nText: {}\nShould Save: {}\nAddress: {}\n",
+		date.year, date.month, date.day, text, should_save, (void*)this
+	);
+}
+
 NoteContainerIterator::NoteContainerIterator(NoteContainer* note_container, Note note_arr[], short start_index, short end_index, size_t container_size) {
 	this->note_container = note_container;
 	this->start_index = start_index;
 	this->end_index = end_index;
 	this->container_size = container_size;
 	this->note_arr = note_arr;
-
-	}
+}
 
 bool NoteContainerIterator::operator==(NoteContainerIterator it) {
 	if (current_index == end_index) {
@@ -51,38 +59,45 @@ NoteContainer::~NoteContainer() {
 	util::dynamic_data_free(_sig_data);
 }
 
-Note& NoteContainer::add_note() {
-	if (start_index == MAX_NOTE_COUNT) {
-		start_index = 0;
-	}
+void NoteContainer::add_note(const Note& note) {
+	Note& back_note = note_arr[end_index];
 
-	if (end_index == MAX_NOTE_COUNT) {
-		end_index = 0;
-	}
+	back_note = note;
 
-	reset(end_index);
-
-
-	end_index++;
-	return note_arr[end_index-1];
+	increment();
 }
 
-Note& NoteContainer::after_end() {
-	unsigned short index = (end_index + 1) % MAX_NOTE_COUNT;
+Note& NoteContainer::after_back() {
+	unsigned short index = (end_index) % MAX_NOTE_COUNT;
 
 	return note_arr[index];
-	
+}
+
+Note& NoteContainer::back() {
+	unsigned short index = (end_index-1) % MAX_NOTE_COUNT;
+
+	return note_arr[index];
 }
 
 void NoteContainer::increment() {
 	end_index = (end_index + 1) % MAX_NOTE_COUNT;
-	
-	_sig_data = util::dynamic_data_assign(_sig_data, sizeof(SigIncremented));
-	SigIncremented* signal = (SigIncremented*)_sig_data;
 
-	signal->end_note = &note_arr[end_index];
+
+	//adjust start bound if end_index and start bound is the same
+	start_index = (
+		(start_index + SAVE_ADJUST_COUNT * (start_index==end_index)) %
+		MAX_NOTE_COUNT
+	);
+
+	SigIncremented sig;
 	
-	sig_handler.emit_data(S_INCREMENTED, signal);
+	sig.end_note = &note_arr[end_index-1];
+
+	sig.end_note->display_info();
+
+	sig.start_index = start_index;
+	sig.end_index = end_index;
+	sig_handler.emit_data(S_INCREMENTED, &sig);
 }
 
 void NoteContainer::reset(int index) {
@@ -117,8 +132,6 @@ void NoteContainer::reset(Note* note) {
 	note->text = "";
 }
 
-
-
 NoteContainerIterator NoteContainer::begin() {
 	return NoteContainerIterator(this, note_arr, start_index, end_index, MAX_NOTE_COUNT);
 }
@@ -134,6 +147,4 @@ short NoteContainer::get_start_index() {
 short NoteContainer::get_end_index() {
 	return start_index;
 }
-
-
 }

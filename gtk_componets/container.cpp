@@ -7,6 +7,7 @@ ContainerIterator::ContainerIterator(gtkc::Container* container, int index) {
 	//initiate the first container map
 	container_map[0] = ContainerIntPair(container, index);
 	iter_container = container_map[0].container;
+
 }
 
 bool ContainerIterator::operator==(ContainerIterator it) {
@@ -59,7 +60,7 @@ ContainerIterator& ContainerIterator::operator++() {
 	
 	*pair_index += 1;
 
-	if (iter_widget->get_type() == "Grid Container") {
+	if (iter_widget->get_type() == Type::GridContainer) {
 		iter_level++;
 		container_map[iter_level] = ContainerIntPair(static_cast<gtkc::Container*>(iter_widget), 0);
 		return *this;
@@ -84,6 +85,9 @@ Widget* ContainerIterator::operator=(Widget* widget_ptr) {
 }
 
 
+Container::Container() {
+	set_type(Type::Container);
+}
 
 Container::~Container() {
 	GtkWidget* gtk_widget = get_gtk_widget();
@@ -140,26 +144,26 @@ void Container::add_widget(Widget *widget) {
 	}
 
 	if (widget_name.empty()) {
-		std::cout << "Widget of type " << widget->get_type() << " does not have a name!\n";
-		return;
+			std::cout << "Widget of type " << (int)widget->get_type() << " does not have a name!\n";
+			return;
+		}
+
+
+		if (Container::check_for_same_widget(widget_name)) {
+			std::cout << "Widget: " << widget_name << " already exists in the scene!\n";
+			return;
+		}
+
+		if (widget != nullptr) {
+			children_vector.push_back(widget);
+		}
 	}
 
+	void Container::add_widget_arr(Widget* widget_arr[], size_t arr_size) {
+		//this meathod adds an array of widgets to the children vector
+		Widget* widget = nullptr;
 
-	if (Container::check_for_same_widget(widget_name)) {
-		std::cout << "Widget: " << widget_name << " already exists in the scene!\n";
-		return;
-	}
-
-	if (widget != nullptr) {
-		children_vector.push_back(widget);
-	}
-}
-
-void Container::add_widget_arr(Widget* widget_arr[], size_t arr_size) {
-	//this meathod adds an array of widgets to the children vector
-	Widget* widget = nullptr;
-
-	for (int i=0; i<arr_size; i++) {
+		for (int i=0; i<arr_size; i++) {
 		widget = widget_arr[i];
 
 		add_widget(widget);
@@ -187,7 +191,7 @@ void Container::get_tagged_widgets(std::vector<gtkc::Widget*>& widget_vec, const
 	}
 
 	for (gtkc::Widget* widget : children_vector) {
-		if (widget->is_type(container_type)) {
+		if (widget->is_type(gtkc::Type::GridContainer)) {
 			container = static_cast<gtkc::Container*>(widget);
 			container->get_tagged_widgets(widget_vec, tag);
 		}

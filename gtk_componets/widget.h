@@ -5,7 +5,14 @@
 #include "core/constants.h"
 #include "core/space.h"
 #include "core/messenger.h"
-#include "core/signal_handler.h"
+#include "types.h"
+//#include "core/signal_handler.h"
+
+namespace core {
+
+	template <typename ObjType>
+	class SigHandler;
+}
 
 namespace gtkc {
 class Container;
@@ -13,8 +20,8 @@ class Container;
 class Widget {
 
 public:
-	void load_css();
-	void load_css(const std::string& class_name);
+	//void load_css();
+	void load_css(const std::string& class_name = "Default");
 	void apply_provider();
 	Widget();
 	~Widget();
@@ -48,8 +55,8 @@ public:
 	void set_grid_point(int x, int y);
 	const space::Point& get_grid_point();
 
-	bool is_type(const std::string& type);
-	const std::string& get_type();
+	bool is_type(Type type);
+	Type get_type();
 
 
 	void set_hexpand(bool hexpand);
@@ -63,14 +70,15 @@ public:
 	int get_sig_data();
 
 protected:
-	std::string _type = "UNDEFINED TYPE";
 	GtkWidget* _gtk_widget;
 
 	void set_css_file_name(const std::string& css_path);
+	void set_type(Type type);
 
 
 private:
 	std::string _name = "";
+	Type _type = Type::Widget;
 	std::string _tag = "";
 	std::string _css_class = "N/A";
 	int _grid_pos = 0;
@@ -89,8 +97,6 @@ private:
 	GtkCssProvider* _css_provider = nullptr;
 	GdkDisplay* _default_display = nullptr;
 
-	core::SigHandler sig_handler;
-	
 //	std::vector<core::Messenger<Widget*>*> messenger_vector; //vector holds the addresses of used messenger_datas, so they can be deleted when widget is freed
 
 

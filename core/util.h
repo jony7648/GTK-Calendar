@@ -10,4 +10,24 @@ namespace util {
 	void str_unsplit(std::vector<std::string>& str_vec, std::string& output_str, char split_char);
 	int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int end_bound);
 	void str_strip(std::string& str);
+
+	template <typename T>
+	void display_vec_info(const T& vec) {
+		for (auto& elem : vec) {
+			std::cout << elem << " ";	
+		}
+	}
+
+	template <typename T>
+	void display_multivec_info(const T& multi_vec) {
+		for (int i=0; i<multi_vec.size(); i++) {
+			std::cout << i << ": ";
+			for (auto& elem : multi_vec.at(i)) {
+				std::cout << elem << " ";	
+
+			}
+
+			std::cout << "\n";
+		}
+	}
 }

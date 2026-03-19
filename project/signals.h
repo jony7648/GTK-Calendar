@@ -6,7 +6,7 @@
 namespace project {
 struct ActivateSignal {
 	core::App* app = nullptr;
-	core::CsvWriter* csv_writer = nullptr;
+	core::csv::Writer* csv_writer = nullptr;
 	data::PersistData* persist_data = nullptr;
 };
 

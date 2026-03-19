@@ -13,12 +13,12 @@ Button::Button(const std::string& name, const std::string& text, int grid_x, int
 
 	//listener.set_gtk_parent(get_gtk_widget());
 	set_name(name);
-	_type = "Button";
+	set_type(Type::Button);
 	set_css_file_name("button.css");
 	set_grid_point(grid_x, grid_y);
 	set_scale(width, height);
 	this->text = text;
-	load_css();
+	load_css("Default");
 }
 
 Button::~Button() {

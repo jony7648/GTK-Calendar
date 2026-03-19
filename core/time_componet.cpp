@@ -79,15 +79,22 @@ TimeComponet::TimeComponet() {
 	reset_menu_time();
 }
 
-int TimeComponet::find_leap_year_count(int start_year, int end_year) {
+int TimeComponet::find_leap_year_count(int start_year, int end_year) const {
 	int next_leap = start_year + (start_year % LEAP_FACTOR);
 	int leap_count = (end_year - next_leap + LEAP_FACTOR) / LEAP_FACTOR;
 
 	return leap_count;
-	
 }
 
-int TimeComponet::month_to_int(const std::string& conv_month) {
+bool TimeComponet::is_leap_month(int month, int year) const {
+	if (year % LEAP_FACTOR == 0) {
+		return true;	
+	}
+
+	return false;
+}
+
+int TimeComponet::month_to_int(const std::string& conv_month) const {
 	int month_index = 0;
 
 	for (int i=0; i<MONTH_COUNT; i++) {
@@ -101,7 +108,7 @@ int TimeComponet::month_to_int(const std::string& conv_month) {
 	return month_index;
 }
 
-int TimeComponet::weekday_to_int(const std::string& conv_day) {
+int TimeComponet::weekday_to_int(const std::string& conv_day) const {
 	int day_index = 0;
 
 	for (int i=0; i<WEEKDAY_COUNT; i++) {
@@ -116,17 +123,13 @@ int TimeComponet::weekday_to_int(const std::string& conv_day) {
 	return day_index;
 }
 
-void TimeComponet::display_time_info() {
+void TimeComponet::display_time_info() const {
 	std::println(
 	"Day: {}\nMonth: {}\nYear: {}\nWeekday: {}\nHour: {}\nMinute: {}\nSecond: {}", 
 		_date.day, _date.month, _date.year, _weekday, _time.hour, _time.minute, _time.minute 
 	);
 
 	std::cout << _month_arr[3] << " this is month\n";	
-}
-
-void TimeComponet::set_minute_and_hour(const std::string& time_str) {
-
 }
 
 void TimeComponet::calculate_from_current_time() {
@@ -151,7 +154,6 @@ void TimeComponet::calculate_from_current_time() {
 				this->_weekday = weekday_to_int(str);
 				break;
 			case CTIME_TIME:
-				set_minute_and_hour(str);
 				break;
 			case CTIME_YEAR:
 				this->_date.year = std::stoi(str);
@@ -160,16 +162,17 @@ void TimeComponet::calculate_from_current_time() {
 	}
 }
 
-int TimeComponet::get_day_count() {
+int TimeComponet::get_day_count() const {
 	//this method will return the amount of days in a month
 	if (_date.month >= MONTH_COUNT || _date.month < 0) {
 		std::cout << "CRITICAL ERROR: MONTH IS OUT OF RANGE!!!" << "\n";
 		return 0;
 	}
+
 	return _day_count_arr[_date.month];
 }
 
-int TimeComponet::get_day_count(int month) {
+int TimeComponet::get_day_count(int month) const {
 	//this method will return the amount of days in a month
 	if (month >= MONTH_COUNT || month < 0) {
 		std::cout << "CRITICAL ERROR: MONTH IS OUT OF RANGE!!!" << "\n";
@@ -179,19 +182,20 @@ int TimeComponet::get_day_count(int month) {
 	return _day_count_arr[month];
 }
 
-int TimeComponet::get_starting_weekday() {
+int TimeComponet::get_starting_weekday() const {
 	return _weekday;
 }
 
 void TimeComponet::advance_menu_month(int cycle_count) {
 	std::cout << _menu_date.month + cycle_count << "\n";
+
+
 	if (_menu_date.month + cycle_count < 0) {
-		_menu_date.year--;
-		std::cout << "Year should go down by one\n";
+		_menu_date.year = util::cycle_through_bounds(_menu_date.year, -1, MIN_YEAR, MAX_YEAR);
 	}
 	
 	if (_menu_date.month + cycle_count == MONTH_COUNT) {
-		_menu_date.year++;
+		_menu_date.year = util::cycle_through_bounds(_menu_date.year, 1, MIN_YEAR, MAX_YEAR);
 	}
 
 	//menu_year = menu_year + (menu_month + cycle_count) / (MONTH_COUNT);
@@ -221,32 +225,42 @@ void TimeComponet::set_menu_date(Date& date) {
 	this->_menu_date.year = date.year;
 }
 
-const std::string& TimeComponet::get_long_month_name(int month) {
-	return _long_mth_names[month];
+const std::string& TimeComponet::get_long_month_name(int month) const {
+	//use moduls here as it allows us to limit the month without
+	//performing a check each time the month is changed
+	return _long_mth_names[month % MONTH_COUNT];
 }
 
-const std::string& TimeComponet::get_short_month_name(int month) {
-	return _month_arr[month];
+const std::string& TimeComponet::get_short_month_name(int month) const {
+	return _month_arr[month % MONTH_COUNT];
+}
+
+const std::string& TimeComponet::get_weekday_name(int weekday) const {
+	return _weekday_arr[weekday % WEEKDAY_COUNT];
 }
 
 
-int TimeComponet::get_menu_month() {
+int TimeComponet::get_menu_month() const {
 	return _menu_date.month;
 }
 
-int TimeComponet::get_menu_year() {
+int TimeComponet::get_menu_year() const {
 	return _menu_date.year;
 }
 
-const Date& TimeComponet::get_menu_date() {
+const Date& TimeComponet::get_menu_date() const {
 	return _menu_date;		
 }
 
-std::string* TimeComponet::get_weekday_arr() {
+const std::string* TimeComponet::get_weekday_arr() const {
 	return _weekday_arr;
 }
 
-void TimeComponet::get_full_day_str(core::Date& date, std::string& output_str) {
+void TimeComponet::get_month_year_str(const core::Date& date, std::string& output_str) const {
+	output_str = _long_mth_names[date.month] +  " " + std::to_string(date.year);
+}
+
+void TimeComponet::get_full_day_str(core::Date& date, std::string& output_str) const {
 	const std::string& RD_ENDING = "rd";			
 	const std::string& TH_ENDING = "th";			
 	const std::string& ST_ENDING = "st";			
@@ -278,7 +292,7 @@ void TimeComponet::get_full_day_str(core::Date& date, std::string& output_str) {
 	output_str = month_str + " " + day_str + ", " + std::to_string(date.year);
 }
 
-int TimeComponet::get_starting_weekday(int target_month, int target_year) {
+int TimeComponet::get_starting_weekday(int target_month, int target_year) const {
 	//this meathod will return the weekday that the month starts on
 
 	int years_ahead = target_year - _date.year;

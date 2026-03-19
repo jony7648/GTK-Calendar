@@ -11,36 +11,39 @@ bool is_custom_point(const space::Point& point) {
 	return false;	
 }
 
-void signal_request_subwin(void* app_addr, void* emitter_obj, void* sig_data_addr) {
-	core::App* app = static_cast<core::App*>(app_addr);
-	gtkc::Widget* widget = static_cast<gtkc::Widget*>(emitter_obj);
-	core::SigData* sig_data = static_cast<core::SigData*>(sig_data_addr);
-	core::Scene* scene = nullptr;
-	core::Scene* sub_scene = nullptr;
+void signal_request_subwin(core::EmitData<core::Scene>& emit_data) {
+	core::App* app = static_cast<core::App*>(emit_data.receiver);
+	core::Window& emit_window = emit_data.holder->get_parent_win();
+	gtkc::Widget* widget = static_cast<gtkc::Widget*>(emit_data.emitter);
+	core::SigData* sig_data = static_cast<core::SigData*>(emit_data.sig_data);
+	core::Scene* p_sub_scene = nullptr;
 
-	scene = app->get_main_scene();
 
 	if (!widget || !sig_data) {
-		app->request_subwin(scene);
+		return;
 	}
 
 	for (core::Scene* scene : app->get_sub_scene_vect()) {
 		if (scene->get_name() == sig_data->str) {
-			sub_scene = scene;
+			p_sub_scene = scene;
 		}
 	}
 
-	app->request_subwin(sub_scene, emitter_obj, sig_data);
+	if (!p_sub_scene) {
+		return;
+	}
+
+	app->request_subwin(*p_sub_scene, &emit_window, widget, sig_data);
 }
 
-void signal_subwin_close(void* app_addr, void* subwin_addr, void*) {
-	core::App* app = static_cast<core::App*>(app_addr);
-	core::Window* subwin = static_cast<core::Window*>(subwin_addr);
+void signal_subwin_close(core::EmitData<core::Window> emit_data) {
+	core::App* app = static_cast<core::App*>(emit_data.receiver);
+	core::Window* subwin = emit_data.holder;
 	core::Scene* main_scene = nullptr;
 	core::Scene* sub_scene = nullptr;
 
-	if (subwin == nullptr) {
-		std::cout << "ERROR: subwin is nullptr\n";
+	if (subwin == nullptr ) {
+		std::cout << "ERROR: closed subwin is nullptr\n";
 		return;
 	}
 
@@ -54,19 +57,20 @@ void signal_subwin_close(void* app_addr, void* subwin_addr, void*) {
 	}
 
 	//do some stuff in calendar to do something with window close signal
+
+	core::Scene::SignalRequestSubwin sig_data;
+
+	sig_data.emitter_scene = sub_scene;
 	
-	main_scene->sig_handler.emit(core::Scene::S_WINDOW_CLOSED, sub_scene);
+	main_scene->sig_handler.emit_data(core::Scene::S_WINDOW_CLOSED, sub_scene);
 	return;
 }
 
-void signal_end_app(void* app_ptr, void* ignore_ptr, void*) {
-	core::App* app = static_cast<core::App*>(app_ptr);
+void signal_end_app(core::EmitData<core::Window> emit_data) {
+	core::App* app = static_cast<core::App*>(emit_data.receiver);
 
 	std::cout << "Time to close the app\n";
 
-	//gtk_window_destroy(GTK_WINDOW(app->main_window->get_gtk_window()));
-
-	//std::cout << "App: " << app << "\n";
 	app->close();
 }
 
@@ -126,7 +130,7 @@ void App::create_subwins(unsigned int count = 0) {
 		subwin_name = "Subwin " + std::to_string(i);
 		subwin = new core::Window(gtk_app, "Subwin ");
 		//S_subwin_close.pickup_signal(&subwin->S_window_close);
-		subwin->add_emit_func(core::Window::S_WINDOW_CLOSE, signal_subwin_close, this);
+		subwin->sig_handler.add_emit_func(core::Window::S_WINDOW_CLOSE, signal_subwin_close, this);
 		subwin_vect.push_back(subwin);
 	}
 }
@@ -138,63 +142,55 @@ int App::attach_subwin(Window* subwin) {
 
 	subwin_vect.push_back(subwin);
 	//S_subwin_close.pickup_signal(&subwin->S_window_close);
-	subwin->add_emit_func(core::Window::S_WINDOW_CLOSE, signal_subwin_close, this);
+	subwin->sig_handler.add_emit_func(core::Window::S_WINDOW_CLOSE, signal_subwin_close, this);
 	return 0;
 }
 
-Error App::request_subwin(core::Scene* sub_scene, void* emitter_obj, SigData* sig_data) {
+Error App::request_subwin(core::Scene& sub_scene, core::Window* emit_window, void* emitter_obj, SigData* sig_data) {
 	bool found_scene = false;
-	core::Window* subwin = nullptr;
-	core::Scene* win_scene = nullptr;
+	core::Window* p_subwin = nullptr;
+	core::Scene* p_win_scene = nullptr;
 
-	if (!sub_scene) {
-		std::cout << "Error: Sub scene is a nullptr!\n";
-		return Error(ErrorType::Nullptr);
-	}
-
-	for (Scene* scene : sub_scene_vect) {
-		std::cout << scene->get_name() << "\n";
-		std::cout << sub_scene->get_name() << "\n";
-
-		if (scene == sub_scene) {
+	for (Scene* p_scene : sub_scene_vect) {
+		if (p_scene == &sub_scene) {
 			found_scene = true;
 			break;
 		}
 	}
 
 	if (!found_scene) {
-		std::cout << "ERROR: passed in sub scene could not be found in the sub scene vector!\n";
+		//std::cout << "ERROR: passed in sub scene could not be found in the sub scene vector!\n";
 		return Error(ErrorType::SceneNotFound);
 	}
 	
 
-	for (auto& win : subwin_vect) {
-		win_scene = win->get_scene();
+	for (Window* p_win : subwin_vect) {
+		p_win_scene = p_win->get_scene();
 		
-		if (win_scene == sub_scene) {
-			subwin = win;
+		if (p_win_scene == &sub_scene) {
+			p_subwin = p_win;
 			break;
 		}
 
 		//if the win_scene is a nullptr set the subwin to that window
 		//but keep searching, just in case
-		if (win_scene == nullptr) {
-			subwin = win;
+		if (p_win_scene == nullptr) {
+			p_subwin = p_win;
 		}
 	}
 
-	if (!subwin) {
-		std::cout << "Error: a subwin couldn't be found for the sub scene " << sub_scene->get_name() << "   (requested thorugh scene pointer)\n";
+	if (!p_subwin) {
+		std::cout << "Error: a subwin couldn't be found for the sub scene " << sub_scene.get_name() << "   (requested thorugh scene pointer)\n";
 		return Error(ErrorType::SubwinNotFound);
 	}
 
 	//if there is an emmiter object emit the window requested signal
 	if (emitter_obj) {
-		sub_scene->sig_handler.emit_data(Scene::S_WINDOW_DISPLAYED, sig_data, emitter_obj);
+		sub_scene.sig_handler.emit_data(Scene::S_WINDOW_DISPLAYED, sig_data, emitter_obj);
 	}
 
 
-	subwin->display(sub_scene);
+	p_subwin->display(sub_scene);
 
 	return Error(ErrorType::Clear);
 }
@@ -220,7 +216,6 @@ Error App::attach_main_scene(core::Scene* scene, void* signal_data) {
 	//scene->S_request_subwin.set_emit_func(signal_request_subwin);
 
 	//rewrite the signals so you can add signals to them and chain them
-	std::cout << "Signal Picked Up!" << "\n";
 	scene->sig_handler.add_emit_func(core::Scene::S_REQUEST_SUBWIN, signal_request_subwin, this);
 	scene->set_time_componet(&time_componet);
 
@@ -239,7 +234,10 @@ Error App::attach_sub_scene(Scene* scene) {
 }
 
 void App::display_main_window() {
-	main_window->display(main_scene);
+	if (main_scene) {
+		main_window->display(*main_scene);
+	}
+
 }
 
 void App::apply_provider(const std::string& css_dir_path) {

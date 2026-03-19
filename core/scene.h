@@ -18,6 +18,10 @@ public:
 		S_REQUEST_SUBWIN,
 	};
 
+	struct SignalRequestSubwin {
+		Scene* emitter_scene = nullptr;
+	};
+
 	Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing);
 	~Scene();
 		//Signal S_ready; // a signal that gets executed when being attached to the app object
@@ -27,29 +31,25 @@ public:
 	//Signal GS_cal_button_clicked;
 	//Signal GS_button_clicked;
 
-
-	void get_tagged_widgets(std::vector<gtkc::Widget*>&, std::string tag);
-
 	void set_time_componet(core::TimeComponet* time_componet);
 	void set_resizability(bool state);
-	bool get_resizability();
+	bool get_resizability() const;
 	void signal_request_subwin(core::Message* message);
 
-	void emit_signal(int id);
-	void add_emit_func(int id, void(*emit_func)(void*, void*, void*), void* receiver_obj);
-
+	void set_parent_win(core::Window* p_win);
+	core::Window& get_parent_win();
 
 	gtkc::GridContainer& get_widget_container();
 
-	const std::string& get_name();
+	const std::string& get_name() const;
 	core::TimeComponet* get_time_componet();
 	void set_custom_dimensions(const space::Point& dimensions);
-	const space::Point& get_custom_dimensions();
+	const space::Point& get_custom_dimensions() const;
 
-	SigHandler sig_handler;
+	SigHandler<Scene> sig_handler;
 
 private:
-
+	core::Window* p_parent_win = nullptr;
 	std::string name = "";
 	core::TimeComponet* time_componet;
 	space::Point custom_dimensions;

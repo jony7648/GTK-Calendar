@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "csv_writer.h"
 #include "util.h"
+#include "sort.h"
 #include "error.h"
 #include "file_util.h"
 
@@ -61,18 +62,18 @@ void remove_chars_from_str(std::string& src_str, std::vector<int>& location_vec)
 	}
 }
 
-namespace core {
-CsvWriter::CsvWriter(const std::string& file_path, const std::vector<std::string>& header_vec) {
+namespace core::csv {
+Writer::Writer(const std::string& file_path, const std::vector<std::string>& header_vec) {
 	_file_path = file_path;	
 	_header_vec = header_vec;
 }
 
-void CsvWriter::csv_map_to_str(CsvMap& data, std::string& output_line) {
+void Writer::csv_map_to_str(Entry& entry, std::string& output_line) {
 	std::string dummy_str = "";
 	output_line = "";
 
 	for (const std::string& header : _header_vec) {
-		dummy_str = data[header];
+		dummy_str = entry.get(header);
 		line_to_csv_line(dummy_str, ',');
 		output_line.append(dummy_str + ",");			
 	}
@@ -80,7 +81,7 @@ void CsvWriter::csv_map_to_str(CsvMap& data, std::string& output_line) {
 	output_line.pop_back();
 }
 
-void CsvWriter::parse_csv_line(std::vector<CsvMap>& data_vec, std::string csv_line, std::vector<int>& remove_locations) {
+void Writer::parse_csv_line(std::vector<Entry>& data_vec, std::string csv_line, std::vector<int>& remove_locations) {
 	char curr_char = ' ';
 	char split_char = ',';
 	char string_char = '"';
@@ -95,8 +96,8 @@ void CsvWriter::parse_csv_line(std::vector<CsvMap>& data_vec, std::string csv_li
 	int start_pos = 0, copy_count = 0, copy_offset = 0, value_index = 0;
 	size_t line_len = csv_line.length();
 	
-	data_vec.push_back(CsvMap());
-	CsvMap& data_map = data_vec.back();
+	data_vec.push_back(Entry());
+	Entry& entry = data_vec.back();
 	
 	for (int i=0; i<line_len; i++) {
 		current_header = _header_vec[value_index];
@@ -133,7 +134,7 @@ void CsvWriter::parse_csv_line(std::vector<CsvMap>& data_vec, std::string csv_li
 			copy_count = i - start_pos + copy_offset;
 			sub_str = csv_line.substr(start_pos, copy_count);
 			remove_chars_from_str(sub_str, remove_locations);
-			data_map[current_header] = sub_str;
+			entry.add(current_header, sub_str);
 			value_index++;
 			start_pos = i+1;
 			copy_offset = 0;
@@ -141,46 +142,44 @@ void CsvWriter::parse_csv_line(std::vector<CsvMap>& data_vec, std::string csv_li
 	}
 }
 
-CsvWriter::CsvMap* CsvWriter::check_for_same_line(std::vector<CsvMap>& data_vec, const std::string& current_line) {
+Entry* Writer::check_for_same_line(std::vector<Entry>& data_vec, const std::string& current_line) {
 	bool found_csv_match = false;
-	CsvMap* data_ptr = nullptr;
+	Entry* entry_ptr = nullptr;
 
 	std::vector<std::string> split_vec;
 
 	util::str_split(current_line, ',', split_vec);
 
-	for (CsvMap& data : data_vec) {
+	for (Entry& entry : data_vec) {
 
-		data_ptr = &data;
+		entry_ptr = &entry;
 
 		for (int i=_same_check_start; i<_same_check_end; i++) {
 			found_csv_match = true;
 
 			const std::string& file_elem = split_vec.at(i);
 			const std::string& current_header = _header_vec.at(i);
-			const std::string& save_elem = data[current_header];
+			const std::string& save_elem = entry.get(current_header);
 
 			std::cout << "Elem " << i << ": " << file_elem << "  "  << save_elem << "\n";
 
 			if (file_elem != save_elem) { 
 				std::cout << "Not Same!\n";
-				data_ptr = nullptr;
+				entry_ptr = nullptr;
 				break;
 			}
 		}
 
 		//if we found a matching entry return it
-		if (data_ptr) {
+		if (entry_ptr) {
 			break;
 		}
-
-
 	}
 
-	return data_ptr;
+	return entry_ptr;
 }
 
-Error CsvWriter::write_csv(std::vector<CsvMap>& data_vec) {
+Error Writer::write_csv(std::vector<Entry>& data_vec) {
 	//Meathod takes in passed in csv data and saves it to a file
 
 	//rewrite meathod to allow for the replacement for certain line
@@ -197,7 +196,7 @@ Error CsvWriter::write_csv(std::vector<CsvMap>& data_vec) {
 
 	std::ifstream input_stream;
 	std::string input_stream_line;
-	std::vector<std::string> file_data_vec;
+	std::vector<std::vector<std::string>> save_vec;
 	std::string header_line;
 
 	std::ofstream output_stream;
@@ -205,7 +204,7 @@ Error CsvWriter::write_csv(std::vector<CsvMap>& data_vec) {
 	std::string output_csv_str = "";
 	unsigned int line_index = 0;
 
-	CsvMap* matching_data = nullptr;
+	Entry* matching_data = nullptr;
 
 
 	input_stream.open(_file_path);
@@ -229,7 +228,10 @@ Error CsvWriter::write_csv(std::vector<CsvMap>& data_vec) {
 			write_state_arr[line_index] = false;
 		}
 
-		file_data_vec.push_back(input_stream_line);
+		save_vec.push_back(std::vector<std::string>());
+		std::vector<std::string>& new_entry_vec = save_vec.back();
+		util::str_split(input_stream_line, ',', new_entry_vec);
+
 		line_index++;
 	}
 
@@ -238,40 +240,57 @@ Error CsvWriter::write_csv(std::vector<CsvMap>& data_vec) {
 
 
 	//add data enteries that we could not find a match for
+	//
 	for (int i=0; i<DATA_COUNT; i++) {
 		bool state = write_state_arr[i];
 
-		CsvMap& map = data_vec.at(i);
+		Entry& entry = data_vec.at(i);
 
 		if (state) {
-			csv_map_to_str(map, input_stream_line);
-			file_data_vec.push_back(input_stream_line);
+			save_vec.push_back(std::vector<std::string>());
+			entry.to_vec(_header_vec, save_vec.back());
+			csv_map_to_str(entry, input_stream_line);
 		}
 	}
 
 
-	output_stream.open(_file_path);
+	output_stream.open("test_output_save.save");
+
+	//change vec to std::vec<std::vec>>
+	util::sort_2d_vec(save_vec, 0, save_vec.size());
+	util::display_multivec_info(save_vec);
 
 
 	//write header line
 	util::str_unsplit(_header_vec, header_line, ',');
 	output_stream << header_line << "\n";
 
-	for (const std::string& line_str : file_data_vec) {
-		output_stream << line_str << "\n";
+	for (std::vector<std::string>& line_vec : save_vec) {
+		input_stream_line = "";
+		
+		for (const std::string& elem : line_vec) {
+			input_stream_line += elem + ",";			
+		}
+
+		input_stream_line.pop_back();
+
+		output_stream << input_stream_line << "\n";
 	}
 
 	output_stream.close();
 
 
 	delete[] write_state_arr;
+	write_state_arr = nullptr;
+
+	//sort_csv_map();
 
 	return Error(ErrorType::Clear);
 }
 
 
 
-Error CsvWriter::read_csv(std::vector<CsvMap>& data_vec) {
+Error Writer::read_csv(std::vector<Entry>& data_vec) {
 	std::ifstream input_stream(_file_path);
 
 	if (!input_stream.is_open()) {
@@ -300,7 +319,7 @@ Error CsvWriter::read_csv(std::vector<CsvMap>& data_vec) {
 	return Error(ErrorType::Clear);
 }
 
-void CsvWriter::replace_line(unsigned int target_line_num, const std::string line_contents) {
+void Writer::replace_line(unsigned int target_line_num, const std::string line_contents) {
 	//Meathod replaces a specified line number with the line contents string
 
 	std::vector<std::string> line_vec;
@@ -328,7 +347,7 @@ void CsvWriter::replace_line(unsigned int target_line_num, const std::string lin
 	file_stream << full_output_str;
 }
 
-int CsvWriter::find_matching_line(core::CsvWriter::CsvMap& csv_map, unsigned int start_index, unsigned int end_index) {
+int Writer::find_matching_line(Entry& csv_entry, unsigned int start_index, unsigned int end_index) {
 	int matching_line = 0;
 
 	std::ifstream file_stream(_file_path);
@@ -371,7 +390,7 @@ int CsvWriter::find_matching_line(core::CsvWriter::CsvMap& csv_map, unsigned int
 
 			const std::string& split_str = split_vec.at(j);
 			const std::string& current_header = _header_vec.at(j);
-			const std::string& data_value = csv_map[current_header];
+			const std::string& data_value = csv_entry.get(current_header);
 
 			if (data_value == split_str) {
 				matching_line = j;
@@ -383,7 +402,7 @@ int CsvWriter::find_matching_line(core::CsvWriter::CsvMap& csv_map, unsigned int
 	return matching_line;
 }
 
-void CsvWriter::set_equivalnce_bounds(int start_index, int end_index) {
+void Writer::set_equivalnce_bounds(int start_index, int end_index) {
 	_same_check_start = start_index;
 	_same_check_end = end_index;
 }

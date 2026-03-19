@@ -44,23 +44,28 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	if (DEBUG) {
 		debug_scene = project::create_debug_scene(signal_data);
 		app->attach_sub_scene(debug_scene);
-		app->request_subwin(debug_scene);
+		app->request_subwin(*debug_scene, nullptr);
 	}
 
 	app->display_main_window();
 }
 
-void load_save_data(data::PersistData& persist_data, core::CsvWriter& csv_writer) {
-	std::vector<core::CsvWriter::CsvMap> data_map_vector;
+void load_save_data(data::PersistData& persist_data, core::csv::Writer& csv_writer) {
+	std::vector<core::csv::Entry> data_map_vector;
+
+	data::NoteContainer& note_container = persist_data.get_note_container();
 
 	csv_writer.read_csv(data_map_vector);
 	try {
-		for (core::CsvWriter::CsvMap& map : data_map_vector) {
-			data::Note& note = persist_data.add_note();
-			note.date.day = stoi(map["Day"]);
-			note.date.month = stoi(map["Month"]);
-			note.date.year = stoi(map["Year"]);
-			note.text = map["Note"];
+		for (core::csv::Entry& entry : data_map_vector) {
+			note_container.add_note(data::Note());
+
+			data::Note& note = note_container.back();
+
+			note.date.day = stoi(entry.get("Day"));
+			note.date.month = stoi(entry.get("Month"));
+			note.date.year = stoi(entry.get("Year"));
+			note.text = entry.get("Note");
 		}
 	}
 
@@ -69,36 +74,35 @@ void load_save_data(data::PersistData& persist_data, core::CsvWriter& csv_writer
 	}
 }
 
-void save_app_data(data::PersistData& persist_data, core::CsvWriter& csv_writer) {
-	std::vector<core::CsvWriter::CsvMap> csv_map_vec;
+void save_app_data(data::PersistData& persist_data, core::csv::Writer& csv_writer) {
+	std::vector<core::csv::Entry> csv_map_vec;
+	std::vector<std::string> a;
 
-	for (data::Note note : persist_data.get_note_container()) {
+	for (const data::Note& note : persist_data.get_note_container()) {
 		if (!note.should_save) {
 			continue;
 		}
 
-		std::cout << "Gathered data\n";
+		csv_map_vec.push_back(core::csv::Entry());
+		core::csv::Entry& entry = csv_map_vec.back();
 
-		csv_map_vec.push_back(core::CsvWriter::CsvMap());
-		core::CsvWriter::CsvMap& csv_map = csv_map_vec.back();
-
-		csv_map["Day"] = std::to_string(note.date.day);	
-		csv_map["Month"] = std::to_string(note.date.month);	
-		csv_map["Year"] = std::to_string(note.date.year);	
-		csv_map["Note"] = note.text;	
+		entry.add("Day",  std::to_string(note.date.day));	
+		entry.add("Month", std::to_string(note.date.month));	
+		entry.add("Year", std::to_string(note.date.year));	
+		entry.add("Note", note.text);	
+		entry.to_vec({"aiace"}, a);
 	}
-
 
 	csv_writer.write_csv(csv_map_vec);
 
 }
 
 int main(int argc, char *argv[]) {
-	std::vector<std::string> csv_header = {"Day", "Month", "Year", "Note"};
+	std::vector<std::string> csv_header = {"Year", "Month", "Day", "Note"};
 	std::string save_path = "test.save";
 
 	data::PersistData persist_data;
-	core::CsvWriter csv_writer(save_path, csv_header);
+	core::csv::Writer csv_writer(save_path, csv_header);
 	csv_writer.set_equivalnce_bounds(0, 3);
 
 
@@ -127,6 +131,4 @@ int main(int argc, char *argv[]) {
 	persist_data.display_notes();
 
 	save_app_data(persist_data, csv_writer);
-
-
 }

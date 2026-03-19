@@ -8,11 +8,6 @@ PersistData::PersistData() {
 	
 }
 
-Note& PersistData::add_note() {
-	Note& note = note_container.add_note();
-	return note;
-}
-
 EntryMarker& PersistData::add_entry_marker() {
 	_entry_marker_vec.push_back(EntryMarker());
 	return _entry_marker_vec.back();
@@ -39,8 +34,8 @@ bool PersistData::note_exists(int day, int month, int year) {
 void PersistData::display_notes() {
 	for (Note& note : note_container) {
 		std::println(
-			"Day: {}, Month: {}, Year: {}, Note: {}, Should Save: {}",
-			note.date.day, note.date.month, note.date.year, note.text, note.should_save
+			"Day: {}, Month: {}, Year: {}, Note: {}, Should Save: {}, Address: {}",
+			note.date.day, note.date.month, note.date.year, note.text, note.should_save, (void*)&note
 		);
 	}
 }
@@ -69,7 +64,7 @@ NoteContainer& PersistData::get_note_container() {
 	return note_container;
 }
 
-void get_data(core::CsvWriter& csv_writer, std::vector<core::CsvWriter::CsvMap>& data_map_vector) {
+void get_data(core::csv::Writer& csv_writer, std::vector<core::csv::Entry>& data_map_vector) {
 	csv_writer.read_csv(data_map_vector);
 }
 }

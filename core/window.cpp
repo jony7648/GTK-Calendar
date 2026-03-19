@@ -46,23 +46,16 @@ Window::~Window() {
 	gtk_window_destroy(GTK_WINDOW(gtk_window));
 }
 
-void Window::emit_signal(int id, void* parent) {
-	sig_handler.emit(id, parent);
-}
-
-void Window::add_emit_func(int id, void(*emit_func)(void*, void*, void*), void* receiver_obj) {
-	sig_handler.add_emit_func(id, emit_func, receiver_obj);
-}
 
 void Window::set_scene(Scene* scene) {
 	if (scene != nullptr) {
 		gtk_window_set_child(GTK_WINDOW(gtk_window), scene->get_widget_container().get_gtk_widget());
-		current_scene = scene;
+		p_current_scene = scene;
 	}
 }
 
 core::Scene* Window::get_scene() {
-	return current_scene;
+	return p_current_scene;
 }
 
 void Window::show() {
@@ -75,13 +68,10 @@ void Window::hide() {
 	is_visible = false;
 }
 
-
-
-
-Error Window::display(Scene* scene) {
+Error Window::display(Scene& scene) {
 	/*
-	if (current_scene == nullptr) {
-		std::cout << "ERROR: current_scene is nullptr!\n";
+	if (p_current_scene == nullptr) {
+		std::cout << "ERROR: p_current_scene is nullptr!\n";
 		return;
 	}
 	*/
@@ -91,6 +81,7 @@ Error Window::display(Scene* scene) {
 		return Error(ErrorType::Clear);
 	}
 
+	/*
 	if (scene == nullptr) {
 		std::cout << "ERROR: Can't display a scene that is a nullptr\n";
 		return Error(ErrorType::Nullptr);
@@ -100,40 +91,24 @@ Error Window::display(Scene* scene) {
 		std::cout << "ERROR: The gtk widget of the scene container is a nullptr";
 		return Error(ErrorType::Nullptr);
 	}
+	*/
 
+	const space::Point& scene_dimensions = scene.get_custom_dimensions();
 
-
-	const space::Point& scene_dimensions = scene->get_custom_dimensions();
-
-	current_scene = scene;
-	gtk_window_set_resizable(GTK_WINDOW(gtk_window), scene->get_resizability());
+	p_current_scene = &scene;
+	gtk_window_set_resizable(GTK_WINDOW(gtk_window), scene.get_resizability());
 	gtk_window_set_default_size(GTK_WINDOW(gtk_window), scene_dimensions.x, scene_dimensions.y);
 	gtk_window_present(GTK_WINDOW(gtk_window));
-	gtk_window_set_child(GTK_WINDOW(get_gtk_window()), scene->get_widget_container().get_gtk_widget());
+	gtk_window_set_child(GTK_WINDOW(get_gtk_window()), scene.get_widget_container().get_gtk_widget());
 	//gtk_widget_set_size_request(scene->widget_container.get_gtk_widget(), dimensions.x, dimensions.y);
-
 
 	is_displaying = true;
 
 	return Error(ErrorType::Clear);
 }
 
-
-
-void Window::signal_set_close(core::App* app, bool(*func)(GtkWidget* widget, gpointer user_data)) {
-	if (func == nullptr) {
-		return;
-	}
-
-	//YOU NEED TO REWRITE THIS AS THIS IS A MEMORY LEAK
-
-	auto* messenger = new DoubleMessenger<App*, Window*>;
-	messenger->object1 = app;
-	messenger->object2 = this;
-
-	g_signal_connect(gtk_window, "close-request", G_CALLBACK (func), messenger);
-	
-	//_signal_close = func;
+void Window::set_sensitivity(bool state) {
+	gtk_widget_set_sensitive(GTK_WIDGET(gtk_window), state);
 }
 
 void Window::set_attached_state() {

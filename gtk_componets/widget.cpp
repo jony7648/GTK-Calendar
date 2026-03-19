@@ -5,12 +5,14 @@
 #include "core/space.h"
 #include "widget.h"
 #include "container.h"
+#include "core/signal_handler.h"
 
 namespace gtkc {
 
 Widget::Widget() {
 	_scale.x = 1;
 	_scale.y = 1;
+	//
 	//signaler.connect_to_signal(nullptr, "clicked", nullptr);
 }
 
@@ -56,22 +58,6 @@ void Widget::apply_provider() {
 	gtk_style_context_add_provider_for_display(_default_display, GTK_STYLE_PROVIDER(_css_provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
-void Widget::load_css() {
-	if (!_gtk_widget) {
-		std::cout << "ERROR: can't css style gtk_widget is a nullptr\n";
-	}
-
-	if (!_css_provider) {
-		std::cout << "Error: _css_provider is a nullptr!\n";
-	}
-
-	const std::string& css_class = get_type();
-
-	gtk_widget_remove_css_class(_gtk_widget, _css_class.c_str());
-	gtk_widget_add_css_class(_gtk_widget, css_class.c_str());
-	_css_class = css_class;
-}
-
 void Widget::load_css(const std::string& class_name) {
 	if (!_gtk_widget) {
 		std::cout << "ERROR: can't css style gtk_widget is a nullptr\n";
@@ -103,7 +89,7 @@ bool Widget::get_visibility() {
 
 void Widget::display_info() {
 	std::println("Widget Name: {}, Type: {}, Tag: {}, SigData: {}, HEXPAND: {}, VEXPAND: {}, Address: {}, GTK Address: {}\n",
-		_name, _type, _tag, _sig_data, _vexpand, _hexpand, static_cast<void*>(this), static_cast<void*>(_gtk_widget)
+		_name, (int)_type, _tag, _sig_data, _vexpand, _hexpand, static_cast<void*>(this), static_cast<void*>(_gtk_widget)
 	);
 }
 
@@ -134,7 +120,6 @@ void Widget::set_gtk_widget(GtkWidget* gtk_widget) {
 	this->_gtk_widget = gtk_widget;
 	_css_provider = gtk_css_provider_new();
 	_default_display = gdk_display_get_default();
-	sig_handler.set_parent_object(this);
 	//listener.set_parent_widget(this);
 	//listener.set_gtk_parent(gtk_widget);
 }
@@ -191,7 +176,7 @@ void Widget::set_presenting(bool state) {
 	_presenting = true;
 }
 
-bool Widget::is_type(const std::string& type) {
+bool Widget::is_type(Type type) {
 	if (_type == type) {
 		return true;
 	}
@@ -199,7 +184,11 @@ bool Widget::is_type(const std::string& type) {
 	return false;
 }
 
-const std::string& Widget::get_type() {
+void Widget::set_type(Type type) {
+	_type = type;
+}
+
+Type Widget::get_type() {
 	return _type;
 }
 
@@ -210,5 +199,4 @@ void Widget::set_sig_data(int data) {
 int Widget::get_sig_data() {
 	return _sig_data;
 }
-
 }

@@ -7,38 +7,50 @@
 #include "persist_data.h"
 #include "note_container.h"
 
+#define CONTAINER_NAME_CALBUTTON "CalButton Container"
+#define TAG_CALBUTTON "CalButton"
+
 data::PersistData* persist_data = nullptr;
 
-static void arrange_cal_buttons(core::TimeComponet* time_componet, std::vector<gtkc::Widget*>& widget_vector, int month) {
+static void arrange_cal_buttons(gtkc::GridContainer* container, core::TimeComponet* time_componet, int month) {
 	//create the system for other months
 	gtkc::Widget* widget = nullptr;
 	int grid_x = 0;
 	int grid_y = 0;
 
+	const core::Date& date = time_componet->get_menu_date();
+
 	int day = 0;
-	int year = time_componet->get_menu_year();
-	std::cout << year << "\n";
-	int start_weekday = time_componet->get_starting_weekday(month, year);
-	int day_count = time_componet->get_day_count(month);
+	int start_weekday = time_componet->get_starting_weekday(month, date.year);
+	int day_count = time_componet->get_day_count(month) + time_componet->is_leap_month(date.month, date.year);
 	int pos_index = 0;
 
-	for (int i=0; i<widget_vector.size(); i++) {
+	const std::vector<gtkc::Widget*>& widget_vector = container->get_widget_vector();
+
+
+	for (int i=-1, vec_i=0; vec_i<widget_vector.size(); vec_i++) {
+		widget = widget_vector.at(vec_i);
+		if (!widget || widget->get_tag() != TAG_CALBUTTON) {
+			continue;
+		}
+
+		i++;
+
 		day = i+1;
-		widget = widget_vector.at(i);
 
 		//if the month has less than 31 days hide the buttons that
 		//have a higher day value than the month's day count
 		if (i >= day_count) {
 			widget->hide();
 			continue;
+
 		}
 
-		if (persist_data->note_exists(day, month, year)) {
-			std::cout << "Day " << day << " exists!\n";
+		if (persist_data->note_exists(day, month, date.year)) {
 			widget->load_css("ShadeButton");
 		}
 		else {
-			widget->load_css("Button");
+			widget->load_css();
 		}
 
 		pos_index = i + start_weekday;
@@ -51,77 +63,58 @@ static void arrange_cal_buttons(core::TimeComponet* time_componet, std::vector<g
 		//even when already presenting and let widgets know if they
 		//are presenting or not
 	}
-
-
 }
 
 static void update_date_header(gtkc::Widget* container_location, core::TimeComponet* time_componet) {
-	int month = time_componet->get_menu_month();
-	int	year = time_componet->get_menu_year();
+	const core::Date& date = time_componet->get_menu_date();
+	std::string header_str;
 
 	gtkc::GridContainer* header_container = static_cast<gtkc::GridContainer*>(container_location);
 	gtkc::Label* label = nullptr;
 
 	for (gtkc::Widget* widget : *header_container) {
-		if (widget->get_type() != "Label") {
+		if (!widget->is_type(gtkc::Type::Label)) {
 			continue;	
 		}
+
 		label = static_cast<gtkc::Label*>(widget);
 	}
 
 	if (label == nullptr) {
 		std::cout << "Failed to find date field!\n";
-
 		return;
 	}
 
-	const std::string& month_name = time_componet->get_long_month_name(month);
+	time_componet->get_month_year_str(date, header_str);
 
-	label->set_text(month_name + " " + std::to_string(year));
+	label->set_text(header_str);
 
 }
 
-static void signal_button_clicked(void* receiver_obj, void* emitter_obj) {
-	core::Scene* scene = static_cast<core::Scene*>(receiver_obj);
+static void signal_button_clicked(core::G_EmitData& emit_data) {
+	core::Scene* scene = static_cast<core::Scene*>(emit_data.receiver);
+	gtkc::Button* button = static_cast<gtkc::Button*>(emit_data.emitter);
 	core::TimeComponet* time_componet = scene->get_time_componet();
-	gtkc::Button* button = static_cast<gtkc::Button*>(emitter_obj);
-	gtkc::GridContainer* cal_container = nullptr;
+	gtkc::GridContainer* container = nullptr;
 
-	std::vector<gtkc::Widget*> widget_vec;
-	std::vector<gtkc::Widget*> cal_container_vec;
-
-	scene->get_tagged_widgets(widget_vec, "Cal Buttons");
-	scene->get_tagged_widgets(cal_container_vec, "CalButton Container");
-
-	/*
-	for (auto widget : widget_vec) {
-		std::cout << "Iterated Widget " << widget->get_name() << "\n";
-	}
-	*/
-
-	for (gtkc::Widget* widget : widget_vec) {
-		//std::cout << widget->get_name() << "\n";
-	}
-
-	cal_container = static_cast<gtkc::GridContainer*>(cal_container_vec.at(0));
+	container = scene->get_widget_container().get_child_container(CONTAINER_NAME_CALBUTTON);
 
 
 	time_componet->advance_menu_month(button->get_sig_data());
-	arrange_cal_buttons(scene->get_time_componet(), widget_vec, time_componet->get_menu_month());
+	arrange_cal_buttons(container, time_componet, time_componet->get_menu_month());
 
 	for (gtkc::Widget* widget : scene->get_widget_container()) {
 		if (widget->get_name() == "Date Container") {
 			update_date_header(widget, scene->get_time_componet());
 		}
 	}
-	
 }
 
 
-static void signal_open_note_window(void* receiver_obj, void* emitter_obj) {
-	core::Scene* scene = static_cast<core::Scene*>(receiver_obj);
+static void signal_open_note_window(core::G_EmitData& emit_data) {
+	core::Scene* scene = static_cast<core::Scene*>(emit_data.receiver);
+	gtkc::Button* button = static_cast<gtkc::Button*>(emit_data.emitter);
 	core::TimeComponet* time_componet = scene->get_time_componet();
-	gtkc::Button* button = static_cast<gtkc::Button*>(emitter_obj);
 	data::Note* note_ptr = nullptr;
 
 
@@ -142,12 +135,12 @@ static void signal_open_note_window(void* receiver_obj, void* emitter_obj) {
 
 	sig_data.str = "Note Scene";
 
+
 	if (note_ptr) {
 		sig_data.obj_ptr = note_ptr;
 	}
 	else {
-		note_ptr = &persist_data->note_container.after_end();
-		std::cout << "this is the note pointer: " << note_ptr << "\n";
+		note_ptr = &persist_data->note_container.after_back();
 		persist_data->note_container.reset(note_ptr);
 
 		note_ptr->date.day = std::stoi(button->get_text());
@@ -161,23 +154,56 @@ static void signal_open_note_window(void* receiver_obj, void* emitter_obj) {
 	scene->sig_handler.emit_data(core::Scene::S_REQUEST_SUBWIN, &sig_data, button);
 }
 
-static void signal_window_closed(void* scene_addr, void* subscene_addr, void* sig_data) {
-	core::Scene* scene = static_cast<core::Scene*>(scene_addr);	
-	core::Scene* sub_scene = static_cast<core::Scene*>(subscene_addr);	
-	data::Note& end_note = persist_data->note_container.after_end();
+static void signal_window_closed(core::EmitData<core::Scene> emit_data) {
+	auto* sig_data = static_cast<core::Window::SignalWindowClose*>(emit_data.sig_data);
+
+	core::Scene* scene = emit_data.holder;
+	core::Scene* sub_scene = static_cast<core::Scene*>(sig_data->subscene);	
+	data::Note& end_note = persist_data->note_container.after_back();
 	data::NoteContainer& note_container = persist_data->note_container;
 
+	gtkc::GridContainer* calbutton_container = nullptr;
 
 
-	std::cout << "Closed Scene Name: " << scene->get_name() << "\n";
-	std::cout << "Closed Sub Scene Name: " << sub_scene->get_name() << "\n";
-	std::cout << "Should Save " << end_note.should_save << "\n";
-
-	if (end_note.should_save) {
-		note_container.increment();			
-	}
 	
+	if (!sub_scene) {
+		std::cout << "Error: Sub Scene is nullptr";
+	}
 
+	if (!end_note.should_save) {
+		return;
+	}
+
+	note_container.increment();			
+
+
+	for (gtkc::Widget* widget : scene->get_widget_container()) {
+		if (widget->get_name() == CONTAINER_NAME_CALBUTTON) {
+			calbutton_container = static_cast<gtkc::GridContainer*>(widget);
+		}
+	}
+
+	if (!calbutton_container) {
+		std::cout << "Error cal button is a nullptr\n";
+		return;
+	}
+
+	for (gtkc::Widget* widget : *calbutton_container) {
+		gtkc::Button* button = nullptr;
+
+		if (!widget->is_type(gtkc::Type::Button)) {
+			continue;
+		}
+
+		button = static_cast<gtkc::Button*>(widget);
+
+		if (button->get_text() == std::to_string(end_note.date.day)) {
+			button->load_css("ShadeButton");
+			button->reattach();
+		}
+	}
+
+	
 }
 
 static void add_weekday_header(core::TimeComponet* time_componet, std::vector<gtkc::Widget*>& widget_vector) {
@@ -192,12 +218,10 @@ static void add_weekday_header(core::TimeComponet* time_componet, std::vector<gt
 	int column_count = 1;
 	int day_pos = 0;
 
-	std::string* weekday_arr = time_componet->get_weekday_arr();
-
 
 	for (int i=0; i<time_componet->WEEKDAY_COUNT; i++) {
-		name = weekday_arr[i];
-		button_text = weekday_arr[i];
+		name = time_componet->get_weekday_name(i);
+		button_text = name;
 		grid_x = i;
 		grid_y = 0;
 		widget = new gtkc::Label(name, button_text, grid_x, grid_y, 1,1);
@@ -219,14 +243,11 @@ static void create_cal_buttons(core::Scene* scene, std::vector<gtkc::Widget*>& w
 		text = name;
 		button = new gtkc::Button(name, text, 0, 3, 1, 1);
 
-		button->set_tag("Cal Buttons");
+		button->set_tag(TAG_CALBUTTON);
 		widget_vector.push_back(button);
 		scene->sig_handler.g_listen(button, "clicked", signal_open_note_window);
 	}
-}
-
-
-
+} 
 
 static gtkc::GridContainer* create_info_container(core::Scene* scene) {
 	gtkc::GridContainer* info_container = new gtkc::GridContainer("Info Contanier", 6,6);
@@ -269,7 +290,7 @@ static gtkc::GridContainer* create_info_container(core::Scene* scene) {
 static gtkc::GridContainer* create_cal_button_container() {
 	gtkc::GridContainer* button_container = nullptr;
 
-	button_container = new gtkc::GridContainer("Button Contanier", 1, 1);
+	button_container = new gtkc::GridContainer(CONTAINER_NAME_CALBUTTON, 1, 1);
 	button_container->set_grid_point(0,1);
 	button_container->set_widget_spacing(15);
 
@@ -279,7 +300,7 @@ static gtkc::GridContainer* create_cal_button_container() {
 	return button_container;
 }
 
-static gtkc::GridContainer* create_date_header_container(const core::Scene* scene) {
+static gtkc::GridContainer* create_date_header_container(const core::Scene* scene, const std::string& date_str) {
 	gtkc::GridContainer* date_container = nullptr;	
 	gtkc::Label* date_field = nullptr;
 	
@@ -292,6 +313,7 @@ static gtkc::GridContainer* create_date_header_container(const core::Scene* scen
 	date_field = new gtkc::Label("Date Field", "February 2026", 0, 0, 1, 1);
 	date_field->set_hexpand(true);
 	date_field->set_font_size(8);
+	date_field->set_text(date_str);
 
 	date_container->add_widget(date_field);
 
@@ -305,7 +327,7 @@ static gtkc::GridContainer* create_date_header_container(const core::Scene* scen
 
 
 namespace project {
-core::Scene* create_main_scene(core::TimeComponet* time_componet, core::CsvWriter* csv_writer, data::PersistData* persist_data_object) {
+core::Scene* create_main_scene(core::TimeComponet* time_componet, core::csv::Writer* csv_writer, data::PersistData* persist_data_object) {
 	persist_data = persist_data_object;
 
 	const std::string scene_name = "Main Scene";
@@ -315,6 +337,9 @@ core::Scene* create_main_scene(core::TimeComponet* time_componet, core::CsvWrite
 	gtkc::GridContainer* date_header_container = nullptr;
 	gtkc::GridContainer* cal_button_container = nullptr;
 
+	std::string full_day_str;
+	core::Date date;
+
 	space::Point scene_dimensions;
 	scene_dimensions.x = 600;
 	scene_dimensions.y = 600;
@@ -322,10 +347,14 @@ core::Scene* create_main_scene(core::TimeComponet* time_componet, core::CsvWrite
 	std::vector<gtkc::Widget*> widget_vector;
 	std::vector<gtkc::Widget*> cal_button_vector;
 
+
+	date = time_componet->get_menu_date();
+	time_componet->get_month_year_str(date, full_day_str);
+
 	core::Scene* scene = new core::Scene("Main Scene", 32,5);
 
 	scene->set_custom_dimensions(scene_dimensions);
-	scene->add_emit_func(core::Scene::S_WINDOW_CLOSED, signal_window_closed, scene);
+	scene->sig_handler.add_emit_func(core::Scene::S_WINDOW_CLOSED, signal_window_closed, scene);
 
 	gtkc::GridContainer& main_container = scene->get_widget_container();
 	main_container.set_valign(GTK_ALIGN_FILL);
@@ -340,7 +369,7 @@ core::Scene* create_main_scene(core::TimeComponet* time_componet, core::CsvWrite
 	cal_container->set_widget_spacing(15);
 
 	info_container = create_info_container(scene);
-	date_header_container = create_date_header_container(scene);
+	date_header_container = create_date_header_container(scene, full_day_str);
 	cal_button_container = create_cal_button_container();
 	
 	//cal_container->set_scale(3,3);
@@ -353,8 +382,6 @@ core::Scene* create_main_scene(core::TimeComponet* time_componet, core::CsvWrite
 	create_cal_buttons(scene, cal_button_vector);
 
 
-	arrange_cal_buttons(time_componet, cal_button_vector, time_componet->get_menu_month());
-
 
 	
 	//info_container->present_widgets();
@@ -364,18 +391,20 @@ core::Scene* create_main_scene(core::TimeComponet* time_componet, core::CsvWrite
 	cal_button_container->add_widget_vector(cal_button_vector);
 	cal_button_container->present_widgets();
 
+	
 
 	cal_container->add_widget(date_header_container);
 	cal_container->add_widget(cal_button_container);
 	
 	cal_container->present_widgets();
 
+	arrange_cal_buttons(cal_button_container, time_componet, time_componet->get_menu_month());
+
 
 	//main_container.add_widget(date_header_container);
 	main_container.add_widget(cal_container);
 	main_container.add_widget(info_container);
 
-	std::cout << "Main Container Address: " << &main_container << "\n";
 
 	return scene;
 }
