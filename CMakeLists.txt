@@ -21,19 +21,15 @@ set(SIGNAL_COMPONETS "${CORE_DIR}/signal_handler.cpp")
 
 
 if(MSVC)
-    # Get the compile options from the imported GTK4 target
-    get_target_property(GTK4_INTERNAL_OPTS PkgConfig::GTK4 INTERFACE_COMPILE_OPTIONS)
+	get_target_property(GTK4_INCLUDE_DIRS PkgConfig::GTK4 INTERFACE_INCLUDE_DIRECTORIES)
+	set(GTK4_WIN_INCLUDES "")
 
-    # Filter out the flags MSVC doesn't understand
-    set(CLEAN_OPTS "")
-    foreach(opt ${GTK4_INTERNAL_OPTS})
-        if(NOT opt STREQUAL "-msse" AND NOT opt STREQUAL "-msse2" AND NOT opt STREQUAL "-mfpmath=sse")
-            list(APPEND CLEAN_OPTS ${opt})
-        endif()
-    endforeach()
+	foreach(inc_path ${GTK4_INCLUDE_DIRS})
+		file(TO_CMAKE_PATH "${inc_path}" clean_path)
+		list(APPEND GTK4_WIN_INCLUDES "${clean_path}")
+	endforeach()
 
-    # Overwrite the target's properties with the clean list
-    set_target_properties(PkgConfig::GTK4 PROPERTIES INTERFACE_COMPILE_OPTIONS "${CLEAN_OPTS}")
+	set_target_properties(PkgConfig::GTK4 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${GTK4_WIN_INCLUDES}")
 endif()
 
 add_executable(Calendar main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
