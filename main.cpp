@@ -1,5 +1,5 @@
 #include <iostream>
-#include <gtk/gtk.h>
+
 #include "core/app.h"
 #include "core/window.h"
 #include "core/space.h"
@@ -11,6 +11,10 @@
 #include "project/debug_scene.h"
 #include "project/signals.h"
 #include "project/persist_data.h"
+
+#include <gtk/gtk.h>
+
+
 
 const bool DEBUG = true;
 

@@ -1,7 +1,9 @@
 #include <iostream>
-#include <gtk/gtk.h>
+
 #include "file_util.h"
 #include "app.h"
+
+#include <gtk/gtk.h>
 
 bool is_custom_point(const space::Point& point) {
 	if (point.x == 0 && point.y == 0) {
