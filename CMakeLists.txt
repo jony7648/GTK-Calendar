@@ -21,8 +21,11 @@ set(SIGNAL_COMPONETS "${CORE_DIR}/signal_handler.cpp")
 
 
 if(MSVC)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+    add_definitions(-DNOMINMAX)
+
     add_compile_options(/TP /GS-) 
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS -DNOMINMAX)
 endif()
 
 add_executable(Calendar main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
