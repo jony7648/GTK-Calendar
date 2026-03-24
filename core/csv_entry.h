@@ -12,6 +12,7 @@ public:
 	void add(const std::string& key, const std::string& value);
 	std::string get(const std::string& key);
 	void remove(const std::string& key);
+	bool already_exists = false;
 
 	void to_vec(const std::vector<std::string>& header_vec, std::vector<std::string>& str_vec);
 };

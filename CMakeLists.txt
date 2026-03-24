@@ -1,6 +1,6 @@
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 cmake_minimum_required(VERSION 3.10)
-project(TestProject CXX)
+project(Calendar CXX)
 
 
 find_package(PkgConfig REQUIRED)
@@ -19,18 +19,9 @@ set(WIDGET_COMPONETS  "${WIDGET_DIR}/widget.cpp" "${WIDGET_DIR}/button_widget.cp
 set(CORE_COMPONETS "${CORE_DIR}/app.cpp" "${CORE_DIR}/window.cpp" "${CORE_DIR}/space.cpp" "${CORE_DIR}/util.cpp" "${CORE_DIR}/file_util.cpp" "${CORE_DIR}/sort.cpp" "${CORE_DIR}/time_componet.cpp" "${CORE_DIR}/scene.cpp" "${CORE_DIR}/csv_entry.cpp" "${CORE_DIR}/csv_writer.cpp" "${CORE_DIR}/error.cpp")
 set(SIGNAL_COMPONETS "${CORE_DIR}/signal_handler.cpp")
 
-
-if(MSVC)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
-    add_definitions(-DNOMINMAX)
-
-    add_compile_options(/TP /GS-) 
-endif()
-
-add_executable(Calendar main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
-target_compile_options(Calendar PRIVATE ${GTK4_CFLAGS})
-target_compile_features(Calendar PRIVATE cxx_std_23)
-target_link_libraries(Calendar PkgConfig::GTK4)
+add_executable(calendar main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
+target_compile_options(calendar PRIVATE ${GTK4_CFLAGS})
+target_compile_features(calendar PRIVATE cxx_std_20)
+target_link_libraries(calendar PkgConfig::GTK4)
 
 

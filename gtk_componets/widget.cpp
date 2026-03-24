@@ -88,8 +88,8 @@ bool Widget::get_visibility() {
 }
 
 void Widget::display_info() {
-	std::println("Widget Name: {}, Type: {}, Tag: {}, SigData: {}, HEXPAND: {}, VEXPAND: {}, Address: {}, GTK Address: {}\n",
-		_name, (int)_type, _tag, _sig_data, _vexpand, _hexpand, static_cast<void*>(this), static_cast<void*>(_gtk_widget)
+	g_print("Widget Name: %s, Type: %d, Tag: %s, SigData: %d, HEXPAND: %d, VEXPAND: %d, Address: %p, GTK Address: %p\n",
+		_name.c_str(), (int)_type, _tag.c_str(), _sig_data, _vexpand, _hexpand, static_cast<void*>(this), static_cast<void*>(_gtk_widget)
 	);
 }
 

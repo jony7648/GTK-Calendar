@@ -17,7 +17,7 @@ void signal_request_subwin(core::EmitData<core::Scene>& emit_data) {
 	core::App* app = static_cast<core::App*>(emit_data.receiver);
 	core::Window& emit_window = emit_data.holder->get_parent_win();
 	gtkc::Widget* widget = static_cast<gtkc::Widget*>(emit_data.emitter);
-	core::SigData* sig_data = static_cast<core::SigData*>(emit_data.sig_data);
+	auto* sig_data = static_cast<core::Scene::SigRequestSubwin*>(emit_data.sig_data);
 	core::Scene* p_sub_scene = nullptr;
 
 
@@ -26,7 +26,7 @@ void signal_request_subwin(core::EmitData<core::Scene>& emit_data) {
 	}
 
 	for (core::Scene* scene : app->get_sub_scene_vect()) {
-		if (scene->get_name() == sig_data->str) {
+		if (scene->get_name() == sig_data->scene_name) {
 			p_sub_scene = scene;
 		}
 	}
@@ -60,11 +60,8 @@ void signal_subwin_close(core::EmitData<core::Window> emit_data) {
 
 	//do some stuff in calendar to do something with window close signal
 
-	core::Scene::SignalRequestSubwin sig_data;
-
-	sig_data.emitter_scene = sub_scene;
-	
 	main_scene->sig_handler.emit_data(core::Scene::S_WINDOW_CLOSED, sub_scene);
+	
 	return;
 }
 
@@ -148,7 +145,7 @@ int App::attach_subwin(Window* subwin) {
 	return 0;
 }
 
-Error App::request_subwin(core::Scene& sub_scene, core::Window* emit_window, void* emitter_obj, SigData* sig_data) {
+Error App::request_subwin(core::Scene& sub_scene, core::Window* emit_window, void* emitter_obj, core::Scene::SigRequestSubwin* sig_data) {
 	bool found_scene = false;
 	core::Window* p_subwin = nullptr;
 	core::Scene* p_win_scene = nullptr;
@@ -188,7 +185,7 @@ Error App::request_subwin(core::Scene& sub_scene, core::Window* emit_window, voi
 
 	//if there is an emmiter object emit the window requested signal
 	if (emitter_obj) {
-		sub_scene.sig_handler.emit_data(Scene::S_WINDOW_DISPLAYED, sig_data, emitter_obj);
+		sub_scene.sig_handler.emit_data(Scene::S_WINDOW_DISPLAYED, sig_data->sig_ptr, emitter_obj);
 	}
 
 

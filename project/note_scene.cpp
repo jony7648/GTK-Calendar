@@ -1,5 +1,6 @@
 #include <iostream>
 #include "gtk_componets/gtk_componets.h"
+#include "signals.h"
 #include "note_scene.h"
 #include "persist_data.h"
 
@@ -7,9 +8,10 @@
 const std::string NOTE_CONTAINER_STR = "Note Container";
 const std::string NOTE_INPUT_NAME = "Note TextField";
 
-data::Note* current_note = nullptr;
+data::Note current_note;
+data::PersistData* G_PersistData = nullptr;
 
-void prepare_note_scene(core::Scene* scene, data::Note* note) {
+void prepare_note_scene(core::Scene* scene, data::Note& note) {
 	core::TimeComponet* time_componet = nullptr;
 	gtkc::GridContainer& main_container = scene->get_widget_container();
 	gtkc::GridContainer* date_container = nullptr;
@@ -19,7 +21,7 @@ void prepare_note_scene(core::Scene* scene, data::Note* note) {
 	gtkc::TextField* text_field = nullptr;
 
 	time_componet = scene->get_time_componet();
-	const std::string& month_str = time_componet->get_long_month_name(note->date.month);
+	const std::string& month_str = time_componet->get_long_month_name(note.date.month);
 
 	date_container = main_container.get_child_container("Date Container");	
 	note_container = main_container.get_child_container("Date Container");	
@@ -47,23 +49,33 @@ void prepare_note_scene(core::Scene* scene, data::Note* note) {
 	}
 	
 	//time_componet->get_full_day_str(note->day, note->month, note->year, date_str);
-	time_componet->get_full_day_str(note->date, date_str);
-	text_field->set_text(note->text);
+	time_componet->get_full_day_str(note.date, date_str);
+	text_field->set_text(note.text);
 	date_label->set_text(date_str);
 	current_note = note;
 }
 
 void signal_window_displayed(core::EmitData<core::Scene> emit_data) {
-	core::SigData* sig_data = static_cast<core::SigData*>(emit_data.sig_data);
+	project::calendar::SigOpenNoteWindow* sig_data = static_cast<project::calendar::SigOpenNoteWindow*>(emit_data.sig_data);
 	core::Scene* scene = emit_data.holder;
-	gtkc::Button* emit_button = static_cast<gtkc::Button*>(emit_data.emitter);
 
-	data::Note* note = static_cast<data::Note*>(sig_data->obj_ptr);
-	std::cout << "Note Text before text field " << note->text << "\n";
-	std::cout << emit_button->get_text() << "\n";
+	data::PersistData& persist_data = sig_data->persist_data;
+	G_PersistData = &persist_data;
+
+	data::Note* note_ptr = persist_data.get_note(sig_data->date);
 
 
-	prepare_note_scene(scene, note);
+	if (note_ptr) {
+		prepare_note_scene(scene, *note_ptr);
+		std::cout << "Note Text before text field " << note_ptr->text << "\n";
+	}
+
+	data::Note new_note {
+		.date = sig_data->date, 
+		.new_note = true,
+	};
+
+	prepare_note_scene(scene, new_note);
 }
 
 
@@ -102,6 +114,12 @@ static void signal_window_closed(core::EmitData<core::Scene> emit_data) {
 	gtkc::TextField* text_field = nullptr;
 
 
+	if (!G_PersistData) {
+		std::cout << "G_PersistData is a nullptr\n";
+		return;
+	}
+
+
 	if (!scene) {
 		std::cout << "scene is nullptr!";
 		return;
@@ -113,14 +131,17 @@ static void signal_window_closed(core::EmitData<core::Scene> emit_data) {
 		}
 	}
 
-
 	const std::string& text_field_text = text_field->get_text();
 
 	text_field->display_info();
 
-	if (text_field_text != text_field->get_default_text() && text_field_text != current_note->text) {
-		current_note->text = text_field_text;
-		current_note->should_save = true;
+	if (text_field_text != text_field->get_default_text() && text_field_text != current_note.text) {
+		current_note.text = text_field_text;
+		current_note.should_save = true;
+		
+		if (current_note.new_note) {
+			G_PersistData->get_note_container().add_note(current_note);
+		}
 	}
 }
 

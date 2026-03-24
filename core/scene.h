@@ -18,8 +18,14 @@ public:
 		S_REQUEST_SUBWIN,
 	};
 
-	struct SignalRequestSubwin {
-		Scene* emitter_scene = nullptr;
+	struct SigRequestSubwin {
+		const std::string& scene_name;
+		void* sig_ptr = nullptr;
+	};
+
+	struct SigSubWinGranted {
+		const Scene& scene;
+		void* sig_ptr = nullptr;
 	};
 
 	Scene(const std::string& name, int widget_x_spacing, int widget_y_spacing);

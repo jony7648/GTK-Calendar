@@ -33,9 +33,9 @@ bool PersistData::note_exists(int day, int month, int year) {
 
 void PersistData::display_notes() {
 	for (Note& note : note_container) {
-		std::println(
-			"Day: {}, Month: {}, Year: {}, Note: {}, Should Save: {}, Address: {}",
-			note.date.day, note.date.month, note.date.year, note.text, note.should_save, (void*)&note
+		g_print(
+			"Day: %d, Month: %d, Year: %d, Note: %s, Should Save: %d, Address: %p",
+			note.date.day, note.date.month, note.date.year, note.text.c_str(), note.should_save, (void*)&note
 		);
 	}
 }

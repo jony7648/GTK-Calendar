@@ -181,9 +181,6 @@ Entry* Writer::check_for_same_line(std::vector<Entry>& data_vec, const std::stri
 
 Error Writer::write_csv(std::vector<Entry>& data_vec) {
 	//Meathod takes in passed in csv data and saves it to a file
-
-	//rewrite meathod to allow for the replacement for certain line
-
 	const size_t DATA_COUNT = data_vec.size();
 
 
@@ -191,8 +188,6 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 	if (DATA_COUNT <= 0) {
 		return Error(ErrorType::Clear);
 	}
-
-	bool* write_state_arr = nullptr;
 
 	std::ifstream input_stream;
 	std::string input_stream_line;
@@ -215,7 +210,6 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 		return Error(ErrorType::FileOpenFail);
 	}
 
-	write_state_arr = new bool[DATA_COUNT]{true};
 
 	//populate file_data_vec
 	while (getline(input_stream, input_stream_line)) {
@@ -225,7 +219,7 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 		//if so replace the line
 		if (matching_data) {
 			csv_map_to_str(*matching_data, input_stream_line);
-			write_state_arr[line_index] = false;
+			matching_data->already_exists = true;
 		}
 
 		save_vec.push_back(std::vector<std::string>());
@@ -235,26 +229,22 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 		line_index++;
 	}
 
-	//close the file stream
-	input_stream.close();
 
-
-	//add data enteries that we could not find a match for
-	//
-	for (int i=0; i<DATA_COUNT; i++) {
-		bool state = write_state_arr[i];
-
-		Entry& entry = data_vec.at(i);
-
-		if (state) {
+	for (Entry& entry : data_vec) {
+		if (!entry.already_exists) {
 			save_vec.push_back(std::vector<std::string>());
 			entry.to_vec(_header_vec, save_vec.back());
 			csv_map_to_str(entry, input_stream_line);
 		}
 	}
 
+	//close the file stream
+	input_stream.close();
 
-	output_stream.open("test_output_save.save");
+
+	//add data enteries that we could not find a match for
+
+	output_stream.open(_file_path);
 
 	//change vec to std::vec<std::vec>>
 	util::sort_2d_vec(save_vec, 0, save_vec.size());
@@ -263,7 +253,11 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 
 	//write header line
 	util::str_unsplit(_header_vec, header_line, ',');
+
+	std::cout << "Save Information\n";
+
 	output_stream << header_line << "\n";
+
 
 	for (std::vector<std::string>& line_vec : save_vec) {
 		input_stream_line = "";
@@ -278,10 +272,6 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 	}
 
 	output_stream.close();
-
-
-	delete[] write_state_arr;
-	write_state_arr = nullptr;
 
 	//sort_csv_map();
 

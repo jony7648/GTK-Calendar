@@ -1,9 +1,9 @@
 #include <iostream>
 #include <vector>
-#include <print>
 #include <ctime>
 #include "util.h"
 #include "time_componet.h"
+#include <glib.h>
 
 enum CTIME_INDEX {
 	CTIME_WEEKDAY,
@@ -124,8 +124,8 @@ int TimeComponet::weekday_to_int(const std::string& conv_day) const {
 }
 
 void TimeComponet::display_time_info() const {
-	std::println(
-	"Day: {}\nMonth: {}\nYear: {}\nWeekday: {}\nHour: {}\nMinute: {}\nSecond: {}", 
+	g_print (
+	"Day: %d\nMonth: %d\nYear: %d\nWeekday: %d\nHour: %d\nMinute: %d\nSecond: %d", 
 		_date.day, _date.month, _date.year, _weekday, _time.hour, _time.minute, _time.minute 
 	);
 
@@ -334,13 +334,6 @@ int TimeComponet::get_starting_weekday(int target_month, int target_year) const 
 
 
 	int result = util::cycle_through_bounds(_weekday, days_to_cycle, 0, WEEKDAY_COUNT);
-
-	/*
-	std::println(
-		"Weekday: {}\nDays to cycle: {}\nMonths Ahead: {}\nResult: {}",
-		weekday, days_to_cycle, months_ahead, result
-	);
-	*/
 
 	return result;
 }

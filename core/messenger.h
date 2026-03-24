@@ -1,9 +1,12 @@
 #pragma once
-#include <gtk/gtk.h>
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+
 #include "csv_writer.h"
+
+
+#include <gtk/gtk.h>
 
 namespace core{class Window; struct Signal; struct SigMessageLink;};
 namespace gtkc{class Widget;};
@@ -28,7 +31,6 @@ struct SigData {
 	std::string str;
 	void* obj_ptr = nullptr;
 };
-
 
 struct SigDataInt {
 	int data;	

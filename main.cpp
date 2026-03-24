@@ -14,8 +14,6 @@
 
 #include <gtk/gtk.h>
 
-
-
 const bool DEBUG = true;
 
 void activate(GtkApplication* gtk_app, gpointer user_data) {
@@ -54,12 +52,11 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	app->display_main_window();
 }
 
-void load_save_data(data::PersistData& persist_data, core::csv::Writer& csv_writer) {
+void load_save_data(data::NoteContainer& note_container, core::csv::Writer& csv_writer) {
 	std::vector<core::csv::Entry> data_map_vector;
 
-	data::NoteContainer& note_container = persist_data.get_note_container();
-
 	csv_writer.read_csv(data_map_vector);
+
 	try {
 		for (core::csv::Entry& entry : data_map_vector) {
 			note_container.add_note(data::Note());
@@ -73,17 +70,28 @@ void load_save_data(data::PersistData& persist_data, core::csv::Writer& csv_writ
 		}
 	}
 
+
 	catch (std::exception& e) {
 		std::cout << "File failed to load, likely due to bad formatting!\n";
 	}
 }
 
-void save_app_data(data::PersistData& persist_data, core::csv::Writer& csv_writer) {
+void save_app_data(data::NoteContainer& note_container, core::csv::Writer& csv_writer, int save_count=-1) {
 	std::vector<core::csv::Entry> csv_map_vec;
-	std::vector<std::string> a;
 
-	for (const data::Note& note : persist_data.get_note_container()) {
+	int going_to_save_count = 0;
+	for (data::Note& note : note_container) {
+		if (save_count == 0) {
+			break;
+		}
+		going_to_save_count++;
+
+		save_count--;
+
 		if (!note.should_save) {
+			//std::cout << "SHOULD NOT SAVE\n";
+			//note.display_info();
+			//std::cout << "\n\n";
 			continue;
 		}
 
@@ -94,10 +102,23 @@ void save_app_data(data::PersistData& persist_data, core::csv::Writer& csv_write
 		entry.add("Month", std::to_string(note.date.month));	
 		entry.add("Year", std::to_string(note.date.year));	
 		entry.add("Note", note.text);	
-		entry.to_vec({"aiace"}, a);
+
 	}
 
+	//fix the csv writer as it can only save a single note at a time
+
 	csv_writer.write_csv(csv_map_vec);
+	std::cout << "WE ARE ABOUT TO SAVE " << going_to_save_count << " notes!\n";
+}
+
+void signal_persist_data_note_released(core::EmitData<data::NoteContainer>& emit_data) {
+	data::NoteContainer* note_container = emit_data.holder;
+	core::csv::Writer* csv_writer = static_cast<core::csv::Writer*>(emit_data.receiver);
+	auto* sig_data = static_cast<data::NoteContainer::SigNotesReleased*>(emit_data.sig_data);
+
+	std::cout << "Hit the signal time to save now\n";
+
+	save_app_data(*note_container, *csv_writer, sig_data->save_count);
 
 }
 
@@ -110,29 +131,32 @@ int main(int argc, char *argv[]) {
 	csv_writer.set_equivalnce_bounds(0, 3);
 
 
-	load_save_data(persist_data, csv_writer);
+	persist_data.get_note_container().sig_handler.add_emit_func (
+		data::NoteContainer::S_NotesReleased,
+		signal_persist_data_note_released,
+		&csv_writer
+	);
 
-	space::Point win_dimensions;
 
-	project::ActivateSignal activate_signal;
+	load_save_data(persist_data.get_note_container(), csv_writer);
 
+	space::Point win_dimensions = {
+		.x = 1200,
+		.y = 600,
+	};
 
-
-	win_dimensions.x = 1200;
-	win_dimensions.y = 600;
 
 	core::App app("org.jony.test", win_dimensions, argc, argv);
 
-	activate_signal.app = &app;
-	activate_signal.csv_writer = &csv_writer;
-	activate_signal.persist_data = &persist_data;
+
+	project::ActivateSignal activate_signal = {
+		.app = &app,
+		.csv_writer = &csv_writer,
+		.persist_data = &persist_data,
+	};
 
 
 	app.run(&activate, &activate_signal);
 
-
-
-	persist_data.display_notes();
-
-	save_app_data(persist_data, csv_writer);
+	save_app_data(persist_data.get_note_container(), csv_writer);
 }

@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include "gtk_componets.h"
 #include "calendar_scene.h"
+#include "signals.h"
 #include "core/window.h"
 #include "core/util.h"
 #include "persist_data.h"
@@ -117,8 +118,16 @@ static void signal_open_note_window(core::G_EmitData& emit_data) {
 	core::TimeComponet* time_componet = scene->get_time_componet();
 	data::Note* note_ptr = nullptr;
 
+	project::calendar::SigOpenNoteWindow sig_data = {
+		.persist_data = *persist_data,
+		.date = time_componet->get_menu_date(),
+	};
 
-	core::SigData sig_data;
+
+	core::Scene::SigRequestSubwin request_data = {
+		.scene_name = "Note Scene",
+		.sig_ptr = &sig_data,
+	};
 
 	if (time_componet == nullptr) {
 		return;	
@@ -132,10 +141,7 @@ static void signal_open_note_window(core::G_EmitData& emit_data) {
 	note_ptr = persist_data->get_note(date);
 
 
-
-	sig_data.str = "Note Scene";
-
-
+	/*
 	if (note_ptr) {
 		sig_data.obj_ptr = note_ptr;
 	}
@@ -149,9 +155,11 @@ static void signal_open_note_window(core::G_EmitData& emit_data) {
 
 		sig_data.obj_ptr = note_ptr;
 	}
+	*/
 
 
-	scene->sig_handler.emit_data(core::Scene::S_REQUEST_SUBWIN, &sig_data, button);
+
+	scene->sig_handler.emit_data(core::Scene::S_REQUEST_SUBWIN, &request_data, button);
 }
 
 static void signal_window_closed(core::EmitData<core::Scene> emit_data) {
@@ -159,7 +167,7 @@ static void signal_window_closed(core::EmitData<core::Scene> emit_data) {
 
 	core::Scene* scene = emit_data.holder;
 	core::Scene* sub_scene = static_cast<core::Scene*>(sig_data->subscene);	
-	data::Note& end_note = persist_data->note_container.after_back();
+	data::Note& back_note = persist_data->note_container.back();
 	data::NoteContainer& note_container = persist_data->note_container;
 
 	gtkc::GridContainer* calbutton_container = nullptr;
@@ -170,13 +178,14 @@ static void signal_window_closed(core::EmitData<core::Scene> emit_data) {
 		std::cout << "Error: Sub Scene is nullptr";
 	}
 
-	if (!end_note.should_save) {
+	if (!back_note.new_note) {
 		return;
 	}
 
-	note_container.increment();			
+	back_note.new_note = false;
 
 
+	//adjust the button shade that matches the notes date accodingly
 	for (gtkc::Widget* widget : scene->get_widget_container()) {
 		if (widget->get_name() == CONTAINER_NAME_CALBUTTON) {
 			calbutton_container = static_cast<gtkc::GridContainer*>(widget);
@@ -197,13 +206,11 @@ static void signal_window_closed(core::EmitData<core::Scene> emit_data) {
 
 		button = static_cast<gtkc::Button*>(widget);
 
-		if (button->get_text() == std::to_string(end_note.date.day)) {
+		if (button->get_text() == std::to_string(back_note.date.day)) {
 			button->load_css("ShadeButton");
 			button->reattach();
 		}
 	}
-
-	
 }
 
 static void add_weekday_header(core::TimeComponet* time_componet, std::vector<gtkc::Widget*>& widget_vector) {

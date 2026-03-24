@@ -23,6 +23,8 @@ public:
 		Scene* subscene = nullptr;
 	};
 
+	
+
 
 	GtkWidget* get_gtk_window();
 	Window(GtkApplication* gtk_app_ptr, const std::string& title);
@@ -63,8 +65,5 @@ private:
 	bool is_attached = false;
 	bool is_displaying = false;
 	bool is_visible = false;
-
-	
-
 };
 }

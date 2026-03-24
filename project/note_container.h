@@ -4,10 +4,15 @@
 #include "core/signal_handler.h"
 
 const short int MAX_NOTE_COUNT = 4;
+//const short int MAX_NOTE_COUNT = 10;
 //const short int MAX_SAVE_COUNT = 20;
 
 namespace data {
 class NoteContainer;
+
+struct save_bounds {
+	short left_month, right_month;
+};
 
 struct Note {
 	void display_info();
@@ -15,20 +20,17 @@ struct Note {
 	core::Date date;
 	std::string text = "";	
 	bool should_save = false;
+	bool new_note = false;
 };
-
-
 
 class NoteContainerIterator {
 public:
-	
-
 	using Pointer = Note*;
 	using refrence = Note&;
 
-	NoteContainerIterator(NoteContainer* note_container, Note note_arr[], short start_index, short end_index, size_t container_size);
+	NoteContainerIterator(NoteContainer* note_container, Note note_arr[], short mark_index, size_t container_size);
 
-	bool operator==(NoteContainerIterator it);
+	bool operator==(NoteContainerIterator& it);
 
 	Note& operator*();
 	Note* operator->();
@@ -42,10 +44,8 @@ public:
 private:
 	NoteContainer* note_container;
 	Note* note_arr;
-	int start_index = 0, end_index = 0, current_index = 0;
+	int mark_index = 0, current_index = 0;
 	size_t container_size = 0;
-	
-
 };
 
 class NoteContainer {
@@ -56,10 +56,19 @@ public:
 		S_NOTE_ADDED,
 		S_NOTE_SAVED,
 		S_INCREMENTED,
+		S_NotesReleased
+	};
+
+	struct Entry {
+		Note note;
+		bool empty = true;
 	};
 
 	struct SigNoteAdded {
-		Note* note = nullptr;
+		Note& back_note;
+		NoteContainer& note_container;
+		Entry* entry_arr;
+		int start_index = 0, end_index = 0;
 	};
 
 	struct SigNoteSaved {
@@ -69,11 +78,17 @@ public:
 	struct SigIncremented {
 		Note* end_note = nullptr;	
 		int start_index = 0, end_index = 0;
-
 	};
 
+	struct SigNotesReleased {
+		unsigned int save_count = 0;
+	};
+
+	
+
 	NoteContainer();
-	~NoteContainer();
+	void display_info();
+
 	core::SigHandler<NoteContainer> sig_handler;
 	void add_note(const Note& note);
 	Note& after_back();
@@ -89,9 +104,8 @@ public:
 
 
 private:
-	Note note_arr[MAX_NOTE_COUNT] = {};
+	Note _note_arr[MAX_NOTE_COUNT] = {};
 	short start_index = 0, end_index = 0;
 	short save_count = 0;
-	void* _sig_data = nullptr;
 };
 }

@@ -14,3 +14,10 @@ struct ObjectSignal {
 	void* object = nullptr;
 };
 }
+
+namespace project::calendar {
+	struct SigOpenNoteWindow {
+		data::PersistData& persist_data;
+		const core::Date& date;
+	};
+}

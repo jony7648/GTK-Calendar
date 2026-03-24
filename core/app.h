@@ -1,6 +1,6 @@
 #pragma once
-#include <gtk/gtk.h>
 #include <iostream>
+
 #include "util.h"
 #include "messenger.h"
 #include "space.h"
@@ -10,6 +10,7 @@
 #include "error.h"
 #include "signal_handler.h"
 
+#include <gtk/gtk.h>
 
 namespace core {
 class Window;
@@ -21,6 +22,13 @@ public:
 		S_SCENE_REQUEST_SUBWIN,
 		S_WINDOW_END_PROGRAM,
 		S_SUBWIN_CLOSE,
+	};
+
+
+	template <typename T>
+	struct SigSceneRequestSubwin {
+		const std::string& scene_name;
+		T& obj;
 	};
 
 	App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
@@ -36,7 +44,7 @@ public:
 	void display_main_window();
 	void apply_provider(const std::string& css_dir_path);
 	//Error request_subwin(void* emitter_obj, SigData* sig_data);
-	Error request_subwin(core::Scene& scene, core::Window* p_emit_window = nullptr, void* emitter_obj = nullptr, SigData* sig_data = nullptr);
+	Error request_subwin(core::Scene& scene, core::Window* p_emit_window = nullptr, void* emitter_obj = nullptr, core::Scene::SigRequestSubwin* sig_data = nullptr);
 
 	SigHandler<App> sig_handler;
 	
