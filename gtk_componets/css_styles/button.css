@@ -1,3 +1,23 @@
+.Default1, .BlankState1, .ShadeButton1 {
+	font-size: 15px;
+	min-width: 10px;
+	min-height: 10px;
+	background-image: none;
+	background-color: white;
+	border: 1px solid;
+}
+
+.Default2, .BlankState2, .ShadeButton3 {
+	font-size: 23px;
+	min-width: 20px;
+	min-height: 20px;
+	background-image: none;
+	background-color: white;
+	border: 1px solid;
+}
+
+
+
 .Default, .BlankState, .ShadeButton {
 	font-size: 30px;
 	background-image: none;
@@ -12,15 +32,15 @@
 	font-size: 30px;
 }
 
-.Default:hover {
+.Default:hover, .Default1:hover, .Default2:hover, .Default3:hover {
 	background-color: lightgray;
 }
 
-.Default:active {
+.Default:active, .Default1:active, .Default2:active, .Default3:active {
 	background-color: gray;
 	border: 1px solid;
 }
 
-.ShadeButton {
+.ShadeButton, .ShadeButton1, .ShadeButton2, .ShadeButton3 {
 	background-color: gray;	
 }

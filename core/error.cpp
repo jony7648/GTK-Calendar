@@ -14,6 +14,7 @@ void set_errors() {
 	ErrorArr[ErrorType::FileOpenFail] = "File failed to open";
 	ErrorArr[ErrorType::SubwinNotFound] = "Subwin could not be found";
 	ErrorArr[ErrorType::SceneNotFound] = "Scene could not be found";
+	ErrorArr[ErrorType::FileDataParse] = "Filed to parse data file";
 	ErrorArr[ErrorType::Clear] = "No errors were found";
 
 

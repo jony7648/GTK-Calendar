@@ -1,6 +1,5 @@
 #include "container.h"
 
-
 namespace gtkc {
 
 ContainerIterator::ContainerIterator(gtkc::Container* container, int index) {

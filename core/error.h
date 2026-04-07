@@ -11,6 +11,7 @@ enum Codes {
 	FileOpenFail,
 	SubwinNotFound,
 	SceneNotFound,
+	FileDataParse,
 	Clear,
 };
 }

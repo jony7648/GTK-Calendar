@@ -23,12 +23,10 @@ class PersistData {
 	
 
 public:
-	PersistData();
 	NoteContainer note_container;
 	EntryMarker& add_entry_marker();
 	void store_day_save(DaySave& day_save);
 	void store_entry_marker(EntryMarker& entry_marker);	
-	bool note_exists(int day, int month, int year);
 	void display_notes();
 	Note* get_note(int day, int month, int year);
 	Note* get_note(const core::Date& date);

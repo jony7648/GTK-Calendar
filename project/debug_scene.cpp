@@ -124,12 +124,8 @@ static void signal_note_added(core::EmitData<data::NoteContainer> emit_data) {
 	for (data::Note& note : sig_data->note_container) {
 		refresh_property_label("Note" + std::to_string(loop_index+1), str_property_map, grid, note.text);
 
-		loop_index = (loop_index + 1) % MAX_NOTE_COUNT;
+		loop_index = (loop_index + 1) % data::NoteContainer::MAX_NOTE_COUNT;
 	}
-
-
-
-	
 }
 
 namespace project {

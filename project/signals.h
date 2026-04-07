@@ -20,4 +20,8 @@ namespace project::calendar {
 		data::PersistData& persist_data;
 		const core::Date& date;
 	};
+
+	struct MonthButtonClicked {
+		core::TimeComponet& time_componet;
+	};
 }

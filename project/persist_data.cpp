@@ -4,10 +4,6 @@
 
 namespace data {
 
-PersistData::PersistData() {
-	
-}
-
 EntryMarker& PersistData::add_entry_marker() {
 	_entry_marker_vec.push_back(EntryMarker());
 	return _entry_marker_vec.back();
@@ -19,16 +15,6 @@ void PersistData::store_day_save(DaySave& day_save) {
 
 void PersistData::store_entry_marker(EntryMarker& entry_marker) {
 	_entry_marker_vec.push_back(entry_marker);
-}
-
-bool PersistData::note_exists(int day, int month, int year) {
-	for (Note& note : note_container) {
-		if (note.date.year == year && note.date.month == month && note.date.day == day) {
-			return true;
-		}
-
-	}
-	return false;
 }
 
 void PersistData::display_notes() {

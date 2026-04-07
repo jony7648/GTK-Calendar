@@ -1,8 +1,9 @@
 #include "button_widget.h"
 
+#define MAX_FONT_SIZE 3
+
 namespace gtkc {
 Button::Button(const std::string& name, const std::string& text, int grid_x, int grid_y, int width, int height) : Widget() {
-
 	if (text.empty()) {
 		set_gtk_widget(gtk_button_new());
 	}
@@ -19,6 +20,25 @@ Button::Button(const std::string& name, const std::string& text, int grid_x, int
 	set_scale(width, height);
 	this->text = text;
 	load_css("Default");
+	sig_handler.set_parent_object(this);
+}
+
+Button::Button(const InitProperties& prop) : Widget(prop.base_prop) {
+	if (text.empty()) {
+		set_gtk_widget(gtk_button_new());
+	}
+	else {
+		set_gtk_widget(gtk_button_new_with_label(text.c_str()));
+	}
+
+	//listener.set_gtk_parent(get_gtk_widget());
+	
+	set_type(Type::Button);
+	set_css_file_name("button.css");
+	load_css("Default");
+	set_text(prop.text);
+	set_font_size(prop.font_size);
+	sig_handler.set_parent_object(this);
 }
 
 Button::~Button() {
@@ -36,6 +56,16 @@ void Button::set_activate_func(void(*activate_func)(GtkWidget*, gpointer user_da
 	GtkWidget* gtk_widget = this->get_gtk_widget();
 
 	g_signal_connect(gtk_widget, "clicked", G_CALLBACK (activate_func), nullptr);
+}
+
+void Button::set_font_size(int font_size) {
+	if (font_size > MAX_FONT_SIZE) {
+		std::cout << "ERROR: font size for is to big! Max Size is: " << MAX_FONT_SIZE << " " << "Widget info displayed below...\n";
+		display_info();
+	}
+
+	this->_font_size = font_size;
+	load_css(get_css_class() + std::to_string(font_size));
 }
 
 void Button::set_text(const std::string& text) {

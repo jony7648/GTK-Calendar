@@ -77,6 +77,9 @@ TimeComponet::TimeComponet() {
 
 	calculate_from_current_time();
 	reset_menu_time();
+
+	sig_handler.set_parent_object(this);
+	sig_handler.add_signal(S_MenuDateChanged);
 }
 
 int TimeComponet::find_leap_year_count(int start_year, int end_year) const {
@@ -187,9 +190,6 @@ int TimeComponet::get_starting_weekday() const {
 }
 
 void TimeComponet::advance_menu_month(int cycle_count) {
-	std::cout << _menu_date.month + cycle_count << "\n";
-
-
 	if (_menu_date.month + cycle_count < 0) {
 		_menu_date.year = util::cycle_through_bounds(_menu_date.year, -1, MIN_YEAR, MAX_YEAR);
 	}
@@ -200,6 +200,12 @@ void TimeComponet::advance_menu_month(int cycle_count) {
 
 	//menu_year = menu_year + (menu_month + cycle_count) / (MONTH_COUNT);
 	_menu_date.month = util::cycle_through_bounds(_menu_date.month, cycle_count, 0, MONTH_COUNT);
+
+	SigMenuDateChanged sig_data = {
+		.date=_menu_date
+	};
+
+	sig_handler.emit_data(S_MenuDateChanged, &sig_data);
 }
 
 void TimeComponet::reset_menu_time() {
@@ -209,14 +215,35 @@ void TimeComponet::reset_menu_time() {
 
 void TimeComponet::set_menu_day(int day) {
 	_menu_date.day = day;
+
+	SigMenuDateChanged sig_data = {
+		.date=_menu_date
+	};
+
+	sig_handler.emit_data(S_MenuDateChanged, &sig_data);
+
 }
 
 void TimeComponet::set_menu_month(int month) {
 	_menu_date.month = month;
+
+	SigMenuDateChanged sig_data = {
+		.date=_menu_date
+	};
+
+	sig_handler.emit_data(S_MenuDateChanged, &sig_data);
+
 }
 
 void TimeComponet::set_menu_year(int year) {
 	_menu_date.year = year;
+	
+	SigMenuDateChanged sig_data = {
+		.date=_menu_date
+	};
+
+	sig_handler.emit_data(S_MenuDateChanged, &sig_data);
+
 }
 
 void TimeComponet::set_menu_date(Date& date) {
@@ -239,6 +266,29 @@ const std::string& TimeComponet::get_weekday_name(int weekday) const {
 	return _weekday_arr[weekday % WEEKDAY_COUNT];
 }
 
+const core::Date& TimeComponet::get_date() const {
+	return _date;
+}
+
+int TimeComponet::get_day() const {
+	return _date.day;
+}
+
+int TimeComponet::get_month() const {
+	return _date.month;
+}
+
+int TimeComponet::get_year() const {
+	return _date.year;
+}
+
+const Date& TimeComponet::get_menu_date() const {
+	return _menu_date;		
+}
+
+int TimeComponet::get_menu_day() const {
+	return _menu_date.day;
+}
 
 int TimeComponet::get_menu_month() const {
 	return _menu_date.month;
@@ -248,9 +298,7 @@ int TimeComponet::get_menu_year() const {
 	return _menu_date.year;
 }
 
-const Date& TimeComponet::get_menu_date() const {
-	return _menu_date;		
-}
+
 
 const std::string* TimeComponet::get_weekday_arr() const {
 	return _weekday_arr;

@@ -68,6 +68,7 @@ void signal_window_displayed(core::EmitData<core::Scene> emit_data) {
 	if (note_ptr) {
 		prepare_note_scene(scene, *note_ptr);
 		std::cout << "Note Text before text field " << note_ptr->text << "\n";
+		return;
 	}
 
 	data::Note new_note {

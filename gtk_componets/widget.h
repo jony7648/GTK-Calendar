@@ -9,7 +9,6 @@
 //#include "core/signal_handler.h"
 
 namespace core {
-
 	template <typename ObjType>
 	class SigHandler;
 }
@@ -18,16 +17,33 @@ namespace gtkc {
 class Container;
 
 class Widget {
-
 public:
+	struct CommonInitProperties {
+		std::string tag;
+		space::Point scale;
+		space::Point size_request;
+		bool hexpand = false;
+		bool vexpand = false;
+	};
+
+	struct BaseInitProperties {
+		const CommonInitProperties& shared_properties;
+		std::string name;
+		space::Point grid_point;
+		
+		int sig_data = 0;
+	};
+
 	//void load_css();
 	void load_css(const std::string& class_name = "Default");
 	void apply_provider();
 	Widget();
+	Widget(const BaseInitProperties& prop);
 	~Widget();
 
 	void display_info();
 	void attach(Container* container);
+
 
 
 	void reattach();
@@ -48,11 +64,14 @@ public:
 	GtkWidget* get_gtk_widget();
 
 	void set_scale(int x, int y);
+	void set_scale(const space::Point& scale);
 	const space::Point& get_scale();
 
 	void size_request(int x, int y);
+	void size_request(const space::Point& size);
 
 	void set_grid_point(int x, int y);
+	void set_grid_point(const space::Point& point);
 	const space::Point& get_grid_point();
 
 	bool is_type(Type type);
@@ -73,6 +92,7 @@ protected:
 	GtkWidget* _gtk_widget;
 
 	void set_css_file_name(const std::string& css_path);
+	const std::string& get_css_class();
 	void set_type(Type type);
 
 

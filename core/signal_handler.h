@@ -179,7 +179,7 @@ void emit_data(int id, void* sig_data, void* emitter_obj = nullptr) {
 }
 
 
-void add_emit_func(int id, std::function<void(EmitDataType&)> emit_func, void* receiver_obj) {
+void add_emit_func(int id, std::function<void(EmitDataType&)> emit_func, void* receiver_obj = nullptr) {
 	// the function pointer passed into this function will be executed
 	// when the signal id is executed
 	

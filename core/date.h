@@ -1,6 +1,7 @@
 #pragma once
 namespace core {
 struct Date {
+	bool operator==(Date& date);
 	int day = 0, month = 0, year = 0;
 };
 

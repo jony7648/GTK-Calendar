@@ -34,6 +34,10 @@ GridContainer* GridContainer::get_child_container(const std::string& name) {
 	return ret_widget;
 }
 
+void GridContainer::set_column_homogeneous(bool state) {
+	gtk_grid_set_column_homogeneous(GTK_GRID(_gtk_widget), state);
+}
+
 const space::Point& GridContainer::get_grid_size() {
 	return grid_size;	
 }

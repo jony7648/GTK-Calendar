@@ -12,8 +12,17 @@ namespace gtkc {
 Widget::Widget() {
 	_scale.x = 1;
 	_scale.y = 1;
-	//
-	//signaler.connect_to_signal(nullptr, "clicked", nullptr);
+}
+
+Widget::Widget(const BaseInitProperties& prop) {
+	set_hexpand(prop.shared_properties.hexpand);
+	set_vexpand(prop.shared_properties.vexpand);
+	set_scale(prop.shared_properties.scale);
+	//size_request(prop.shared_properties.size_request);
+	set_tag(prop.shared_properties.tag);
+	set_name(prop.name);
+	set_grid_point(prop.grid_point);
+	set_sig_data(prop.sig_data);
 }
 
 
@@ -45,6 +54,7 @@ void Widget::set_css_file_name(const std::string& css_path) {
 	_css_path = CSS_STYLES_DIR + css_path;
 }
 
+
 void Widget::apply_provider() {
 	//this function will style the widget based on the properties
 	//set in it's css file
@@ -71,6 +81,10 @@ void Widget::load_css(const std::string& class_name) {
 	gtk_widget_add_css_class(_gtk_widget, class_name.c_str());
 	_css_class = class_name;
 
+}
+
+const std::string& Widget::get_css_class() {
+	return _css_class;
 }
 
 void Widget::show() {
@@ -135,8 +149,17 @@ void Widget::set_scale(int x, int y) {
 	_scale.y = y;
 }
 
+void Widget::set_scale(const space::Point& scale) {
+	_scale.x = scale.x;
+	_scale.y = scale.y;
+}
+
 void Widget::size_request(int width, int height) {
 	gtk_widget_set_size_request(_gtk_widget, width, height);
+}
+
+void Widget::size_request(const space::Point& size) {
+	gtk_widget_set_size_request(_gtk_widget, size.x, size.y);
 }
 
 const space::Point& Widget::get_scale() {
@@ -146,6 +169,15 @@ const space::Point& Widget::get_scale() {
 void Widget::set_grid_point(int x, int y) {
 	_grid_point.x = x;
 	_grid_point.y = y;
+
+	if (_presenting) {
+		reattach();
+	}
+}
+
+void Widget::set_grid_point(const space::Point& point) {
+	_grid_point.x = point.x;
+	_grid_point.y = point.y;
 
 	if (_presenting) {
 		reattach();

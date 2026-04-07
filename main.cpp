@@ -34,7 +34,7 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	note_scene->get_widget_container().present_widgets();
 
 	app->attach_main_window(window);
-	app->create_subwins(8);
+	app->create_subwins(3);
 	app->attach_sub_scene(note_scene);
 	app->attach_main_scene(main_scene, signal_data);
 
@@ -59,14 +59,14 @@ void load_save_data(data::NoteContainer& note_container, core::csv::Writer& csv_
 
 	try {
 		for (core::csv::Entry& entry : data_map_vector) {
-			note_container.add_note(data::Note());
-
-			data::Note& note = note_container.back();
+			data::Note note;
 
 			note.date.day = stoi(entry.get("Day"));
 			note.date.month = stoi(entry.get("Month"));
 			note.date.year = stoi(entry.get("Year"));
 			note.text = entry.get("Note");
+			
+			note_container.add_note(note);
 		}
 	}
 
@@ -118,7 +118,7 @@ void signal_persist_data_note_released(core::EmitData<data::NoteContainer>& emit
 
 	std::cout << "Hit the signal time to save now\n";
 
-	save_app_data(*note_container, *csv_writer, sig_data->save_count);
+	//save_app_data(*note_container, *csv_writer, sig_data->save_count);
 
 }
 
@@ -127,27 +127,33 @@ int main(int argc, char *argv[]) {
 	std::string save_path = "test.save";
 
 	data::PersistData persist_data;
+	data::NoteContainer& note_container = persist_data.get_note_container();
 	core::csv::Writer csv_writer(save_path, csv_header);
 	csv_writer.set_equivalnce_bounds(0, 3);
 
 
-	persist_data.get_note_container().sig_handler.add_emit_func (
+	note_container.sig_handler.add_emit_func (
 		data::NoteContainer::S_NotesReleased,
 		signal_persist_data_note_released,
 		&csv_writer
 	);
 
 
-	load_save_data(persist_data.get_note_container(), csv_writer);
+	//load_save_data(persist_data.get_note_container(), csv_writer);
+
+	note_container.attach_csv_writer(&csv_writer);
+	note_container.load_new_notes();
 
 	space::Point win_dimensions = {
 		.x = 1200,
 		.y = 600,
 	};
 
-
 	core::App app("org.jony.test", win_dimensions, argc, argv);
+	core::TimeComponet* time_componet = app.get_time_componet();
 
+
+	note_container.connect_time_componet_signals(*time_componet);
 
 	project::ActivateSignal activate_signal = {
 		.app = &app,
@@ -158,5 +164,5 @@ int main(int argc, char *argv[]) {
 
 	app.run(&activate, &activate_signal);
 
-	save_app_data(persist_data.get_note_container(), csv_writer);
+	//save_app_data(persist_data.get_note_container(), csv_writer);
 }

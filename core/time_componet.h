@@ -1,7 +1,10 @@
 #pragma once
+
+#include "signal_handler.h"
+#include "date.h"
+
 #include <iostream>
 #include <ctime>
-#include "date.h"
 
 
 namespace core {
@@ -20,12 +23,20 @@ private:
 	int _weekday = 0;
 
 public:
+	const static size_t WEEKDAY_COUNT = 7;
+	const static size_t MONTH_COUNT = 12;
+	const static short LEAP_FACTOR = 4;
 	const size_t DAY_COUNT_ARR_LEN = 12;
-	const size_t WEEKDAY_COUNT = 7;
-	const size_t MONTH_COUNT = 12;
-	const short LEAP_FACTOR = 4;
 	const int MAX_YEAR = 2100;
 	const int MIN_YEAR = 1900;
+
+	enum Signals {
+		S_MenuDateChanged
+	};
+
+	struct SigMenuDateChanged {
+		const Date& date;	
+	};
 
 	TimeComponet();
 	
@@ -55,13 +66,22 @@ public:
 	void get_full_day_str(core::Date& date, std::string& output_str) const;
 	const std::string* get_weekday_arr() const;
 
+	const Date& get_date() const;
+	int get_day() const;
+	int get_month() const;
+	int get_year() const;
+
+	
+	const Date& get_menu_date() const;
+	int get_menu_day() const;
 	int get_menu_month() const;
 	int get_menu_year() const;
 
-	const Date& get_menu_date() const;
 
 
 	void display_time_info() const;
+
+	SigHandler<TimeComponet> sig_handler;
 	
 };
 

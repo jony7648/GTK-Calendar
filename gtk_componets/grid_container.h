@@ -10,6 +10,8 @@ private:
 public:
 	GridContainer();
 	GridContainer(const std::string& name, int size_x, int size_y);
+	void set_column_homogeneous(bool state);
+
 
 	const space::Point& get_grid_size();
 
