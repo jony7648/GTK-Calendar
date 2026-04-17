@@ -54,14 +54,14 @@ void get_file_contents(std::fstream& file_stream, std::vector<std::string>& line
 
 void get_files_in_dir(std::vector<std::string>& path_vector, const std::string& dir_path) {
 	namespace fs = std::filesystem;
-	
+
 
 	for (auto& entry : fs::directory_iterator(dir_path)) {
 		if (entry.is_directory()) {
 			continue;
 		}
 
-		path_vector.push_back(entry.path());	
+		path_vector.push_back(entry.path().string());
 	}
 }
 
@@ -71,7 +71,7 @@ std::string get_parent_dir_from_file(const std::string& path) {
 
 	for (int i=path.length()-1; i>=0; i--) {
 		if (curr_char == '/') {
-			parent_dir = parent_dir.substr(0, i-1);	
+			parent_dir = parent_dir.substr(0, i-1);
 			break;
 		}
 	}
