@@ -1,10 +1,11 @@
-#include <fstream>
-#include <algorithm>
-#include "csv_writer.h"
 #include "util.h"
 #include "sort.h"
 #include "error.h"
 #include "file_util.h"
+#include "csv_writer.h"
+
+#include <fstream>
+#include <algorithm>
 
 const std::string NO_FILE_MESSAGE = "FILE COULD NOT BE OPENED";
 
@@ -66,11 +67,18 @@ namespace core::csv {
 Writer::Writer(const std::string& file_path, const std::vector<std::string>& header_vec) {
 	_file_path = file_path;	
 	_header_vec = header_vec;
+	_nug = &header_vec.at(3);
+	std::cout << "Vector addr: " << &_header_vec << " | Internal Data: " << _header_vec.data() << " | Size: " << _header_vec.size() << std::endl;
+}
+
+Writer::~Writer() {
+
 }
 
 void Writer::csv_map_to_str(Entry& entry, std::string& output_line) {
 	std::string dummy_str = "";
 	output_line = "";
+
 
 	for (const std::string& header : _header_vec) {
 		dummy_str = entry.get(header);
@@ -103,17 +111,22 @@ void Writer::parse_csv_line(std::vector<Entry>& data_vec, std::string csv_line, 
 		current_header = _header_vec[value_index];
 		curr_char = csv_line.at(i);
 		should_split = false;
-	
-		if (curr_char == escape_char) {
+
+		bool is_new_line = curr_char == '\\' && i < line_len - 1 && csv_line.at(i+1) == 'n';
+
+		if (is_new_line) {
+			std::cout << "is new line!\n";
+			i++;
+		}
+		else if (curr_char == escape_char) {
 			remove_locations.at(escape_vec_index) = i - start_pos;
 			escape_vec_index++;
 			i++;
 			continue;
 		}
+
 	
-		if ((curr_char == split_char && !string_mode) || i == line_len-1) {
-			should_split = true;
-		}
+		should_split = (curr_char == split_char && !string_mode) || i == line_len-1;
 	
 		if (i == line_len-1) {
 			copy_offset++;
@@ -132,7 +145,11 @@ void Writer::parse_csv_line(std::vector<Entry>& data_vec, std::string csv_line, 
 	
 		if (should_split) {
 			copy_count = i - start_pos + copy_offset;
+			std::cout << "COPY COUNT" << copy_count << "\n";
 			sub_str = csv_line.substr(start_pos, copy_count);
+
+			sub_str = util::str_replace(sub_str, "\\n", "\n");
+
 			remove_chars_from_str(sub_str, remove_locations);
 			entry.add(current_header, sub_str);
 			value_index++;
@@ -140,6 +157,9 @@ void Writer::parse_csv_line(std::vector<Entry>& data_vec, std::string csv_line, 
 			copy_offset = 0;
 		}
 	}
+
+
+	entry.display_info();
 }
 
 Entry* Writer::check_for_same_line(std::vector<Entry>& data_vec, const std::string& current_line) {
@@ -149,14 +169,16 @@ Entry* Writer::check_for_same_line(std::vector<Entry>& data_vec, const std::stri
 	std::vector<std::string> split_vec;
 
 	util::str_split(current_line, ',', split_vec);
+	util::display_vec_info(_header_vec);
 
 	for (Entry& entry : data_vec) {
+		entry.display_info();
 
 		entry_ptr = &entry;
 
 		for (int i=_same_check_start; i<_same_check_end; i++) {
 			found_csv_match = true;
-
+			std::cout << "this is the vec info" << _header_vec.size() << "\n";
 			const std::string& file_elem = split_vec.at(i);
 			const std::string& current_header = _header_vec.at(i);
 			const std::string& save_elem = entry.get(current_header);
@@ -179,6 +201,32 @@ Entry* Writer::check_for_same_line(std::vector<Entry>& data_vec, const std::stri
 	return entry_ptr;
 }
 
+void Writer::replace_existing_saves(std::ifstream& input_stream, std::vector<core::csv::Entry>& data_vec, std::vector<std::vector<std::string>>& save_vec) {
+	std::string input_stream_line;
+	core::csv::Entry* matching_data = nullptr;
+
+	int line_index = 0;	
+
+	while (getline(input_stream, input_stream_line)) {
+		//check to see if there is a data entry that mataches this line
+		matching_data = check_for_same_line(data_vec, input_stream_line);
+
+		//if so replace the line
+		if (matching_data) {
+			csv_map_to_str(*matching_data, input_stream_line);
+			matching_data->already_exists = true;
+		}
+
+		//maybe no element exists maybe I need to create something in the save vec
+
+		save_vec.push_back(std::vector<std::string>());
+		std::vector<std::string>& new_entry_vec = save_vec.back();
+		util::str_split(input_stream_line, ',', new_entry_vec);
+
+		line_index++;
+	}
+}
+
 Error Writer::write_csv(std::vector<Entry>& data_vec) {
 	//Meathod takes in passed in csv data and saves it to a file
 	const size_t DATA_COUNT = data_vec.size();
@@ -194,40 +242,28 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 	std::vector<std::vector<std::string>> save_vec;
 	std::string header_line;
 
+
 	std::ofstream output_stream;
 	
 	std::string output_csv_str = "";
-	unsigned int line_index = 0;
-
-	Entry* matching_data = nullptr;
 
 
 	input_stream.open(_file_path);
 	file_util::set_stream_start_line(input_stream, 1);
 
-	if (!input_stream.is_open()) {
-		std::cout << "Error: File stream failed to open for whatever reason\n";
-		return Error(ErrorType::FileOpenFail);
-	}
 
 
-	//populate file_data_vec
-	while (getline(input_stream, input_stream_line)) {
-		//check to see if there is a data entry that mataches this line
-		matching_data = check_for_same_line(data_vec, input_stream_line);
-
-		//if so replace the line
-		if (matching_data) {
-			csv_map_to_str(*matching_data, input_stream_line);
-			matching_data->already_exists = true;
+	if (file_util::file_exists(_file_path)) {
+		if (input_stream.is_open()) {
+			replace_existing_saves(input_stream, data_vec, save_vec);
 		}
-
-		save_vec.push_back(std::vector<std::string>());
-		std::vector<std::string>& new_entry_vec = save_vec.back();
-		util::str_split(input_stream_line, ',', new_entry_vec);
-
-		line_index++;
+		else {
+			std::cout << "Error: File stream failed to open for whatever reason\n";
+			return Error(ErrorType::FileOpenFail);
+		}
 	}
+
+
 
 
 	for (Entry& entry : data_vec) {
@@ -262,8 +298,9 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 	for (std::vector<std::string>& line_vec : save_vec) {
 		input_stream_line = "";
 		
-		for (const std::string& elem : line_vec) {
-			input_stream_line += elem + ",";			
+		for (std::string& elem : line_vec) {
+			std::string replace_str = util::str_replace(elem, "\n", "\\n");	
+			input_stream_line += replace_str + ",";			
 		}
 
 		input_stream_line.pop_back();

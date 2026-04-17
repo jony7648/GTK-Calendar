@@ -65,6 +65,24 @@ void get_files_in_dir(std::vector<std::string>& path_vector, const std::string& 
 	}
 }
 
+std::string get_parent_dir_from_file(const std::string& path) {
+	std::string parent_dir = path;
+	char curr_char = ' ';
+
+	for (int i=path.length()-1; i>=0; i--) {
+		if (curr_char == '/') {
+			parent_dir = parent_dir.substr(0, i-1);	
+			break;
+		}
+	}
+
+	return parent_dir;
+}
+
+bool file_exists(const std::string& path) {
+	return std::filesystem::is_regular_file(path);
+}
+
 void write_line(std::fstream& file_stream, const std::string& line) {
 	if (!file_stream.is_open()) {
 		return;

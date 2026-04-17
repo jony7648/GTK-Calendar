@@ -58,8 +58,11 @@ void signal_subwin_close(core::EmitData<core::Window> emit_data) {
 		return;
 	}
 
-	//do some stuff in calendar to do something with window close signal
+	if (sub_scene->get_takes_focus()) {
+		app->get_main_window()->set_sensitivity(true);
+	}
 
+	//do some stuff in calendar to do something with window close signal
 	main_scene->sig_handler.emit_data(core::Scene::S_WINDOW_CLOSED, sub_scene);
 	
 	return;
@@ -106,7 +109,7 @@ Error App::attach_main_window(Window* window) {
 	//attaches a window to the  app
 	this->main_window = window;
 	window->set_attached_state();
-	window->set_as_main_window();
+	window->set_type(Window::Type::Main);
 	//S_window_end_program.pickup_signal(&window->S_end_program);
 	std::cout << "ID before being bassed " << core::Window::S_END_PROGRAM << "\n";
 	window->sig_handler.add_emit_func(core::Window::S_END_PROGRAM, signal_end_app, this);
@@ -117,7 +120,7 @@ Scene* App::get_main_scene() {
 	return main_scene;	
 }
 
-void App::create_subwins(unsigned int count = 0) {
+void App::create_subwins(unsigned int count, int nonfocus_subwin_count) {
 	core::Window* subwin = nullptr;
 	std::string subwin_name = "";
 
@@ -131,6 +134,11 @@ void App::create_subwins(unsigned int count = 0) {
 		//S_subwin_close.pickup_signal(&subwin->S_window_close);
 		subwin->sig_handler.add_emit_func(core::Window::S_WINDOW_CLOSE, signal_subwin_close, this);
 		subwin_vect.push_back(subwin);
+
+		if (nonfocus_subwin_count > 0) {
+			subwin->set_type(Window::Type::SubFocus);
+			nonfocus_subwin_count--;
+		}
 	}
 }
 
@@ -191,6 +199,11 @@ Error App::request_subwin(core::Scene& sub_scene, core::Window* emit_window, voi
 
 	p_subwin->display(sub_scene);
 
+
+	if (sub_scene.get_takes_focus()) {
+		main_window->set_sensitivity(false);
+	}
+
 	return Error(ErrorType::Clear);
 }
 
@@ -236,7 +249,6 @@ void App::display_main_window() {
 	if (main_scene) {
 		main_window->display(*main_scene);
 	}
-
 }
 
 void App::apply_provider(const std::string& css_dir_path) {
@@ -282,6 +294,10 @@ void App::close() {
 	for (Window* window : subwin_vect) {
 		delete window;
 	}
+}
+
+Window* App::get_main_window() {
+	return main_window;
 }
 
 core::TimeComponet* App::get_time_componet() {

@@ -37,7 +37,7 @@ public:
 	void run(void(*activate_func)(GtkApplication*, gpointer), void* activate_signal);
 	void close();
 	Error attach_main_window(Window* window);
-	void create_subwins(unsigned int count);
+	void create_subwins(unsigned int count, int nonfocus_subwin_count = 0);
 	int attach_subwin(Window* window);
 	Error attach_main_scene(Scene* scene, void* signal_data = nullptr);
 	Error attach_sub_scene(Scene* scene);
@@ -52,6 +52,7 @@ public:
 	//Signal S_window_end_program;
 	//Signal S_subwin_close;
 
+	Window* get_main_window();
 	Scene* get_main_scene();
 	std::vector<Scene*>& get_sub_scene_vect();
 	GtkWidget* get_scene_container();

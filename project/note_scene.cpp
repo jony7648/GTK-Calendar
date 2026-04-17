@@ -178,6 +178,8 @@ core::Scene* create_note_scene(core::TimeComponet* time_componet) {
 	main_container.add_widget(date_container);
 	main_container.add_widget(note_container);
 
+	scene->set_takes_focus(true);
+
 	return scene;	
 }
 }

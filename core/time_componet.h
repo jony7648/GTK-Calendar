@@ -15,20 +15,20 @@ private:
 	std::string _month_arr[12];
 	std::string _long_mth_names[12];
 
-	int _day_count_arr[12];
+	short _day_count_arr[12];
 	
 	Date _date;
 	Time _time;
 	Date _menu_date;
-	int _weekday = 0;
+	short _weekday = 0;
 
 public:
-	const static size_t WEEKDAY_COUNT = 7;
-	const static size_t MONTH_COUNT = 12;
+	const static short WEEKDAY_COUNT = 7;
+	const static short MONTH_COUNT = 12;
 	const static short LEAP_FACTOR = 4;
-	const size_t DAY_COUNT_ARR_LEN = 12;
-	const int MAX_YEAR = 2100;
-	const int MIN_YEAR = 1900;
+	const short DAY_COUNT_ARR_LEN = 12;
+	const short MAX_YEAR = 2100;
+	const short MIN_YEAR = 1900;
 
 	enum Signals {
 		S_MenuDateChanged

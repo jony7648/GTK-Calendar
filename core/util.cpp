@@ -76,6 +76,8 @@ void str_split(const std::string& src_str, char split_char, std::vector<std::str
 	char curr_char = ' ';
 	std::string sub_str = "";
 
+	std::cout << &output_vec << "\n";
+
 	//use vector.at notation to preserve orginal implementatino
 
 
@@ -83,6 +85,7 @@ void str_split(const std::string& src_str, char split_char, std::vector<std::str
 
 	for (int i=0; i<strlen; i++) {
 		curr_char = src_str.at(i);
+
 		
 		if (i == final_index) {
 			copy_offset++;
@@ -99,7 +102,7 @@ void str_split(const std::string& src_str, char split_char, std::vector<std::str
 	}
 }
 
-void str_unsplit(std::vector<std::string>& str_vec, std::string& output_str, char split_char) {
+void str_unsplit(const std::vector<std::string>& str_vec, std::string& output_str, char split_char) {
 	output_str = "";
 
 	for (const std::string& str : str_vec) {
@@ -107,6 +110,26 @@ void str_unsplit(std::vector<std::string>& str_vec, std::string& output_str, cha
 	}
 
 	output_str.pop_back();
+}
+
+std::string str_replace(std::string src_str, std::string target_str, std::string replace_substr) {
+	std::string ret_str = src_str;
+	std::string peek_str = "";
+
+	size_t replace_len = replace_substr.length();
+
+	int peek_len = target_str.length();
+
+	for (int i=0; i<ret_str.length()-peek_len+1; i++) {
+		peek_str = ret_str.substr(i,peek_len);	
+
+		if (peek_str == target_str) {
+			ret_str.replace(i, peek_len, replace_substr);	
+			i += replace_len - 1;
+		}
+	}
+
+	return ret_str;
 }
 
 void str_strip(std::string& str) { 

@@ -10,9 +10,11 @@
 
 namespace core::csv {
 class Writer {
+
 public:
 	Writer(const std::string& file_path, const std::vector<std::string>& header_vec);
 	Writer(const Writer&) = delete;
+	~Writer();
 
 	Error read_csv(std::vector<Entry>& output_vec);
 	Error write_csv(std::vector<Entry>& csv_map);
@@ -25,9 +27,11 @@ public:
 private:
 	int _same_check_start = 0;
 	int _same_check_end = 0;
-	std::string _file_path;
 	std::vector<std::string> _header_vec;
+	std::string _file_path;
+	const std::string* _nug = nullptr;
 	void parse_csv_line(std::vector<Entry>& data_vec, std::string csv_line, std::vector<int>& remove_locations);
 	Entry* check_for_same_line(std::vector<Entry>& data_vec, const std::string& current_line);
+	void replace_existing_saves(std::ifstream& input_stream, std::vector<core::csv::Entry>& data_vec, std::vector<std::vector<std::string>>& save_vec);
 };
 }

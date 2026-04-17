@@ -321,7 +321,12 @@ static void create_mini_cal_buttons(gtkc::GridContainer* day_container, core::Sc
 }
 
 static void create_mini_advance_buttons(gtkc::GridContainer* grid_container, core::Scene* scene) {
-	int month_jump_count_arr[] = {3, 6, 12};
+	int month_jump_count_arr[] = {3, 6, 12, 15};
+	size_t month_arr_size = sizeof(month_jump_count_arr)/sizeof(month_jump_count_arr[0]);
+	
+	int jump_pairs_per_row = 2;
+
+
 	gtkc::Button* left_button = nullptr;
 	gtkc::Button* right_button = nullptr;
 
@@ -342,19 +347,27 @@ static void create_mini_advance_buttons(gtkc::GridContainer* grid_container, cor
 	};
 
 
-	for (int i=1; i<=2; i++) {
+	//configure and add the widgets
+	for (int i=0; i<month_arr_size; i++) {
+		int right_jump_count = month_jump_count_arr[i];
+		
 		left_button_properties.base_prop.name = "Left Button " + std::to_string(i);
 		right_button_properties.base_prop.name = "Right Button " + std::to_string(i);
 
-		left_button_properties.base_prop.grid_point = {i, 0};	
-		right_button_properties.base_prop.grid_point = {-i, 0};	
-		left_button_properties.base_prop.sig_data = i;	
-		right_button_properties.base_prop.sig_data = -i;	
+		left_button_properties.base_prop.grid_point = {
+			(-i%jump_pairs_per_row)-1, -i/jump_pairs_per_row
+		};	
 
-		int left_jump_count = month_jump_count_arr[i];
+		right_button_properties.base_prop.grid_point = {
+			(i%jump_pairs_per_row)+1, -i/jump_pairs_per_row
+		};	
 
-		left_button_properties.text = "+" + std::to_string(left_jump_count);
-		right_button_properties.text = std::to_string(-left_jump_count);
+		left_button_properties.base_prop.sig_data = -right_jump_count;	
+		right_button_properties.base_prop.sig_data = right_jump_count;	
+
+
+		left_button_properties.text = std::to_string(-right_jump_count);
+		right_button_properties.text = '+' + std::to_string(right_jump_count);
 
 		left_button = new gtkc::Button(left_button_properties);
 		right_button = new gtkc::Button(right_button_properties);
@@ -362,6 +375,8 @@ static void create_mini_advance_buttons(gtkc::GridContainer* grid_container, cor
 		grid_container->add_widget(left_button);
 		grid_container->add_widget(right_button);
 
+		scene->sig_handler.g_listen(left_button, "clicked", signal_advance_month_button_clicked);
+		scene->sig_handler.g_listen(right_button, "clicked", signal_advance_month_button_clicked);
 	}
 }
 
@@ -568,7 +583,6 @@ core::Scene* create_main_scene(core::TimeComponet* time_componet, core::csv::Wri
 	main_container.add_widget(info_container);
 
 	time_componet->sig_handler.add_emit_func(core::TimeComponet::S_MenuDateChanged, signal_time_componet_date_changed, scene);
-
 
 	return scene;
 }

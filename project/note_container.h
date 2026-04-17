@@ -54,8 +54,8 @@ class NoteContainer {
 public:
 	const static short MONTH_SEEK_COUNT = 2;
 	const static short DAYS_PER_MONTH = 31;
-	//const static short int MAX_NOTE_COUNT = MONTH_SEEK_COUNT*DAYS_PER_MONTH;
-	const static short MAX_NOTE_COUNT = 4;
+	const static short int MAX_NOTE_COUNT = MONTH_SEEK_COUNT*DAYS_PER_MONTH;
+	//const static short MAX_NOTE_COUNT = 4;
 
 	enum SIGNALS {
 		S_NOTE_ADDED,
@@ -117,6 +117,7 @@ public:
 	short get_end_index();
 	Note& back();
 
+	core::Error save_notes(short save_count = -1);
 	core::Error load_new_notes();
 
 	void set_save_anchor(const core::Date& date);

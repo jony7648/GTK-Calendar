@@ -13,6 +13,12 @@ class App;
 class Window {
 	
 public:
+	enum class Type {
+		Main,
+		Sub,
+		SubFocus,
+	};
+
 	enum SIGNALS {
 		S_REQUEST,
 		S_END_PROGRAM,
@@ -45,8 +51,11 @@ public:
 
 	void set_dimensions(const space::Point& dimensions);
 
-	void set_as_main_window();
-	bool get_is_main_window();
+	void set_type(Type type);
+	bool is_type(Type type);
+	bool is_main();
+	Type get_type();
+		
 
 	bool get_display_state();
 	bool get_visibility();
@@ -56,14 +65,14 @@ public:
 
 
 private:
-	std::string title = "";
-	space::Point dimensions;
-	GtkWidget* gtk_window = nullptr;
-	Scene* p_current_scene = nullptr;
+	std::string _title = "";
+	space::Point _dimensions;
+	GtkWidget* _gtk_window = nullptr;
+	Scene* _p_current_scene = nullptr;
 	void(*_signal_close)(GtkWidget*, gpointer user_data);
-	bool is_main_window = false;
-	bool is_attached = false;
-	bool is_displaying = false;
-	bool is_visible = false;
+	bool _is_attached = false;
+	bool _is_displaying = false;
+	bool _is_visible = false;
+	Type _type = Type::Sub;
 };
 }

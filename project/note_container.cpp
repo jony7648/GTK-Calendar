@@ -92,8 +92,6 @@ NoteContainer::NoteContainer() {
 	sig_handler.add_signal(S_INCREMENTED);
 	sig_handler.add_signal(S_NotesReleased);
 	sig_handler.add_signal(data::NoteContainer::S_ClearOldNotes);		
-
-	
 }
 
 void NoteContainer::attach_csv_writer(core::csv::Writer* writer) {
@@ -245,6 +243,49 @@ void NoteContainer::reset(Note* note) {
 	note->date.month = 0;
 	note->date.day = 0;
 	note->text = "";
+}
+
+core::Error NoteContainer::save_notes(short save_count) {
+	std::vector<core::csv::Entry> csv_map_vec;
+
+	if (!_p_csv_writer) {
+		return core::Error(core::ErrorType::Nullptr);
+	}
+
+	int going_to_save_count = 0;
+
+	for (data::Note& note : *this) {
+		if (save_count == 0) {
+			break;
+		}
+		going_to_save_count++;
+
+		save_count--;
+
+		if (!note.should_save) {
+			//std::cout << "SHOULD NOT SAVE\n";
+			//note.display_info();
+			//std::cout << "\n\n";
+			continue;
+		}
+
+		csv_map_vec.push_back(core::csv::Entry());
+		core::csv::Entry& entry = csv_map_vec.back();
+		note.display_info();
+
+		entry.add("Day",  std::to_string(note.date.day));	
+		entry.add("Month", std::to_string(note.date.month));	
+		entry.add("Year", std::to_string(note.date.year));	
+		entry.add("Note", note.text);	
+
+	}
+
+	//fix the csv writer as it can only save a single note at a time
+
+	_p_csv_writer->write_csv(csv_map_vec);
+	std::cout << "WE ARE ABOUT TO SAVE " << going_to_save_count << " notes!\n";
+
+	return core::Error(core::ErrorType::Clear);
 }
 
 core::Error NoteContainer::load_new_notes() {

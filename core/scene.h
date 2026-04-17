@@ -42,6 +42,9 @@ public:
 	bool get_resizability() const;
 	void signal_request_subwin(core::Message* message);
 
+	bool get_takes_focus();
+	void set_takes_focus(bool focus);
+
 	void set_parent_win(core::Window* p_win);
 	core::Window& get_parent_win();
 
@@ -59,7 +62,8 @@ private:
 	std::string name = "";
 	core::TimeComponet* time_componet;
 	space::Point custom_dimensions;
-	bool resizable_win = true;
 	gtkc::GridContainer widget_container;
+	bool _takes_focus = false;
+	bool resizable_win = true;
 };
 }

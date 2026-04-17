@@ -45,6 +45,14 @@ void Scene::set_parent_win(core::Window* p_win) {
 	p_parent_win = p_win;
 }
 
+void Scene::set_takes_focus(bool focus) {
+	_takes_focus = focus;
+}
+
+bool Scene::get_takes_focus() {
+	return _takes_focus;
+}
+
 core::Window& Scene::get_parent_win() {
 	return *p_parent_win;
 }
@@ -58,6 +66,6 @@ void Scene::set_time_componet(core::TimeComponet* time_componet) {
 }
 
 core::TimeComponet* Scene::get_time_componet() {
-	return time_componet;
+return time_componet;
 }
 }

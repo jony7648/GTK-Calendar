@@ -190,13 +190,24 @@ int TimeComponet::get_starting_weekday() const {
 }
 
 void TimeComponet::advance_menu_month(int cycle_count) {
-	if (_menu_date.month + cycle_count < 0) {
-		_menu_date.year = util::cycle_through_bounds(_menu_date.year, -1, MIN_YEAR, MAX_YEAR);
+	int year_cycle_count = 0;
+
+
+	if (cycle_count > 0) {
+		year_cycle_count = (_menu_date.month + cycle_count) / MONTH_COUNT;
 	}
-	
-	if (_menu_date.month + cycle_count == MONTH_COUNT) {
-		_menu_date.year = util::cycle_through_bounds(_menu_date.year, 1, MIN_YEAR, MAX_YEAR);
+	else if (cycle_count < 0) {
+		year_cycle_count = -(
+			(TimeComponet::MONTH_COUNT - _menu_date.month - cycle_count - 1) /
+			MONTH_COUNT
+		);
 	}
+	else {
+		return;
+	}
+
+
+	_menu_date.year = util::cycle_through_bounds(_menu_date.year, year_cycle_count, MIN_YEAR, MAX_YEAR);
 
 	//menu_year = menu_year + (menu_month + cycle_count) / (MONTH_COUNT);
 	_menu_date.month = util::cycle_through_bounds(_menu_date.month, cycle_count, 0, MONTH_COUNT);

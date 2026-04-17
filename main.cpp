@@ -123,8 +123,10 @@ void signal_persist_data_note_released(core::EmitData<data::NoteContainer>& emit
 }
 
 int main(int argc, char *argv[]) {
+	core::set_errors(); //set error type messages
+
 	std::vector<std::string> csv_header = {"Year", "Month", "Day", "Note"};
-	std::string save_path = "test.save";
+	std::string save_path = "calendar_save.csv";
 
 	data::PersistData persist_data;
 	data::NoteContainer& note_container = persist_data.get_note_container();
@@ -141,19 +143,20 @@ int main(int argc, char *argv[]) {
 
 	//load_save_data(persist_data.get_note_container(), csv_writer);
 
-	note_container.attach_csv_writer(&csv_writer);
-	note_container.load_new_notes();
+	
 
 	space::Point win_dimensions = {
 		.x = 1200,
 		.y = 600,
 	};
 
-	core::App app("org.jony.test", win_dimensions, argc, argv);
+	core::App app("org.jony.Calendar", win_dimensions, argc, argv);
 	core::TimeComponet* time_componet = app.get_time_componet();
 
 
+	note_container.attach_csv_writer(&csv_writer);
 	note_container.connect_time_componet_signals(*time_componet);
+	note_container.load_new_notes();
 
 	project::ActivateSignal activate_signal = {
 		.app = &app,
@@ -162,7 +165,7 @@ int main(int argc, char *argv[]) {
 	};
 
 
-	app.run(&activate, &activate_signal);
 
-	//save_app_data(persist_data.get_note_container(), csv_writer);
+	app.run(&activate, &activate_signal);
+	note_container.save_notes();
 }
