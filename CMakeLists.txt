@@ -13,13 +13,29 @@ set(WIDGET_DIR "gtk_componets")
 set(PROJECT_DIR "project")
 set(CORE_DIR "core")
 
+set(WIN_DIR "windows")
+
 set(DEBUG_COMPONETS "${PROJECT_DIR}/debug_scene.cpp")
 set(PROJECT_COMPONETS "${PROJECT_DIR}/calendar_scene.cpp" "${PROJECT_DIR}/note_scene.cpp" "${PROJECT_DIR}/persist_data.cpp" "${PROJECT_DIR}/note_container.cpp")
 set(WIDGET_COMPONETS  "${WIDGET_DIR}/widget.cpp" "${WIDGET_DIR}/button_widget.cpp" "${WIDGET_DIR}/container.cpp" "${WIDGET_DIR}/grid_container.cpp" "${WIDGET_DIR}/label.cpp" "${WIDGET_DIR}/text_field.cpp" "${WIDGET_DIR}/key_map_label.cpp")
 set(CORE_COMPONETS "${CORE_DIR}/app.cpp" "${CORE_DIR}/date.cpp" "${CORE_DIR}/window.cpp" "${CORE_DIR}/space.cpp" "${CORE_DIR}/util.cpp" "${CORE_DIR}/file_util.cpp" "${CORE_DIR}/sort.cpp" "${CORE_DIR}/time_componet.cpp" "${CORE_DIR}/scene.cpp" "${CORE_DIR}/csv_entry.cpp" "${CORE_DIR}/csv_writer.cpp" "${CORE_DIR}/error.cpp")
 set(SIGNAL_COMPONETS "${CORE_DIR}/signal_handler.cpp")
 
-add_executable(calendar main.cpp ${DEBUG_COMPONETS} ${CORE_COMPONETS} ${SIGNAL_COMPONETS} ${PROJECT_COMPONETS} ${WIDGET_COMPONETS})
+if (WIN32)
+	set(ICON_RESOURCE "${WIN_DIR}/icon.rc")
+endif()
+
+add_executable (
+	calendar 
+	main.cpp 
+	${DEBUG_COMPONETS} 
+	${CORE_COMPONETS} 
+	${SIGNAL_COMPONETS} 
+	${PROJECT_COMPONETS} 
+	${WIDGET_COMPONETS}
+	${ICON_RESOURCE}
+)
+
 target_compile_options(calendar PRIVATE ${GTK4_CFLAGS})
 target_compile_features(calendar PRIVATE cxx_std_20)
 target_link_libraries(calendar PkgConfig::GTK4)
