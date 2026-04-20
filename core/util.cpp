@@ -173,5 +173,31 @@ void str_strip(std::string& str) {
 	}
 }
 
+std::string copy_str_strip(const std::string& str) {
+	size_t strlen = str.length();
+	size_t str_start = 0;
+	size_t copy_count = strlen;
 
+	char strip_char = ' ';
+
+	std::string ret_str = "";
+
+	for (int i=0; i<strlen; i++) {
+		if (str.at(i) != strip_char) {
+			str_start = i;
+			break;
+		}
+	}
+
+	for (int i=strlen-1; i>=0; i--) {
+		if (str.at(i) != strip_char) {
+			copy_count = i - str_start + 1;
+			break;
+		}
+	}
+
+	ret_str = str.substr(str_start, copy_count);
+	
+	return ret_str;
+}
 }

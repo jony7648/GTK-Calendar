@@ -5,13 +5,13 @@
 #include "scene.h"
 #include "error.h"
 #include "app.h"
+#include "css_provider.h"
 
 
 namespace core {
 class App;
 
 class Window {
-	
 public:
 	enum class Type {
 		Main,
@@ -67,12 +67,14 @@ public:
 private:
 	std::string _title = "";
 	space::Point _dimensions;
-	GtkWidget* _gtk_window = nullptr;
 	Scene* _p_current_scene = nullptr;
 	void(*_signal_close)(GtkWidget*, gpointer user_data);
 	bool _is_attached = false;
 	bool _is_displaying = false;
 	bool _is_visible = false;
 	Type _type = Type::Sub;
+
+	GtkWidget* _gtk_window = nullptr;
+	CSSProvider _css_provider;
 };
 }

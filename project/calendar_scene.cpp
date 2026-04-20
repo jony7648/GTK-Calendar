@@ -13,12 +13,15 @@
 #define TAG_MONTH_CALBUTTON "MonthCalButton"
 
 data::PersistData* persist_data = nullptr;
+project::Config* G_config = nullptr;
 
 static void arrange_cal_buttons(gtkc::GridContainer* container, core::TimeComponet* time_componet, int month) {
 	//create the system for other months
 	gtkc::Widget* widget = nullptr;
 	int grid_x = 0;
 	int grid_y = 0;
+
+	gtkc::Widget::Theme theme = gtkc::Widget::get_theme(G_config->get_value("theme"));
 
 	const core::Date& date = time_componet->get_menu_date();
 
@@ -48,10 +51,8 @@ static void arrange_cal_buttons(gtkc::GridContainer* container, core::TimeCompon
 
 		}
 
-	
-
 		if (persist_data->note_container.note_exists({.day=day, .month=month, .year=date.year})) {
-			widget->load_css("ShadeButton");
+			widget->load_css("ShadeButton", theme);
 		}
 		else {
 			widget->load_css();
@@ -512,8 +513,9 @@ static gtkc::GridContainer* create_date_header_container(const core::Scene* scen
 
 
 namespace project {
-core::Scene* create_main_scene(core::TimeComponet* time_componet, core::csv::Writer* csv_writer, data::PersistData* persist_data_object) {
+core::Scene* create_main_scene(core::TimeComponet* time_componet, core::csv::Writer* csv_writer, data::PersistData* persist_data_object, project::Config& config) {
 	persist_data = persist_data_object;
+	G_config = &config;
 
 	const std::string scene_name = "Main Scene";
 	int day_count = time_componet->get_day_count();

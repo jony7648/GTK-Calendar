@@ -11,6 +11,7 @@
 #include "project/debug_scene.h"
 #include "project/signals.h"
 #include "project/persist_data.h"
+#include "project/config.h"
 
 #include <gtk/gtk.h>
 
@@ -27,7 +28,7 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	core::Window* window = new core::Window(gtk_app, title);
 	core::TimeComponet* time_componet = app->get_time_componet();
 
-	core::Scene* main_scene = project::create_main_scene(time_componet, signal_data->csv_writer, signal_data->persist_data);
+	core::Scene* main_scene = project::create_main_scene(time_componet, signal_data->csv_writer, signal_data->persist_data, signal_data->config);
 	core::Scene* note_scene = project::create_note_scene(time_componet);
 
 	main_scene->get_widget_container().present_widgets();
@@ -124,6 +125,9 @@ void signal_persist_data_note_released(core::EmitData<data::NoteContainer>& emit
 
 int main(int argc, char *argv[]) {
 	core::set_errors(); //set error type messages
+	std::string config_path = "config.cfg";
+
+	project::Config config(config_path);
 
 	std::vector<std::string> csv_header = {"Year", "Month", "Day", "Note"};
 	std::string save_path = "calendar_save.csv";
@@ -162,6 +166,7 @@ int main(int argc, char *argv[]) {
 		.app = &app,
 		.csv_writer = &csv_writer,
 		.persist_data = &persist_data,
+		.config = config,
 	};
 
 

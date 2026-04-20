@@ -6,6 +6,7 @@
 #include "widget.h"
 #include "container.h"
 #include "core/signal_handler.h"
+#include "core/util.h"
 
 namespace gtkc {
 
@@ -32,6 +33,16 @@ Widget::~Widget() {
 	if (_gtk_widget) {
 		g_object_unref(get_gtk_widget());
 	}
+}
+
+Widget::Theme Widget::get_theme(const std::string& line) {
+	std::string line_cpy = util::copy_str_strip(line);
+
+	if (line_cpy == "dark") {
+		return Theme::Dark;
+	}
+
+	return Theme::Light;
 }
 
 void Widget::attach(Container* container) {
@@ -68,18 +79,36 @@ void Widget::apply_provider() {
 	gtk_style_context_add_provider_for_display(_default_display, GTK_STYLE_PROVIDER(_css_provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
-void Widget::load_css(const std::string& class_name) {
+void Widget::load_css(const std::string& class_name, Theme theme) {
+	std::string theme_str = "";
+	
 	if (!_gtk_widget) {
 		std::cout << "ERROR: can't css style gtk_widget is a nullptr\n";
+		return;
 	}
 
 	if (!_css_provider) {
 		std::cout << "Error: _css_provider is a nullptr!\n";
+		return;
 	}
 
+	switch (theme) {
+		case Theme::Light:
+			theme_str = "Light";
+			break;
+		case Theme::Dark:
+			theme_str = "Dark";
+			break;
+		case Theme::None:
+			theme_str = "";
+			break;
+	}
+
+
 	gtk_widget_remove_css_class(_gtk_widget, _css_class.c_str());
-	gtk_widget_add_css_class(_gtk_widget, class_name.c_str());
-	_css_class = class_name;
+
+	_css_class = theme_str + class_name;
+	gtk_widget_add_css_class(_gtk_widget, _css_class.c_str());
 
 }
 

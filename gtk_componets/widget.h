@@ -18,6 +18,12 @@ class Container;
 
 class Widget {
 public:
+	enum class Theme {
+		Light,
+		Dark,
+		None,
+	};
+
 	struct CommonInitProperties {
 		std::string tag;
 		space::Point scale;
@@ -35,7 +41,8 @@ public:
 	};
 
 	//void load_css();
-	void load_css(const std::string& class_name = "Default");
+	static Theme get_theme(const std::string& line);
+	void load_css(const std::string& class_name = "Default", Theme theme = Theme::None);
 	void apply_provider();
 	Widget();
 	Widget(const BaseInitProperties& prop);

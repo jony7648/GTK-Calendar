@@ -4,7 +4,6 @@
 
 bool process_close_request(GtkWidget* gtk_window, gpointer user_data) {
 	core::Window* window = static_cast<core::Window*>(user_data);
-
 	
 	if (!window->is_main()) {
 		core::Scene* win_scene = window->get_scene();
@@ -44,6 +43,9 @@ Window::Window(GtkApplication* gtk_app_ptr, const std::string& title) {
 
 	g_signal_connect(this->_gtk_window, "close-request", G_CALLBACK(process_close_request), this);
 	//std::cout << "This is the window address: " << this << "\n";
+	
+
+	_css_provider.load_file("window.css", _gtk_window);
 }
 
 Window::~Window() {

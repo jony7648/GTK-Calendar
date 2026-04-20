@@ -1,6 +1,7 @@
 #include <fstream>
 #include <filesystem>
 #include "file_util.h"
+#include "error.h"
 
 namespace file_util {
 void set_stream_start_line(std::ifstream& stream, int line) {
@@ -19,9 +20,10 @@ void set_stream_start_line(std::fstream& stream, int line) {
 	}
 }
 
-void get_file_contents(std::ifstream& file_stream, std::vector<std::string>& line_vector) {
+core::Error get_file_contents(std::ifstream& file_stream, std::vector<std::string>& line_vector) {
 	if (file_stream.is_open() == false) {
 		std::cout << "ERROR: file is not open!\n";
+		return core::Error(core::ErrorType::FileOpenFail);
 	}
 
 	//reset the position back to the start
@@ -32,12 +34,14 @@ void get_file_contents(std::ifstream& file_stream, std::vector<std::string>& lin
 	while (getline(file_stream, current_line)) {
 		line_vector.push_back(current_line);
 	}
+
+	return core::Error(core::ErrorType::Clear);
 }
 
-void get_file_contents(std::fstream& file_stream, std::vector<std::string>& line_vector) {
+core::Error get_file_contents(std::fstream& file_stream, std::vector<std::string>& line_vector) {
 	if (file_stream.is_open() == false) {
 		std::cout << "ERROR: file is not open!\n";
-		return;
+		return core::Error(core::ErrorType::FileOpenFail);
 	}
 
 	//reset the position back to the start
@@ -50,6 +54,8 @@ void get_file_contents(std::fstream& file_stream, std::vector<std::string>& line
 		std::cout << current_line.length() << "\n";
 		line_vector.push_back(current_line);
 	}
+
+	return core::Error(core::ErrorType::Clear);
 }
 
 void get_files_in_dir(std::vector<std::string>& path_vector, const std::string& dir_path) {
