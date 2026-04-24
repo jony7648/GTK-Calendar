@@ -48,8 +48,9 @@
 	background-color: white;
 }
 
-.DarkDefault, .DarkShadeButton {
+.DarkDefault, .DarkShadeButton, .DarkDefault1, .DarkDefault2, .DarkDefault3 {
 	color: #ffffff;
+	background-color: #282626;
 }
 
 .LightDefault {
@@ -62,7 +63,7 @@
 }
 
 .LightDefault:active, .LightDefault1:active, .LightDefault2:active, .LightDefault3:active {
-	background-color: gray;
+	background-color: gray;	
 	border: 1px solid;
 }
 
@@ -76,15 +77,24 @@
 	border: 1px solid;
 }
 
+.LightShadeButton:hover, .LightShadeButton1:hover, .LightShadeButton2:hover, .LightShadeButton3:hover {
+	background-color: #606060;
+	border: 1px solid;
+}
+
+.LightShadeButton:active, .LightShadeButton1:active, .LightShadeButton2:active, .LightShadeButton3:active {
+	background-color: #505050;
+	border: 1px solid;
+}
+
 .DarkShadeButton, .DarkShadeButton1, .DarkShadeButton2, .DarkShadeButton3 {
-	background-color: #101010;
+	background-color: #171515;
 }
 
 
 
-.DarkDefault:hover, .DarkDefault1:hover, .DarkDefault2:hover, .DarkDefault3:hover,
-.DarkShadeButton1:hover, .DarkShadeButton1:hover, .DarkShadeButton2:hover, .DarkShadeButton3:hover {
-	background-color: #282626;
+.DarkDefault:hover, .DarkDefault1:hover, .DarkDefault2:hover, .DarkDefault3:hover, .DarkShadeButton1:hover, .DarkShadeButton1:hover, .DarkShadeButton2:hover, .DarkShadeButton3:hover {
+	background-color: #212121;
 }
 
 
