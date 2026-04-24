@@ -1,17 +1,17 @@
 #pragma once
-#include <iostream>
 #include "core/error.h"
 #include "core/css_provider.h"
 
+#include <iostream>
+#include <vector>
+
 namespace project {
-
-
 
 class Config {
 public:
 	struct Values {
 		std::string config_path = "";
-		core::CssProvider::Theme theme = core::CssProvider::Theme::Light;	
+		core::CssProvider::Theme theme = core::CssProvider::Theme::Light;
 	};
 
 	struct Entry {
