@@ -34,7 +34,7 @@ you will need to compile the app.
 
 <br>
 
-After having the libraies required for gtk setup run the following
+After having installed the libraries required for gtk, run the following
 
 ```
 git clone https://github.com/jony7648/GTK-Calendar.git
