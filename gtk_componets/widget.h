@@ -5,8 +5,8 @@
 #include "core/constants.h"
 #include "core/space.h"
 #include "core/messenger.h"
+#include "core/css_provider.h"
 #include "types.h"
-//#include "core/signal_handler.h"
 
 namespace core {
 	template <typename ObjType>
@@ -41,9 +41,6 @@ public:
 	};
 
 	//void load_css();
-	static Theme get_theme(const std::string& line);
-	void load_css(const std::string& class_name = "Default", Theme theme = Theme::None);
-	void apply_provider();
 	Widget();
 	Widget(const BaseInitProperties& prop);
 	~Widget();
@@ -95,11 +92,12 @@ public:
 	void set_sig_data(int data);
 	int get_sig_data();
 
+	core::CssProvider css_provider;
+
 protected:
 	GtkWidget* _gtk_widget;
 
 	void set_css_file_name(const std::string& css_path);
-	const std::string& get_css_class();
 	void set_type(Type type);
 
 
@@ -107,7 +105,6 @@ private:
 	std::string _name = "";
 	Type _type = Type::Widget;
 	std::string _tag = "";
-	std::string _css_class = "N/A";
 	int _grid_pos = 0;
 	space::Rect _transform;
 	space::Point _grid_point;

@@ -1,31 +1,39 @@
-.h1 {
+.Darkh1, .Darkh2, .Darkh3, .Darkh4, .Darkh5, .Darkh6, .Darkh7, .Darkh8 {
+	color: #ffffff;
+}
+
+.Lighth1, .Lighth2, .Lighth3, .Lighth4, .Lighth5, .Lighth6, .Lighth7, .Lighth8 {
+	color: #000000;
+}
+
+.Lighth1, .Darkh1, .h1 {
 	font-size: 10px;		
 }
 
-.h2 {
+.Lighth2, .Darkh2, .h2 {
 	font-size: 15px;		
 }
 
-.h3 {
+.Lighth3, .Darkh3, .h3 {
 	font-size: 30px;		
 }
 
-.h4 {
+.Lighth4, .Darkh4, .h4 {
 	font-size: 25px;		
 }
 
-.h5 {
+.Lighth5, .Darkh5, .h5 {
 	font-size: 30px;		
 }
 
-.h6 {
+.Lighth6, .Darkh6, .h6 {
 	font-size: 35px;		
 }
 
-.h7 {
+.Lighth7, .Darkh7, .h7 {
 	font-size: 40px;		
 }
 
-.h8 {
+.Lighth8, .Darkh8, .h8 {
 	font-size: 45px;		
 }

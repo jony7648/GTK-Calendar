@@ -228,7 +228,6 @@ void Container::present_widgets() {
 
 		//gtk_grid_attach(GTK_GRID(gtk_widget), child_gtk_widget, widget_grid_point.x,widget_grid_point.y,widget_scale.x,widget_scale.y);
 		widget->attach(this);
-		widget->apply_provider();
 
 		gtk_widget_set_hexpand(child_gtk_widget, child_hexpand);
 		gtk_widget_set_vexpand(child_gtk_widget, child_vexpand);

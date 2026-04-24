@@ -12,6 +12,8 @@
 #define TAG_CALBUTTON "CalButton"
 #define TAG_MONTH_CALBUTTON "MonthCalButton"
 
+#define SHADE_BUTTON_CSS_CLASS "ShadeButton"
+
 data::PersistData* persist_data = nullptr;
 project::Config* G_config = nullptr;
 
@@ -20,8 +22,6 @@ static void arrange_cal_buttons(gtkc::GridContainer* container, core::TimeCompon
 	gtkc::Widget* widget = nullptr;
 	int grid_x = 0;
 	int grid_y = 0;
-
-	gtkc::Widget::Theme theme = gtkc::Widget::get_theme(G_config->get_value("theme"));
 
 	const core::Date& date = time_componet->get_menu_date();
 
@@ -52,10 +52,10 @@ static void arrange_cal_buttons(gtkc::GridContainer* container, core::TimeCompon
 		}
 
 		if (persist_data->note_container.note_exists({.day=day, .month=month, .year=date.year})) {
-			widget->load_css("ShadeButton", theme);
+			widget->css_provider.load_class("ShadeButton");
 		}
 		else {
-			widget->load_css();
+			widget->css_provider.load_class("Default");
 		}
 
 		pos_index = i + start_weekday;
@@ -94,6 +94,37 @@ static void update_date_header(gtkc::Widget* container_location, core::TimeCompo
 
 	label->set_text(header_str);
 
+}
+
+static void set_theme_button_text(gtkc::Button* theme_button, core::CssProvider::Theme theme) {
+	if (!theme_button) {
+		return;
+	}
+
+	using Theme = core::CssProvider::Theme;
+	std::string theme_button_text = "";
+
+	switch (theme) {
+		case Theme::Light:
+			 theme_button_text = "Dark";
+			 break;
+		case Theme::Dark:
+			 theme_button_text = "Light";
+			 break;
+		default:
+			 theme_button_text = "N/A";
+			 break;
+	}
+
+	theme_button->set_text(theme_button_text);
+}
+
+static void signal_theme_button_clicked(core::G_EmitData& emit_data) {
+	core::CssProvider::switch_light_and_dark();
+
+	gtkc::Button* theme_button = static_cast<gtkc::Button*>(emit_data.emitter);
+
+	set_theme_button_text(theme_button, core::CssProvider::get_G_theme());	
 }
 
 static void signal_advance_month_button_clicked(core::G_EmitData& emit_data) {
@@ -229,7 +260,7 @@ static void signal_note_container_note_added(core::EmitData<data::NoteContainer>
 		button = static_cast<gtkc::Button*>(widget);
 
 		if (button->get_text() == std::to_string(received_note.date.day)) {
-			button->load_css("ShadeButton");
+			button->css_provider.load_class(SHADE_BUTTON_CSS_CLASS);
 			button->reattach();
 		}
 	}
@@ -381,7 +412,7 @@ static void create_mini_advance_buttons(gtkc::GridContainer* grid_container, cor
 	}
 }
 
-static gtkc::GridContainer* create_mini_cal_grid(core::Scene* scene) {
+static gtkc::GridContainer* create_mini_cal_grid(core::Scene* scene, space::Point pos) {
 	if (!scene) {
 		std::cout << "Scene is a nullptr!\n";
 		return nullptr;
@@ -400,7 +431,7 @@ static gtkc::GridContainer* create_mini_cal_grid(core::Scene* scene) {
 	gtkc::GridContainer* day_container = new gtkc::GridContainer("Day container", 9, 5);
 	
 
-	day_container->set_grid_point(0,1);
+	day_container->set_grid_point(pos);
 	day_container->set_hexpand(true);
 	day_container->set_vexpand(true);
 	day_container->set_valign(GTK_ALIGN_FILL);
@@ -434,10 +465,28 @@ static gtkc::GridContainer* create_mini_cal_grid(core::Scene* scene) {
 	return cal_grid;
 }
 
+static gtkc::GridContainer* create_theme_container(const core::Scene* scene, space::Point pos) {
+	gtkc::GridContainer* theme_container = new gtkc::GridContainer("Theme Container", 1,1);
+	theme_container->set_grid_point(pos);
+
+	gtkc::Button* theme_button = new gtkc::Button("Theme Button", "Light", 0, 0, 1, 1);
+
+	theme_button->sig_handler.g_listen(theme_button, "clicked", signal_theme_button_clicked);
+
+	theme_container->add_widget(theme_button);
+
+	theme_container->present_widgets();
+
+	set_theme_button_text(theme_button, core::CssProvider::get_G_theme());
+
+	return theme_container;
+}
+
 static gtkc::GridContainer* create_info_container(core::Scene* scene) {
 	gtkc::GridContainer* info_container = new gtkc::GridContainer("Info Contanier", 6,6);
 	gtkc::GridContainer* top_container = new gtkc::GridContainer("Top Container", 6,1);
-	gtkc::GridContainer* mini_cal_grid = create_mini_cal_grid(scene);
+	gtkc::GridContainer* mini_cal_grid = create_mini_cal_grid(scene, {0,1});
+	gtkc::GridContainer* theme_container = create_theme_container(scene, {0,2});
 
 	info_container->set_valign(GTK_ALIGN_FILL);
 	//info_container->set_halign(GTK_ALIGN_FILL);
@@ -445,7 +494,7 @@ static gtkc::GridContainer* create_info_container(core::Scene* scene) {
 	info_container->set_hexpand(false);
 
 	top_container->set_valign(GTK_ALIGN_START);
-	top_container->set_halign(GTK_ALIGN_END);
+	top_container->set_halign(GTK_ALIGN_CENTER);
 	top_container->set_widget_spacing(64,1);
 	top_container->set_grid_point(0,0);
 
@@ -467,6 +516,7 @@ static gtkc::GridContainer* create_info_container(core::Scene* scene) {
 	top_container->present_widgets();
 	info_container->add_widget(top_container);
 	info_container->add_widget(mini_cal_grid);
+	info_container->add_widget(theme_container);
 
 	info_container->present_widgets();
 
@@ -510,6 +560,8 @@ static gtkc::GridContainer* create_date_header_container(const core::Scene* scen
 
 	return date_container;
 }
+
+
 
 
 namespace project {
@@ -558,13 +610,12 @@ core::Scene* create_main_scene(core::TimeComponet* time_componet, core::csv::Wri
 
 	info_container = create_info_container(scene);
 	date_header_container = create_date_header_container(scene, full_day_str);
-	cal_button_container = create_cal_button_container();
-	
 	
 	add_weekday_header(time_componet, widget_vector);
+
+
+	cal_button_container = create_cal_button_container();
 	create_cal_buttons(scene, cal_button_vector);
-
-
 	
 	cal_button_container->add_widget_vector(widget_vector);
 	cal_button_container->add_widget_vector(cal_button_vector);

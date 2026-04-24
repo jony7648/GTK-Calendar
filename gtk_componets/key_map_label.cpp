@@ -15,13 +15,10 @@ KeyMapLabel::KeyMapLabel() : _key_label(), _value_label(){
 	_value_label.set_font_size(4);
 
 	set_gtk_widget(gtk_grid_new());
-	apply_provider();
 
 	set_widget_spacing(20);
 	set_halign(GTK_ALIGN_FILL);
 	set_hexpand(true);
-
-
 
 	add_widget(&_key_label);
 	add_widget(&_value_label);

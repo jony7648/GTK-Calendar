@@ -8,9 +8,8 @@ TextField::TextField(const std::string& name, int scale_x, int scale_y) {
 	set_type(Type::TextField);
 	set_scale(scale_x, scale_y);
 	set_grid_point(0,0);
-	set_css_file_name("text_field.css");
 	set_gtk_widget(gtk_text_view_new());
-	load_css("text_field");
+	
 	size_request(300,300);
 
 	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(_gtk_widget), _wrap_mode);
@@ -21,6 +20,9 @@ TextField::TextField(const std::string& name, int scale_x, int scale_y) {
 
 	//gtk_text_buffer_insert(gtk_text_buffer, &gtk_text_iter, "nugs\n", 5);
 	set_text(DEFAULT_TEXT);
+
+	css_provider.load_file("text_field.css");
+	css_provider.load_class("Entry");
 
 }
 

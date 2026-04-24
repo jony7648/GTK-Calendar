@@ -134,8 +134,6 @@ static void signal_window_closed(core::EmitData<core::Scene> emit_data) {
 
 	const std::string& text_field_text = text_field->get_text();
 
-	text_field->display_info();
-
 	if (text_field_text != text_field->get_default_text() && text_field_text != current_note.text) {
 		current_note.text = text_field_text;
 		current_note.should_save = true;

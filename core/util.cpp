@@ -70,6 +70,48 @@ int cycle_through_bounds(int start_value, int cycle_count, int start_bound, int 
 	return cycled_position;
 }
 
+std::string str_to_upper(const std::string& src_str) {
+	std::string ret_str;
+
+	short char_start = 97;
+	short char_end = 122;
+	short cap_add_factor = 32;
+	
+
+	for (int i = 0; i<src_str.length(); i++) {
+		int char_num = src_str.at(i);
+
+		if (char_num >= char_start && char_num <= char_end) {
+			char_num -= 32;
+		}
+
+		ret_str += (char)char_num;
+	}
+
+	return ret_str;
+}
+
+std::string str_to_lower(const std::string& src_str) {
+	std::string ret_str;
+
+	short char_start = 65; 
+	short char_end =  90;
+	short cap_add_factor = 32;
+	
+
+	for (int i = 0; i<src_str.length(); i++) {
+		int char_num = src_str.at(i);
+
+		if (char_num >= char_start && char_num <= char_end) {
+			char_num += 32;
+		}
+
+		ret_str += (char)char_num;
+	}
+
+	return ret_str;
+}
+
 void str_split(const std::string& src_str, char split_char, std::vector<std::string>& output_vec) {
 	unsigned int start_pos = 0, copy_count = 0, copy_offset = 0, final_index = 0;
 	size_t strlen = src_str.length();

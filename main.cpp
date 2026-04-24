@@ -15,7 +15,7 @@
 
 #include <gtk/gtk.h>
 
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 void activate(GtkApplication* gtk_app, gpointer user_data) {
 	std::string title = "Calendar";
@@ -162,6 +162,12 @@ int main(int argc, char *argv[]) {
 	note_container.connect_time_componet_signals(*time_componet);
 	note_container.load_new_notes();
 
+	core::CssProvider::Theme theme = core::CssProvider::get_theme(config.get_value("theme"));
+
+
+	core::CssProvider::set_styles_dir("css_styles");
+	core::CssProvider::change_global_theme(theme);
+
 	project::ActivateSignal activate_signal = {
 		.app = &app,
 		.csv_writer = &csv_writer,
@@ -173,4 +179,9 @@ int main(int argc, char *argv[]) {
 
 	app.run(&activate, &activate_signal);
 	note_container.save_notes();
+
+	config.save_config({
+		.config_path = config_path,
+		.theme = core::CssProvider::get_G_theme(),
+	});
 }

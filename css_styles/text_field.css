@@ -1,3 +1,24 @@
-.text_field {
+.LightEntry {
+	color: black;
 	font-size: 20px;
+    border: 10px solid darkgray;
+}
+
+.DarkEntry {
+	color: #ffffff;
+	font-size: 20px;
+    border: 10px solid #282626;
+}
+
+.LightEntry text, .DarkEntry text {
+	font-size: 20px;
+}
+
+
+.DarkEntry text {
+	background-color: #1c1a1a;
+}
+
+.LightEntry text {
+	background-color: lightgray;
 }

@@ -7,9 +7,8 @@ Label::Label() {
 	text = "Empty";
 	set_type(Type::Label);
 	set_gtk_widget(gtk_label_new(text.c_str()));
-	set_css_file_name("label.css");
+	css_provider.load_file("label.css");
 	set_font_size(2);
-	apply_provider();
 }
 
 Label::Label(const std::string& name, const std::string& text, int grid_x, int grid_y, int width, int height) : Widget() {
@@ -17,7 +16,7 @@ Label::Label(const std::string& name, const std::string& text, int grid_x, int g
 
 	set_name(name);
 	set_type(Type::Label);
-	set_css_file_name("label.css");
+	css_provider.load_file("label.css");
 	set_gtk_widget(gtk_widget);
 	set_grid_point(grid_x, grid_y);
 	set_scale(width, height);
@@ -36,7 +35,7 @@ void Label::set_font_size(int font_size) {
 	}
 
 	this->font_size = font_size;
-	load_css("h" + std::to_string(font_size));
+	css_provider.load_class("h" + std::to_string(font_size));
 }
 
 void Label::set_text(const std::string& new_text) {

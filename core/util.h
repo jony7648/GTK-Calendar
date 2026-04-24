@@ -6,6 +6,8 @@ namespace util {
 	void* dynamic_data_init(size_t data_size);
 	void* dynamic_data_assign(void* dynamic_data, size_t new_struct_size);
 	void dynamic_data_free(void* dynamic_data);
+	std::string str_to_lower(const std::string& src_tsr);
+	std::string str_to_upper(const std::string& src_tsr);
 	void str_split(const std::string& src_str, char split_char, std::vector<std::string>& output_vec);
 	std::string str_replace(std::string src_str, std::string target_str, std::string replace_substr);
 	void str_unsplit(const std::vector<std::string>& str_vec, std::string& output_str, char split_char);

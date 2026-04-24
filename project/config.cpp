@@ -1,5 +1,6 @@
 #include "config.h"
 #include "core/error.h"
+#include "core/util.h"
 #include "core/file_util.h"
 
 #include <iostream>
@@ -79,12 +80,9 @@ void Config::parse_config_contents(const std::vector<std::string>& file_contents
 
 		entry_vec.push_back(entry);
 	}
-
-	display_info();
-
 }
 
-void Config::read_config(const std::string& config_path) {
+core::Error Config::read_config(const std::string& config_path) {
 	std::vector<std::string> file_vec;
 	std::string current_line;
 
@@ -96,9 +94,46 @@ void Config::read_config(const std::string& config_path) {
 
 	if (error.exists()) {
 		std::cout << "Error getting file contents\n";
-		return;
+		return error;
 	}
 
 	parse_config_contents(file_vec);
+
+	return core::Error(core::ErrorType::Clear);
+}
+
+core::Error Config::save_config(const Values& values) {
+	using Theme = core::CssProvider::Theme;
+	std::ofstream stream(values.config_path);
+
+	std::string output_str;
+
+	output_str = "theme: ";
+
+
+
+	switch(values.theme) {
+		case Theme::Light:
+			output_str += "Light";
+			break;
+		case Theme::Dark:
+			output_str += "Dark";
+			break;
+		default:
+			break;
+	}
+
+
+	std::cout << output_str << "\n";
+
+
+	stream << output_str;
+
+
+	stream.close();
+
+	return core::Error(core::ErrorType::Clear);
+
+
 }
 }

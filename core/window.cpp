@@ -42,10 +42,11 @@ Window::Window(GtkApplication* gtk_app_ptr, const std::string& title) {
 	sig_handler.add_signal(S_WINDOW_CLOSE);
 
 	g_signal_connect(this->_gtk_window, "close-request", G_CALLBACK(process_close_request), this);
+	css_provider.attach_gtk_widget(_gtk_window);
+	css_provider.load_file("window.css");
+	css_provider.load_class("MyWin");
 	//std::cout << "This is the window address: " << this << "\n";
-	
 
-	_css_provider.load_file("window.css", _gtk_window);
 }
 
 Window::~Window() {

@@ -194,7 +194,6 @@ Note* NoteContainer::get_note_entry() {
 		old_note = &_note_arr[i];
 
 		int month_dist = calculate_month_distance(_save_anchor, old_note->date);
-		std::cout << "month dist" << month_dist << "\n";
 
 		if (month_dist > MONTH_SEEK_COUNT) {
 			new_note = old_note;
@@ -271,7 +270,6 @@ core::Error NoteContainer::save_notes(short save_count) {
 
 		csv_map_vec.push_back(core::csv::Entry());
 		core::csv::Entry& entry = csv_map_vec.back();
-		note.display_info();
 
 		entry.add("Day",  std::to_string(note.date.day));	
 		entry.add("Month", std::to_string(note.date.month));	
@@ -325,7 +323,6 @@ core::Error NoteContainer::load_new_notes() {
 			continue;	
 		}
 
-		note.display_info();
 		add_note(note);
 	}
 

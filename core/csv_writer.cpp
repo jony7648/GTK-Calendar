@@ -68,7 +68,6 @@ Writer::Writer(const std::string& file_path, const std::vector<std::string>& hea
 	_file_path = file_path;	
 	_header_vec = header_vec;
 	_nug = &header_vec.at(3);
-	std::cout << "Vector addr: " << &_header_vec << " | Internal Data: " << _header_vec.data() << " | Size: " << _header_vec.size() << std::endl;
 }
 
 Writer::~Writer() {
@@ -115,7 +114,6 @@ void Writer::parse_csv_line(std::vector<Entry>& data_vec, std::string csv_line, 
 		bool is_new_line = curr_char == '\\' && i < line_len - 1 && csv_line.at(i+1) == 'n';
 
 		if (is_new_line) {
-			std::cout << "is new line!\n";
 			i++;
 		}
 		else if (curr_char == escape_char) {
@@ -145,7 +143,6 @@ void Writer::parse_csv_line(std::vector<Entry>& data_vec, std::string csv_line, 
 	
 		if (should_split) {
 			copy_count = i - start_pos + copy_offset;
-			std::cout << "COPY COUNT" << copy_count << "\n";
 			sub_str = csv_line.substr(start_pos, copy_count);
 
 			sub_str = util::str_replace(sub_str, "\\n", "\n");
@@ -157,9 +154,6 @@ void Writer::parse_csv_line(std::vector<Entry>& data_vec, std::string csv_line, 
 			copy_offset = 0;
 		}
 	}
-
-
-	entry.display_info();
 }
 
 Entry* Writer::check_for_same_line(std::vector<Entry>& data_vec, const std::string& current_line) {
@@ -169,24 +163,17 @@ Entry* Writer::check_for_same_line(std::vector<Entry>& data_vec, const std::stri
 	std::vector<std::string> split_vec;
 
 	util::str_split(current_line, ',', split_vec);
-	util::display_vec_info(_header_vec);
 
 	for (Entry& entry : data_vec) {
-		entry.display_info();
-
 		entry_ptr = &entry;
 
 		for (int i=_same_check_start; i<_same_check_end; i++) {
 			found_csv_match = true;
-			std::cout << "this is the vec info" << _header_vec.size() << "\n";
 			const std::string& file_elem = split_vec.at(i);
 			const std::string& current_header = _header_vec.at(i);
 			const std::string& save_elem = entry.get(current_header);
 
-			std::cout << "Elem " << i << ": " << file_elem << "  "  << save_elem << "\n";
-
 			if (file_elem != save_elem) { 
-				std::cout << "Not Same!\n";
 				entry_ptr = nullptr;
 				break;
 			}
@@ -284,7 +271,6 @@ Error Writer::write_csv(std::vector<Entry>& data_vec) {
 
 	//change vec to std::vec<std::vec>>
 	util::sort_2d_vec(save_vec, 0, save_vec.size());
-	util::display_multivec_info(save_vec);
 
 
 	//write header line

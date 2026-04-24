@@ -62,6 +62,7 @@ public:
 
 	SigHandler<Window> sig_handler;
 
+	CssProvider css_provider;
 
 
 private:
@@ -75,6 +76,5 @@ private:
 	Type _type = Type::Sub;
 
 	GtkWidget* _gtk_window = nullptr;
-	CSSProvider _css_provider;
 };
 }

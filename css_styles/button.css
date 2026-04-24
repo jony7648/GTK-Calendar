@@ -1,4 +1,4 @@
-.Default1, .BlankState1, .ShadeButton1 {
+.LightDefault1, .BlankState1, .LightShadeButton1 {
 	font-size: 15px;
 	min-width: 10px;
 	min-height: 10px;
@@ -7,7 +7,7 @@
 	border: 1px solid;
 }
 
-.Default2, .BlankState2, .ShadeButton3 {
+.LightDefault2, .BlankState2, .LightShadeButton2 {
 	font-size: 23px;
 	min-width: 20px;
 	min-height: 20px;
@@ -16,31 +16,79 @@
 	border: 1px solid;
 }
 
-
-
-.Default, .BlankState, .ShadeButton {
-	font-size: 30px;
-	background-image: none;
-	background-color: white;
+.DarkDefault1 {
+	font-size: 23px;
+	min-width: 20px;
+	min-height: 20px;
+	background-color: #1c1a1a;
+	color: #ffffff;
 	border: 1px solid;
 }
 
-.Test {
-	background-color: gray;
+.DarkDefault2 {
+	font-size: 23px;
+	min-width: 20px;
+	min-height: 20px;
 	background-image: none;
-	color: black;
-	font-size: 30px;
+	background-color: #1c1a1a;
+	color: #ffffff;
+	border: 1px solid;
 }
 
-.Default:hover, .Default1:hover, .Default2:hover, .Default3:hover {
+
+
+.LightDefault, .DarkDefault, .Default, .BlankState, .LightShadeButton, .DarkShadeButton {
+	font-size: 30px;
+	background-image: none;
+	border: 1px solid;
+}
+
+
+.LightDefault, .Default, .BlankState, .ShadeButton {
+	background-color: white;
+}
+
+.DarkDefault, .DarkShadeButton {
+	color: #ffffff;
+}
+
+.LightDefault {
+	background-color: #ffffff;
+	color: #000000;
+}
+
+.LightDefault:hover, .LightDefault1:hover, .LightDefault2:hover, .LightDefault3:hover {
 	background-color: lightgray;
 }
 
-.Default:active, .Default1:active, .Default2:active, .Default3:active {
+.LightDefault:active, .LightDefault1:active, .LightDefault2:active, .LightDefault3:active {
 	background-color: gray;
 	border: 1px solid;
 }
 
-.ShadeButton, .ShadeButton1, .ShadeButton2, .ShadeButton3 {
+
+
+
+
+
+.LightShadeButton, .LightShadeButton1, .LightShadeButton2, .LightShadeButton3 {
 	background-color: gray;	
+	border: 1px solid;
+}
+
+.DarkShadeButton, .DarkShadeButton1, .DarkShadeButton2, .DarkShadeButton3 {
+	background-color: #101010;
+}
+
+
+
+.DarkDefault:hover, .DarkDefault1:hover, .DarkDefault2:hover, .DarkDefault3:hover,
+.DarkShadeButton1:hover, .DarkShadeButton1:hover, .DarkShadeButton2:hover, .DarkShadeButton3:hover {
+	background-color: #282626;
+}
+
+
+.DarkDefault:active, .DarkDefault1:active, .DarkDefault2:active, .DarkDefault3:active, .DarkShadeButton:active, .DarkShadeButton1:active, .DarkShadeButton2:active, .DarkShadeButton3:active {
+	background-color: black;
+	border: 1px solid;
 }

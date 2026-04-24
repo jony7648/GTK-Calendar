@@ -35,16 +35,6 @@ Widget::~Widget() {
 	}
 }
 
-Widget::Theme Widget::get_theme(const std::string& line) {
-	std::string line_cpy = util::copy_str_strip(line);
-
-	if (line_cpy == "dark") {
-		return Theme::Dark;
-	}
-
-	return Theme::Light;
-}
-
 void Widget::attach(Container* container) {
 	//std::cout << container->get_name() << "\n";
 	gtk_grid_attach(GTK_GRID(container->get_gtk_widget()), _gtk_widget, _grid_point.x, _grid_point.y, _scale.x, _scale.y);
@@ -63,57 +53,6 @@ void Widget::reattach() {
 
 void Widget::set_css_file_name(const std::string& css_path) {
 	_css_path = CSS_STYLES_DIR + css_path;
-}
-
-
-void Widget::apply_provider() {
-	//this function will style the widget based on the properties
-	//set in it's css file
-
-	if (_css_path.empty()) {
-		//std::cout << "ERROR: css_path not set!\n";
-		return;
-	}
-	
-	gtk_css_provider_load_from_path(_css_provider, _css_path.c_str());
-	gtk_style_context_add_provider_for_display(_default_display, GTK_STYLE_PROVIDER(_css_provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-}
-
-void Widget::load_css(const std::string& class_name, Theme theme) {
-	std::string theme_str = "";
-	
-	if (!_gtk_widget) {
-		std::cout << "ERROR: can't css style gtk_widget is a nullptr\n";
-		return;
-	}
-
-	if (!_css_provider) {
-		std::cout << "Error: _css_provider is a nullptr!\n";
-		return;
-	}
-
-	switch (theme) {
-		case Theme::Light:
-			theme_str = "Light";
-			break;
-		case Theme::Dark:
-			theme_str = "Dark";
-			break;
-		case Theme::None:
-			theme_str = "";
-			break;
-	}
-
-
-	gtk_widget_remove_css_class(_gtk_widget, _css_class.c_str());
-
-	_css_class = theme_str + class_name;
-	gtk_widget_add_css_class(_gtk_widget, _css_class.c_str());
-
-}
-
-const std::string& Widget::get_css_class() {
-	return _css_class;
 }
 
 void Widget::show() {
@@ -161,8 +100,7 @@ bool Widget::has_tag(const std::string& tag) {
 
 void Widget::set_gtk_widget(GtkWidget* gtk_widget) {
 	this->_gtk_widget = gtk_widget;
-	_css_provider = gtk_css_provider_new();
-	_default_display = gdk_display_get_default();
+	css_provider.attach_gtk_widget(gtk_widget);
 	//listener.set_parent_widget(this);
 	//listener.set_gtk_parent(gtk_widget);
 }
