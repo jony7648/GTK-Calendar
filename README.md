@@ -34,8 +34,6 @@ If you are using windows you can just download and install the precompiled build
 but if you are using Macos or Linux, or just want to play with the source code 
 you will need to compile from source.
 
-<br>
-
 You will first need to install the libraries required for building GTK apps, instructions can be found on the Official GTK site. After having installed the libraries required for gtk, run the following
 
 ```
