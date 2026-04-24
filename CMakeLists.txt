@@ -24,18 +24,32 @@ set(SIGNAL_COMPONETS "${CORE_DIR}/signal_handler.cpp")
 
 if (WIN32)
 	set(ICON_RESOURCE "${WIN_DIR}/icon.rc")
-endif()
 
-add_executable (
-	calendar 
-	main.cpp 
-	${DEBUG_COMPONETS} 
-	${CORE_COMPONETS} 
-	${SIGNAL_COMPONETS} 
-	${PROJECT_COMPONETS} 
-	${WIDGET_COMPONETS}
-	${ICON_RESOURCE}
-)
+	add_executable (
+		calendar 
+		WIN32
+		main.cpp 
+		${DEBUG_COMPONETS} 
+		${CORE_COMPONETS} 
+		${SIGNAL_COMPONETS} 
+		${PROJECT_COMPONETS} 
+		${WIDGET_COMPONETS}
+		${ICON_RESOURCE}
+		${OS}
+	)
+else()
+	add_executable (
+		calendar 
+		main.cpp 
+		${DEBUG_COMPONETS} 
+		${CORE_COMPONETS} 
+		${SIGNAL_COMPONETS} 
+		${PROJECT_COMPONETS} 
+		${WIDGET_COMPONETS}
+		${ICON_RESOURCE}
+		${OS}
+	)
+endif()
 
 target_compile_options(calendar PRIVATE ${GTK4_CFLAGS})
 target_compile_features(calendar PRIVATE cxx_std_20)
