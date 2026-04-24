@@ -36,8 +36,6 @@ CssProvider::Theme CssProvider::get_theme(const std::string& line) {
 		return Theme::Dark;
 	}
 
-	std::cout << "Lowered str: " <<line_cpy << "\n";
-
 	return Theme::Light;
 }
 
@@ -107,11 +105,9 @@ void CssProvider::reload_class(Theme theme) {
 void CssProvider::switch_light_and_dark() {
 	switch (_G_theme) {
 		case Theme::Light:
-			std::cout << "Dark Theme\n";
 			change_global_theme(Theme::Dark);
 			break;
 		case Theme::Dark:
-			std::cout << "Light Theme\n";
 			change_global_theme(Theme::Light);
 			break;
 		case Theme::None:
