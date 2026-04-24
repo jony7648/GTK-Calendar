@@ -197,8 +197,8 @@ Note* NoteContainer::get_note_entry() {
 
 		if (month_dist > MONTH_SEEK_COUNT) {
 			new_note = old_note;
-			std::cout << "found an old note to replace "<< "\n";
-			old_note->display_info();
+			//std::cout << "found an old note to replace "<< "\n";
+			//old_note->display_info();
 			break;
 		}
 
@@ -281,7 +281,7 @@ core::Error NoteContainer::save_notes(short save_count) {
 	//fix the csv writer as it can only save a single note at a time
 
 	_p_csv_writer->write_csv(csv_map_vec);
-	std::cout << "WE ARE ABOUT TO SAVE " << going_to_save_count << " notes!\n";
+	//std::cout << "WE ARE ABOUT TO SAVE " << going_to_save_count << " notes!\n";
 
 	return core::Error(core::ErrorType::Clear);
 }

@@ -31,7 +31,6 @@ Label::~Label() {
 void Label::set_font_size(int font_size) {
 	if (font_size > MAX_FONT_SIZE) {
 		std::cout << "ERROR: font size for is to big! Max Size is: " << MAX_FONT_SIZE << " " << "Widget info displayed below...\n";
-		display_info();
 	}
 
 	this->font_size = font_size;

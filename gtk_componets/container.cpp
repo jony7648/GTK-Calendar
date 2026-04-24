@@ -24,7 +24,6 @@ bool ContainerIterator::operator==(ContainerIterator it) {
 	}
 
 	if ((iter_level == 0 && container_map[0].index >= widget_vector.size())) {
-		std::cout << "Time to done\n";
 		return true;
 	}
 

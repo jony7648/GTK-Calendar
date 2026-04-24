@@ -122,7 +122,6 @@ void CssProvider::switch_light_and_dark() {
 void CssProvider::change_global_theme(Theme theme) {
 	_G_theme = theme;
 
-		std::cout << "\n\n\nreload time\n";
 	for (CssProvider* p_provider : provider_ptr_vec) {
 		if (!p_provider) {
 			std::cout << "Cannot change all provider themes as one is a nullptr\n";
@@ -131,9 +130,6 @@ void CssProvider::change_global_theme(Theme theme) {
 
 		p_provider->reload_class(theme);
 	}
-
-	std::cout << "Theme: " << (int)theme << "\n";
-	std::cout << "Size: " << provider_ptr_vec.size() << "\n";
 }
 }
 

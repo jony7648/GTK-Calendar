@@ -32,7 +32,6 @@ public:
 	};
 
 	App(const std::string& title, const space::Point& dimensions,  int argc, char* argv[]);
-	~App();
 	//bool process_close_request(GtkWidget* gtk_widget, gpointer user_data);
 	void run(void(*activate_func)(GtkApplication*, gpointer), void* activate_signal);
 	void close();

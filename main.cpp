@@ -53,76 +53,6 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	app->display_main_window();
 }
 
-void load_save_data(data::NoteContainer& note_container, core::csv::Writer& csv_writer) {
-	std::vector<core::csv::Entry> data_map_vector;
-
-	csv_writer.read_csv(data_map_vector);
-
-	try {
-		for (core::csv::Entry& entry : data_map_vector) {
-			data::Note note;
-
-			note.date.day = stoi(entry.get("Day"));
-			note.date.month = stoi(entry.get("Month"));
-			note.date.year = stoi(entry.get("Year"));
-			note.text = entry.get("Note");
-			
-			note_container.add_note(note);
-		}
-	}
-
-
-	catch (std::exception& e) {
-		std::cout << "File failed to load, likely due to bad formatting!\n";
-	}
-}
-
-void save_app_data(data::NoteContainer& note_container, core::csv::Writer& csv_writer, int save_count=-1) {
-	std::vector<core::csv::Entry> csv_map_vec;
-
-	int going_to_save_count = 0;
-	for (data::Note& note : note_container) {
-		if (save_count == 0) {
-			break;
-		}
-		going_to_save_count++;
-
-		save_count--;
-
-		if (!note.should_save) {
-			//std::cout << "SHOULD NOT SAVE\n";
-			//note.display_info();
-			//std::cout << "\n\n";
-			continue;
-		}
-
-		csv_map_vec.push_back(core::csv::Entry());
-		core::csv::Entry& entry = csv_map_vec.back();
-
-		entry.add("Day",  std::to_string(note.date.day));	
-		entry.add("Month", std::to_string(note.date.month));	
-		entry.add("Year", std::to_string(note.date.year));	
-		entry.add("Note", note.text);	
-
-	}
-
-	//fix the csv writer as it can only save a single note at a time
-
-	csv_writer.write_csv(csv_map_vec);
-	std::cout << "WE ARE ABOUT TO SAVE " << going_to_save_count << " notes!\n";
-}
-
-void signal_persist_data_note_released(core::EmitData<data::NoteContainer>& emit_data) {
-	data::NoteContainer* note_container = emit_data.holder;
-	core::csv::Writer* csv_writer = static_cast<core::csv::Writer*>(emit_data.receiver);
-	auto* sig_data = static_cast<data::NoteContainer::SigNotesReleased*>(emit_data.sig_data);
-
-	std::cout << "Hit the signal time to save now\n";
-
-	//save_app_data(*note_container, *csv_writer, sig_data->save_count);
-
-}
-
 int main(int argc, char *argv[]) {
 	core::set_errors(); //set error type messages
 	std::string config_path = "config.cfg";
@@ -136,18 +66,6 @@ int main(int argc, char *argv[]) {
 	data::NoteContainer& note_container = persist_data.get_note_container();
 	core::csv::Writer csv_writer(save_path, csv_header);
 	csv_writer.set_equivalnce_bounds(0, 3);
-
-
-	note_container.sig_handler.add_emit_func (
-		data::NoteContainer::S_NotesReleased,
-		signal_persist_data_note_released,
-		&csv_writer
-	);
-
-
-	//load_save_data(persist_data.get_note_container(), csv_writer);
-
-	
 
 	space::Point win_dimensions = {
 		.x = 1200,
@@ -174,8 +92,6 @@ int main(int argc, char *argv[]) {
 		.persist_data = &persist_data,
 		.config = config,
 	};
-
-
 
 	app.run(&activate, &activate_signal);
 	note_container.save_notes();

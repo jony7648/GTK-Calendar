@@ -123,13 +123,7 @@ core::Error Config::save_config(const Values& values) {
 			break;
 	}
 
-
-	std::cout << output_str << "\n";
-
-
 	stream << output_str;
-
-
 	stream.close();
 
 	return core::Error(core::ErrorType::Clear);

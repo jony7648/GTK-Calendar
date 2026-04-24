@@ -22,7 +22,6 @@ void set_stream_start_line(std::fstream& stream, int line) {
 
 core::Error get_file_contents(std::ifstream& file_stream, std::vector<std::string>& line_vector) {
 	if (file_stream.is_open() == false) {
-		std::cout << "ERROR: file is not open!\n";
 		return core::Error(core::ErrorType::FileOpenFail);
 	}
 
@@ -40,7 +39,6 @@ core::Error get_file_contents(std::ifstream& file_stream, std::vector<std::strin
 
 core::Error get_file_contents(std::fstream& file_stream, std::vector<std::string>& line_vector) {
 	if (file_stream.is_open() == false) {
-		std::cout << "ERROR: file is not open!\n";
 		return core::Error(core::ErrorType::FileOpenFail);
 	}
 
@@ -51,7 +49,6 @@ core::Error get_file_contents(std::fstream& file_stream, std::vector<std::string
 
 
 	while (getline(file_stream, current_line)) {
-		std::cout << current_line.length() << "\n";
 		line_vector.push_back(current_line);
 	}
 

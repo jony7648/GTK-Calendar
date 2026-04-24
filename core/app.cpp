@@ -71,8 +71,6 @@ void signal_subwin_close(core::EmitData<core::Window> emit_data) {
 void signal_end_app(core::EmitData<core::Window> emit_data) {
 	core::App* app = static_cast<core::App*>(emit_data.receiver);
 
-	std::cout << "Time to close the app\n";
-
 	app->close();
 }
 
@@ -90,17 +88,6 @@ App::App(const std::string& app_title, const space::Point& dimensions, int argc,
 	sig_handler.add_signal(S_SUBWIN_CLOSE);
 }
 
-App::~App() {
-	for (auto& win : subwin_vect) {
-		//delete win;
-	}
-
-
-	//delete main_window;
-	//g_object_unref(gtk_app);
-}
-
-
 Error App::attach_main_window(Window* window) {
 	if (window == nullptr) {
 		return Error(ErrorType::Nullptr);
@@ -111,7 +98,6 @@ Error App::attach_main_window(Window* window) {
 	window->set_attached_state();
 	window->set_type(Window::Type::Main);
 	//S_window_end_program.pickup_signal(&window->S_end_program);
-	std::cout << "ID before being bassed " << core::Window::S_END_PROGRAM << "\n";
 	window->sig_handler.add_emit_func(core::Window::S_END_PROGRAM, signal_end_app, this);
 	return Error(ErrorType::Clear);
 }
