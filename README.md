@@ -28,7 +28,9 @@ This calendar features both a light and a dark theme allowing users of either pr
 
 <h3>Compilation</h3>
 
-If you are using windows you can just download and install the precompiled build,
+If you are using windows you can just download and install the precompiled build by clicking 
+<a href="https://github.com/jony7648/GTK-Calendar/releases/">here</a>
+
 but if you are using Macos or Linux, or just want to play with the source code 
 you will need to compile from source.
 
