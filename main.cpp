@@ -15,7 +15,7 @@
 
 #include <gtk/gtk.h>
 
-const bool DEBUG = false;
+bool G_Debug = false;
 
 void activate(GtkApplication* gtk_app, gpointer user_data) {
 	std::string title = "Calendar";
@@ -44,7 +44,7 @@ void activate(GtkApplication* gtk_app, gpointer user_data) {
 	//subwin->display(note_scene);
 
 	//do debug stuff
-	if (DEBUG) {
+	if (G_Debug) {
 		debug_scene = project::create_debug_scene(signal_data);
 		app->attach_sub_scene(debug_scene);
 		app->request_subwin(*debug_scene, nullptr);
@@ -58,6 +58,11 @@ int main(int argc, char *argv[]) {
 	std::string config_path = "config.cfg";
 
 	project::Config config(config_path);
+
+	if (argc > 1 && std::string(argv[1]) == "-debug") {
+		G_Debug = true;
+	}
+
 
 	std::vector<std::string> csv_header = {"Year", "Month", "Day", "Note"};
 	std::string save_path = "calendar_save.csv";
