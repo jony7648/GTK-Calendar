@@ -6,7 +6,7 @@
 <h3>Overview</h3>
 This application is a calendar built with the GTK framework. 
 The application allows you to scroll through the various months
-of the year and see which weekdays certain date occur on.
+of the year and see which weekdays certain dates occur on.
 
 <br>
 <h3>Notes</h3>
@@ -20,7 +20,7 @@ or just to have tasks planned for a future date.
 
 <br>
 <h3>Themes</h3>
-This calendar features both a light and a dark theme allowing both primrily light and dark users can enjoy using the application!
+This calendar features both a light and a dark theme allowing users of either prefrence to enjoy using the application!
 <br><br><br>
 
 <img width="469" height="313" alt="Screenshot 2026-04-24 at 11 22 11" src="https://github.com/user-attachments/assets/b1b4ef35-705e-4905-9676-68a1bb8e1a04" />
@@ -28,13 +28,13 @@ This calendar features both a light and a dark theme allowing both primrily ligh
 
 <h3>Compilation</h3>
 
-If you are using windows you can just download and install the precompiled build,
+If you are using windows you can just download and install the precompiled build by clicking 
+<a href="https://github.com/jony7648/GTK-Calendar/releases/">here</a>
+
 but if you are using Macos or Linux, or just want to play with the source code 
-you will need to compile the app.
+you will need to compile from source.
 
-<br>
-
-After having installed the libraries required for gtk, run the following
+You will first need to install the libraries required for building GTK apps, instructions can be found on the Official GTK site. After having installed the libraries required for gtk, run the following
 
 ```
 git clone https://github.com/jony7648/GTK-Calendar.git
